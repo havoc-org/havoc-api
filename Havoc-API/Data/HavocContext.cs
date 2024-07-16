@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using Havoc_API.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Havoc_API.Models;
+
+namespace Havoc_API.Data;
 
 public partial class HavocContext : DbContext
 {
@@ -31,9 +33,9 @@ public partial class HavocContext : DbContext
 
     public virtual DbSet<Tag> Tags { get; set; }
 
-    public virtual DbSet<Task> Tasks { get; set; }
+    public virtual DbSet<Models.Task> Tasks { get; set; }
 
-    public virtual DbSet<TaskStatus> TaskStatuses { get; set; }
+    public virtual DbSet<Models.TaskStatus> TaskStatuses { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
 
@@ -195,7 +197,7 @@ public partial class HavocContext : DbContext
             entity.HasMany(d => d.Tasks).WithMany(p => p.Tags)
                 .UsingEntity<Dictionary<string, object>>(
                     "TaskTag",
-                    r => r.HasOne<Task>().WithMany()
+                    r => r.HasOne<Models.Task>().WithMany()
                         .HasForeignKey("TaskId")
                         .OnDelete(DeleteBehavior.ClientSetNull)
                         .HasConstraintName("Type_Task"),
@@ -210,7 +212,7 @@ public partial class HavocContext : DbContext
                     });
         });
 
-        modelBuilder.Entity<Task>(entity =>
+        modelBuilder.Entity<Models.Task>(entity =>
         {
             entity.HasKey(e => e.TaskId).HasName("Task_pk");
 
@@ -241,7 +243,7 @@ public partial class HavocContext : DbContext
                 .HasConstraintName("Task_TaskStatus");
         });
 
-        modelBuilder.Entity<TaskStatus>(entity =>
+        modelBuilder.Entity<Models.TaskStatus>(entity =>
         {
             entity.HasKey(e => e.TaskStatusId).HasName("TaskStatus_pk");
 
