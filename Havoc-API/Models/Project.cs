@@ -1,33 +1,59 @@
-﻿using System;
+﻿using Havoc_API.Exceptions;
+using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace Havoc_API.Models;
 
 public partial class Project
 {
-    public int ProjectId { get; set; }
 
-    public string Name { get; set; } = null!;
 
-    public string? Description { get; set; }
+    public int ProjectId { get; private set; }
 
-    public byte[]? Background { get; set; }
+    public string Name { get; private set; } = null!;
 
-    public int CreatorId { get; set; }
+    public string? Description { get; private set; }
 
-    public DateTime? Start { get; set; }
+    public byte[]? Background { get; private set; }
 
-    public DateTime? Deadline { get; set; }
+    public int CreatorId { get; private set; }
 
-    public DateTime LastModified { get; set; }
+    public DateTime? Start { get; private set; }
 
-    public int ProjectStatusId { get; set; }
+    public DateTime? Deadline { get; private set; }
 
-    public virtual User Creator { get; set; } = null!;
+    public DateTime LastModified { get; private set; }
 
-    public virtual ICollection<Participation> Participations { get; set; } = new List<Participation>();
+    public int ProjectStatusId { get; private set; }
 
-    public virtual ProjectStatus ProjectStatus { get; set; } = null!;
+    public virtual User Creator { get; private set; } = null!;
 
-    public virtual ICollection<Task> Tasks { get; set; } = new List<Task>();
+    public virtual ICollection<Participation> Participations { get; private set; } = new List<Participation>();
+
+    public virtual ProjectStatus ProjectStatus { get; private set; } = null!;
+
+    public virtual ICollection<Task> Tasks { get; private set; } = new List<Task>();
+
+    private Project() { }
+
+    public Project(string Name,string? Description, byte[]? Background, DateTime? Start, DateTime? Deadline, User Creator, ProjectStatus ProjectStatus)
+    {
+        if (Name.Length > 25)
+            throw new StringLengthException(nameof(Name));
+        else if (Description != null && Description.Length>200)
+            throw new StringLengthException(nameof(Description));
+
+        this.Name = Name;
+        this.Description = Description; 
+        this.Background = Background;   
+        this.CreatorId = Creator.UserId; 
+        this.Start = Start; 
+        this.Deadline = Deadline;
+        this.LastModified = DateTime.Now;
+        this.ProjectStatusId = ProjectStatus.ProjectStatusId;
+        this.ProjectStatus = ProjectStatus;
+        this.Creator=Creator;
+    }
+
 }

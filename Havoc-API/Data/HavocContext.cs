@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Havoc_API.Data;
 
-public partial class HavocContext : DbContext
+public partial class HavocContext : DbContext, IHavocContext
 {
     public HavocContext()
     {
@@ -39,10 +39,7 @@ public partial class HavocContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Data Source=sql.bsite.net\\MSSQL2016;User ID=havoc_;Password=admin;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False");
-
+   
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Assignment>(entity =>
@@ -276,6 +273,9 @@ public partial class HavocContext : DbContext
 
         OnModelCreatingPartial(modelBuilder);
     }
-
+    public async Task<int> SaveChangesAsync()
+    {
+        return await base.SaveChangesAsync();
+    }
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }
