@@ -7,6 +7,6 @@ namespace Havoc_API.Services
     public interface IProjectService
     {
         public Task<int> addProject(ProjectPOST project);
-        public Task<List<Project>> getProjects();
+        public Task<List<ProjectGET>> getProjects();
     }
 }

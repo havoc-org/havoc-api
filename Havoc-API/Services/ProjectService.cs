@@ -1,6 +1,8 @@
 ﻿    using Havoc_API.Data;
     using Havoc_API.Models;
     using Havoc_API.Models.DTOs.Project;
+using Havoc_API.Models.DTOs.ProjectStatus;
+using Havoc_API.Models.DTOs.User;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -40,10 +42,28 @@ namespace Havoc_API.Services
             }
                 
             }
-            public async Task<List<Project>> getProjects()
+            public async Task<List<ProjectGET>> getProjects()
             {
-            
-                return await _havocContext.Projects.ToListAsync();
+                var project= await _havocContext.Projects.Select(o=>new ProjectGET(
+                    o.ProjectId,
+                    o.Name,
+                    o.Description,
+                    o.Background,
+                    o.Start,
+                    o.Deadline,
+                    o.LastModified,
+                    new UserGET(
+                        o.Creator.UserId,
+                        o.Creator.FirstName,
+                        o.Creator.LastName,
+                        o.Creator.Email,
+                        o.Creator.Password
+                        ),
+                    new ProjectStatusGET(
+                        o.ProjectStatus.ProjectStatusId,
+                        o.ProjectStatus.Name)
+                    )).ToListAsync();
+                return project;
             }
 
         }
