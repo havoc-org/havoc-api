@@ -6,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddScoped<IProjectService, ProjectService>();
+builder.Services.AddScoped<IParticipationService, ParticipationService>();
 builder.Services.AddScoped<IHavocContext, HavocContext>();
 
 builder.Services.AddControllers();

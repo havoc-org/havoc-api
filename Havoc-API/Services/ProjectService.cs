@@ -14,13 +14,15 @@ namespace Havoc_API.Services
     public class ProjectService : IProjectService
     {
         private readonly IHavocContext _havocContext;
-        public ProjectService(IHavocContext context)
+        private readonly IParticipationService _participationService;
+        public ProjectService(IHavocContext context, IParticipationService participationService)
         {
             _havocContext = context;
+            _participationService = participationService;
         }
 
 
-        public async Task<int> addProject(ProjectPOST project)
+        public async Task<int> addProjectAsync(ProjectPOST project)
         {
 
             using (var transaction = _havocContext.Database.BeginTransaction())
@@ -45,22 +47,9 @@ namespace Havoc_API.Services
 
                 foreach (var par in project.Participations)
                 {
-                    var existingParticipation = await _havocContext.Participations.FindAsync(newProject.ProjectId, par.UserId);
-                    if (existingParticipation != null)
-                        throw new Exception("This participation already exists userID: " + existingParticipation.UserId + " projectID: " + existingParticipation.ProjectId);
                     var devRole = await _havocContext.Roles.Where(r => r.Name == "Developer").FirstAsync();
-                    if (devRole == null)
-                        throw new Exception("Role not found");
 
-                    var user = await _havocContext.Users.FindAsync(par.UserId);
-                    if (user == null)
-                        throw new Exception("User not found");
-
-                    await _havocContext.Participations.AddAsync(new Participation(
-                        newProject,
-                        devRole,
-                        user
-                        ));
+                    await _participationService.addParticipationAsync(new ParticipationPOST(newProject.ProjectId,par.UserId,devRole.RoleId));
                 }
 
                 await _havocContext.SaveChangesAsync();
@@ -70,7 +59,7 @@ namespace Havoc_API.Services
             }
 
         }
-        public async Task<List<ProjectGET>> getProjects()
+        public async Task<List<ProjectGET>> getProjectsAsync()
         {
             
             var project = await _havocContext.Projects.Select(o => new ProjectGET(

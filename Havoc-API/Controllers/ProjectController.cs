@@ -19,14 +19,14 @@ namespace Havoc_API.Controllers
         [HttpGet]
         public async Task<ActionResult> getProjects()
         {
-            return Ok(await _projectService.getProjects());
+            return Ok(await _projectService.getProjectsAsync());
         }
         [HttpPost]
         public async Task<ActionResult> addProject(ProjectPOST newProject)
         {
             try
             {
-                return Ok(await _projectService.addProject(newProject));
+                return Ok(await _projectService.addProjectAsync(newProject));
             }
             catch (Exception ex)
             {
