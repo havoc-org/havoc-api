@@ -55,5 +55,14 @@ public partial class Project
         this.ProjectStatus = ProjectStatus;
         this.Creator=Creator;
     }
-
+    /*public void addParticipations(ICollection<Participation> Participations)
+    {
+        foreach (var participation in Participations)
+        {
+            if (this.Participations.Contains(participation))
+                throw new Exception("This participation already exists userID: "+participation.UserId+" projectID: "+participation.ProjectId);
+            this.Participations.Add(participation);
+            
+        }
+    }*/
 }

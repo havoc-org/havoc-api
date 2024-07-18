@@ -1,4 +1,5 @@
-﻿using Havoc_API.Models.DTOs.ProjectStatus;
+﻿using Havoc_API.Models.DTOs.Participation;
+using Havoc_API.Models.DTOs.ProjectStatus;
 using System.ComponentModel.DataAnnotations;
 
 namespace Havoc_API.Models.DTOs.Project
@@ -20,7 +21,7 @@ namespace Havoc_API.Models.DTOs.Project
 
         public virtual ProjectStatusPOST ProjectStatus { get; set; } = null!;
 
-        //public virtual ICollection<Participation> Participations { get; set; } = new List<Participation>();
+        public virtual ICollection<NewProjectParticipationPOST> Participations { get; set; } = new List<NewProjectParticipationPOST>();
 
         //public virtual ICollection<Task> Tasks { get; set; } = new List<Task>();
 

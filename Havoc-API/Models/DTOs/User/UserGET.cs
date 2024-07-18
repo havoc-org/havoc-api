@@ -10,15 +10,12 @@
 
         public string Email { get; private set; } = null!;
 
-        public string Password { get; private set; } = null!;
-
-        public UserGET(int userId, string firstName, string lastName, string email, string password)
+        public UserGET(int userId, string firstName, string lastName, string email)
         {
             UserId = userId;
             FirstName = firstName;
             LastName = lastName;
             Email = email;
-            Password = password;
         }
     }
 }

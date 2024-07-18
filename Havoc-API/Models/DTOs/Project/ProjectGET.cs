@@ -1,4 +1,5 @@
 ﻿
+using Havoc_API.Models.DTOs.Participation;
 using Havoc_API.Models.DTOs.ProjectStatus;
 using Havoc_API.Models.DTOs.User;
 namespace Havoc_API.Models.DTOs.Project
@@ -22,17 +23,19 @@ namespace Havoc_API.Models.DTOs.Project
         public virtual UserGET Creator { get; private set; } = null!;
 
         public virtual ProjectStatusGET ProjectStatus { get; private set; } = null!;
-        public ProjectGET(int projectId, string name, string? description, byte[]? background, DateTime? start, DateTime? deadline, DateTime lastModified, UserGET creator, ProjectStatusGET projectStatus)
+        public virtual ICollection<ParticipationGET> Participations { get; private set; } = new List<ParticipationGET>();
+        public ProjectGET(int projectId, string name, string? description, byte[]? background, DateTime? start, DateTime? deadline, DateTime lastModified, UserGET creator, ProjectStatusGET projectStatus, ICollection<ParticipationGET> participations)
         {
-            ProjectId = projectId;
-            Name = name;
-            Description = description;
-            Background = background;
-            Start = start;
-            Deadline = deadline;
-            LastModified = lastModified;
-            Creator = creator;
-            ProjectStatus = projectStatus;
+            this.ProjectId = projectId;
+            this.Name = name;
+            this.Description = description;
+            this.Background = background;
+            this.Start = start;
+            this.Deadline = deadline;
+            this.LastModified = lastModified;
+            this.Creator = creator;
+            this.ProjectStatus = projectStatus;
+            this.Participations = participations;
         }
     }
 }
