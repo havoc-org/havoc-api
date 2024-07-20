@@ -1,4 +1,4 @@
-﻿using Havoc_API.Models.DTOs.Participation;
+﻿using Havoc_API.DTOs.Participation;
 
 namespace Havoc_API.Services
 {

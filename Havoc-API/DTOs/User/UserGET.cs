@@ -1,8 +1,11 @@
-﻿namespace Havoc_API.Models.DTOs.User
+﻿using Havoc_API.DTOs.Role;
+using System.Data;
+
+namespace Havoc_API.DTOs.User
 {
     public class UserGET
     {
-        public int UserId { get;private set; }
+        public int UserId { get; private set; }
 
         public string FirstName { get; private set; } = null!;
 
@@ -12,6 +15,7 @@
 
         public UserGET(int userId, string firstName, string lastName, string email)
         {
+
             UserId = userId;
             FirstName = firstName;
             LastName = lastName;

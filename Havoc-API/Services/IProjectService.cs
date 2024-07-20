@@ -1,5 +1,5 @@
-﻿using Havoc_API.Models;
-using Havoc_API.Models.DTOs.Project;
+﻿using Havoc_API.DTOs.Project;
+using Havoc_API.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Havoc_API.Services

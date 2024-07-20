@@ -1,4 +1,4 @@
-﻿namespace Havoc_API.Models.DTOs.ProjectStatus
+﻿namespace Havoc_API.DTOs.ProjectStatus
 {
     public class ProjectStatusGET
     {

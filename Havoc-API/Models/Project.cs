@@ -43,6 +43,12 @@ public partial class Project
             throw new StringLengthException(nameof(Name));
         else if (Description != null && Description.Length>200)
             throw new StringLengthException(nameof(Description));
+        else if(Start>Deadline)
+            throw new WrongDateException("Start is after deadline");
+        else if (Start < DateTime.Now)
+            throw new WrongDateException(nameof(Start)+": "+Start);
+        else if (Deadline < DateTime.Now)
+            throw new WrongDateException(nameof(Deadline) + ": " + Deadline);
 
         this.Name = Name;
         this.Description = Description; 

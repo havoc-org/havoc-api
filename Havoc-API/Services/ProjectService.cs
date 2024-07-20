@@ -1,11 +1,10 @@
 ﻿using Havoc_API.Data;
+using Havoc_API.DTOs.Project;
 using Havoc_API.Models;
-using Havoc_API.Models.DTOs.Participation;
-using Havoc_API.Models.DTOs.Project;
-using Havoc_API.Models.DTOs.ProjectStatus;
-using Havoc_API.Models.DTOs.Role;
-using Havoc_API.Models.DTOs.User;
-using Microsoft.AspNetCore.Mvc;
+using Havoc_API.DTOs.Participation;
+using Havoc_API.DTOs.ProjectStatus;
+using Havoc_API.DTOs.Role;
+using Havoc_API.DTOs.User;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
@@ -62,36 +61,36 @@ namespace Havoc_API.Services
         public async Task<List<ProjectGET>> getProjectsAsync()
         {
             
-            var project = await _havocContext.Projects.Select(o => new ProjectGET(
-                o.ProjectId,
-                o.Name,
-                o.Description,
-                o.Background,
-                o.Start,
-                o.Deadline,
-                o.LastModified,
+            var project = await _havocContext.Projects.Select(project => new ProjectGET(
+                project.ProjectId,
+                project.Name,
+                project.Description,
+                project.Background,
+                project.Start,
+                project.Deadline,
+                project.LastModified,
                 new UserGET(
-                    o.Creator.UserId,
-                    o.Creator.FirstName,
-                    o.Creator.LastName,
-                    o.Creator.Email
+                    project.Creator.UserId,
+                    project.Creator.FirstName,
+                    project.Creator.LastName,
+                    project.Creator.Email
                     ),
                 new ProjectStatusGET(
-                    o.ProjectStatus.ProjectStatusId,
-                    o.ProjectStatus.Name
+                    project.ProjectStatus.ProjectStatusId,
+                    project.ProjectStatus.Name
                     ),
-                 _havocContext.Participations.Where(p => p.ProjectId == o.ProjectId)
-                                             .Select(p => new ParticipationGET(
-                    p.ProjectId,
-                    new RoleGET(
-                        p.Role.RoleId,
-                        p.Role.Name
-                        ),
-                    new UserGET(
-                        p.User.UserId,
-                        p.User.FirstName,
-                        p.User.LastName,
-                        p.User.Email
+                 _havocContext.Participations.Where(par => par.ProjectId == project.ProjectId)
+                                             .Select(par => new ParticipationGET(
+                    par.ProjectId,
+                    new UserParticipationGET(
+                        par.User.UserId,
+                        par.User.FirstName,
+                        par.User.LastName,
+                        par.User.Email,
+                        new RoleGET(
+                        par.Role.RoleId,
+                        par.Role.Name
+                        )
                         )
                 )).ToList()
                 

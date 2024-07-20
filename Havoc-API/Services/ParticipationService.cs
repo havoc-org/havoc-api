@@ -1,8 +1,8 @@
 ﻿using Havoc_API.Data;
+using Havoc_API.DTOs.Participation;
 using Havoc_API.Models;
-using Havoc_API.Models.DTOs.Participation;
-using Havoc_API.Models.DTOs.Role;
-using Havoc_API.Models.DTOs.User;
+using Havoc_API.DTOs.Role;
+using Havoc_API.DTOs.User;
 using Microsoft.EntityFrameworkCore;
 
 namespace Havoc_API.Services
@@ -46,15 +46,15 @@ namespace Havoc_API.Services
            return await _havocContext.Participations.Where(p => p.ProjectId == projectId)
                                              .Select(p => new ParticipationGET(
                     p.ProjectId,
-                    new RoleGET(
-                        p.Role.RoleId,
-                        p.Role.Name
-                        ),
-                    new UserGET(
+                    new UserParticipationGET(
                         p.User.UserId,
                         p.User.FirstName,
                         p.User.LastName,
-                        p.User.Email
+                        p.User.Email,
+                        new RoleGET(
+                        p.Role.RoleId,
+                        p.Role.Name
+                        )
                         )
                 )).ToListAsync();
         }

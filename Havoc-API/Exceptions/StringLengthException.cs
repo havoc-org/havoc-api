@@ -1,4 +1,6 @@
-﻿namespace Havoc_API.Exceptions
+﻿using WarehouseApp2.Exceptions;
+
+namespace Havoc_API.Exceptions
 {
-    public class StringLengthException(Object o) : Exception("Wrong argument legth: " + o);
+    public class StringLengthException(Object o) :DomainException("Wrong argument legth: " + o);
 }

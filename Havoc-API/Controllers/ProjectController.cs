@@ -1,4 +1,4 @@
-﻿using Havoc_API.Models.DTOs.Project;
+﻿using Havoc_API.DTOs.Project;
 using Havoc_API.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

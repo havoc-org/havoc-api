@@ -1,4 +1,4 @@
-﻿namespace Havoc_API.Models.DTOs.Participation
+﻿namespace Havoc_API.DTOs.Participation
 {
     public class ParticipationPOST
     {
@@ -15,7 +15,7 @@
             ProjectId = projectId;
             UserId = userId;
             RoleId = roleId;
-            
+
         }
     }
 }

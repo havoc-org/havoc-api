@@ -1,8 +1,8 @@
-﻿using Havoc_API.Models.DTOs.Participation;
-using Havoc_API.Models.DTOs.ProjectStatus;
+﻿using Havoc_API.DTOs.Participation;
+using Havoc_API.DTOs.ProjectStatus;
 using System.ComponentModel.DataAnnotations;
 
-namespace Havoc_API.Models.DTOs.Project
+namespace Havoc_API.DTOs.Project
 {
     public class ProjectPOST
     {
