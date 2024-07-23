@@ -1,12 +1,16 @@
-﻿namespace Havoc_API.DTOs.Participation
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Havoc_API.DTOs.Participation
 {
     public class NewProjectParticipationPOST
     {
-        public int UserId { get; private set; }
+        [Required][MaxLength(100)]
+        [RegularExpression(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", ErrorMessage = "The Email field is not a valid e-mail address.")]
+        public string Email  { get; private set; }
         private NewProjectParticipationPOST() { }
-        public NewProjectParticipationPOST(int userId)
+        public NewProjectParticipationPOST(string email)
         {
-            UserId = userId;
+            this.Email = email;
         }
 
     }

@@ -7,6 +7,7 @@ using Havoc_API.DTOs.Role;
 using Havoc_API.DTOs.User;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using Havoc_API.Exceptions;
 
 namespace Havoc_API.Services
 {
@@ -23,7 +24,6 @@ namespace Havoc_API.Services
 
         public async Task<int> addProjectAsync(ProjectPOST project)
         {
-
             using (var transaction = _havocContext.Database.BeginTransaction())
             {
                 var creator = await _havocContext.Users.FindAsync(project.CreatorId);
@@ -47,8 +47,11 @@ namespace Havoc_API.Services
                 foreach (var par in project.Participations)
                 {
                     var devRole = await _havocContext.Roles.Where(r => r.Name == "Developer").FirstAsync();
+                    var user = await _havocContext.Users.Where(user=>user.Email==par.Email).FirstAsync();
+                    if (user == null)
+                        throw new NotFoundException("User not found");
 
-                    await _participationService.addParticipationAsync(new ParticipationPOST(newProject.ProjectId,par.UserId,devRole.RoleId));
+                    await _participationService.addParticipationAsync(new ParticipationPOST(newProject.ProjectId,user.UserId,devRole.RoleId));
                 }
 
                 await _havocContext.SaveChangesAsync();

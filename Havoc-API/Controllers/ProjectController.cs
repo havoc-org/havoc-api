@@ -33,5 +33,14 @@ namespace Havoc_API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> deleteProject(int id)
+        {
+            
+
+            return Ok();
+        }
+
     }
 }
