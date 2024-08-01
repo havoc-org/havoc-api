@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Havoc_API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/projects")]
     [ApiController]
     public class ProjectController : ControllerBase
     {
@@ -37,8 +37,6 @@ namespace Havoc_API.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> deleteProject(int id)
         {
-            
-
             return Ok();
         }
 
