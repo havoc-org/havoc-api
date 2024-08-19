@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Havoc_API.Controllers
 {
-    
+    [Authorize]
     [Route("api/projects")]
     [ApiController]
     public class ProjectController : ControllerBase
@@ -18,7 +18,7 @@ namespace Havoc_API.Controllers
             _projectService = projectService;
         }
 
-        [Authorize]
+        
         [HttpGet]
         public async Task<ActionResult> getProjects()
         {
