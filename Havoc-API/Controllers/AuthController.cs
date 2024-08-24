@@ -35,6 +35,16 @@ namespace Havoc_API.Controllers
                 UserToken userToken = await _userService.verifyUser(user);
                 var token = _tokenService.GenerateToken(userToken);
 
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true, // Ограничивает доступ к кукам только через HTTP, предотвращает доступ к кукам из JavaScript
+                    Secure = true, // Устанавливает куку только по HTTPS (рекомендуется в продакшене)
+                    SameSite = SameSiteMode.Lax, // Политика SameSite для предотвращения CSRF-атак
+                    Expires = DateTime.UtcNow.AddHours(1) // Время жизни куки
+                };
+
+                Response.Cookies.Append("AuthToken", token, cookieOptions);
+
                 return Ok(new { token });
             }
             catch (Exception ex)

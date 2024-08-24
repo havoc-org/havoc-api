@@ -48,8 +48,8 @@ namespace Havoc_API.Models
             {
                 if (value >= Deadline)
                     throw new WrongDateException("Start is after or equal to deadline");
-                if (value < DateTime.Now)
-                    throw new WrongDateException(nameof(Start) + ": " + value + "  Now: " + DateTime.Now);
+                /*if (value < DateTime.Now)
+                    throw new WrongDateException(nameof(Start) + ": " + value + "  Now: " + DateTime.Now);*/
                 _start = value;
             }
         }

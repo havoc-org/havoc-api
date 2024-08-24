@@ -34,7 +34,7 @@ namespace Havoc_API.Services
                 issuer: _configuration["JWT:Issuer"],
                 audience: _configuration["JWT:Audience"],
                 claims: claims,
-                expires: DateTime.Now.AddDays(2),
+                expires: DateTime.UtcNow.AddHours(1),
                 signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);

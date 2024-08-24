@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Net;
 using System.Text;
 using WarehouseApp2.Middlewares;
 
@@ -23,6 +24,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]!)),
            ValidIssuer = builder.Configuration["JWT:Issuer"],
            ValidAudience = builder.Configuration["JWT:Audience"]
+       };
+       options.Events = new JwtBearerEvents
+       {
+           OnMessageReceived = context =>
+           {
+               context.Token = context.Request.Cookies["AuthToken"];
+               return Task.CompletedTask;
+           }
        };
    });
 Console.WriteLine(builder.Configuration["JWT:Issuer"]);
