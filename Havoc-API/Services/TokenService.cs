@@ -23,10 +23,10 @@ namespace Havoc_API.Services
 
             var claims = new List<Claim>
             {
-                new Claim("Email", user.Email), // Subject usually represents the unique identifier
-                new Claim("FirstName", user.FirstName), // First name
-                new Claim("LastName", user.LastName), // Last name
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()) // Unique identifier for the token
+                new Claim("Email", user.Email), 
+                new Claim("FirstName", user.FirstName), 
+                new Claim("LastName", user.LastName),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                 // Add more claims as necessary
             };
 
