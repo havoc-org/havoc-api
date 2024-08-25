@@ -44,6 +44,7 @@ namespace Havoc_API.Services
                 throw new NotFoundException("Wrong email or password");
             else
                 return new UserToken(
+                   resultUser.UserId,
                    resultUser.FirstName,
                    resultUser.LastName,
                    resultUser.Email

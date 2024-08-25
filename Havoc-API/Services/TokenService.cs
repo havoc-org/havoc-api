@@ -23,6 +23,7 @@ namespace Havoc_API.Services
 
             var claims = new List<Claim>
             {
+                new Claim("UserId",user.Id.ToString()),
                 new Claim("Email", user.Email), 
                 new Claim("FirstName", user.FirstName), 
                 new Claim("LastName", user.LastName),
