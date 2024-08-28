@@ -53,5 +53,15 @@ namespace Havoc_API.Controllers
             }
         }
 
+
+        [HttpPost("logout")]
+        public IActionResult LogoutUser()
+        {
+
+            Response.Cookies.Delete("AuthToken");
+
+            // Возврат ответа, например, с сообщением об успешном выходе
+            return Ok(new { message = "User logged out successfully" });
+        }
     }
 }
