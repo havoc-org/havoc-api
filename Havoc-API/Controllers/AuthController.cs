@@ -37,7 +37,7 @@ namespace Havoc_API.Controllers
 
                 var cookieOptions = new CookieOptions
                 {
-                    HttpOnly = false, //Если true - Ограничивает доступ к кукам только через HTTP, предотвращает доступ к кукам из JavaScript
+                    HttpOnly = true, //Если true - Ограничивает доступ к кукам только через HTTP, предотвращает доступ к кукам из JavaScript
                     Secure = true, // Устанавливает куку только по HTTPS (рекомендуется в продакшене)
                     SameSite = SameSiteMode.Lax, // Политика SameSite для предотвращения CSRF-атак
                     Expires = DateTime.UtcNow.AddHours(1) // Время жизни куки
