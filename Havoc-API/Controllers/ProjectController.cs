@@ -12,18 +12,31 @@ namespace Havoc_API.Controllers
     public class ProjectController : ControllerBase
     {
         private readonly IProjectService _projectService;
+        private readonly IUserService _userService;
 
-        public ProjectController(IProjectService projectService)
+        public ProjectController(IProjectService projectService, IUserService userService)
         {
             _projectService = projectService;
+            _userService = userService;
         }
 
-        
-        [HttpGet]
+
+        [HttpGet("all")]
         public async Task<ActionResult> getProjects()
         {
             return Ok(await _projectService.getProjectsAsync());
         }
+
+
+        [HttpGet]
+        public async Task<ActionResult> getProjectByUser()
+        {
+            var userId = _userService.GetUserId(Request);
+            
+            var projects = await _projectService.getProjectsByUser(userId);
+            return Ok(projects);
+        }
+
         [HttpPost]
         public async Task<ActionResult> addProject(ProjectPOST newProject)
         {
