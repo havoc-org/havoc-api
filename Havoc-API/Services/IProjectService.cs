@@ -8,5 +8,6 @@ namespace Havoc_API.Services
     {
         public Task<int> addProjectAsync(ProjectPOST project);
         public Task<List<ProjectGET>> getProjectsAsync();
+        Task<List<ProjectGET>> getProjectsByUser(int userId);
     }
 }

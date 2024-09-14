@@ -1,4 +1,5 @@
-﻿using Havoc_API.DTOs.Tokens;
+﻿using Azure.Core;
+using Havoc_API.DTOs.Tokens;
 using Havoc_API.Models;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -40,5 +41,8 @@ namespace Havoc_API.Services
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+        
+
     }
 }

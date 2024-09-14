@@ -61,6 +61,47 @@ namespace Havoc_API.Services
             }
 
         }
+
+        public async Task<List<ProjectGET>> getProjectsByUser(int userId)
+        {
+            
+            var project = await _havocContext.Projects.Where(p => p.Participations.Any(par => par.UserId == userId)).Select(project => new ProjectGET(
+                project.ProjectId,
+                project.Name,
+                project.Description,
+                project.Background,
+                project.Start,
+                project.Deadline,
+                project.LastModified,
+                new UserGET(
+                    project.Creator.UserId,
+                    project.Creator.FirstName,
+                    project.Creator.LastName,
+                    project.Creator.Email
+                    ),
+                new ProjectStatusGET(
+                    project.ProjectStatus.ProjectStatusId,
+                    project.ProjectStatus.Name
+                    ),
+                 _havocContext.Participations.Where(par => par.ProjectId == project.ProjectId)
+                                             .Select(par => new ParticipationGET(
+                    par.ProjectId,
+                    new UserParticipationGET(
+                        par.User.UserId,
+                        par.User.FirstName,
+                        par.User.LastName,
+                        par.User.Email,
+                        new RoleGET(
+                        par.Role.RoleId,
+                        par.Role.Name
+                        )
+                        )
+                )).ToList()
+
+            )).ToListAsync();
+            return project;
+        }
+
         public async Task<List<ProjectGET>> getProjectsAsync()
         {
             

@@ -3,6 +3,7 @@ using Havoc_API.DTOs.Tokens;
 using Havoc_API.DTOs.User;
 using Havoc_API.Exceptions;
 using Microsoft.EntityFrameworkCore;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Havoc_API.Services
 {
@@ -24,6 +25,26 @@ namespace Havoc_API.Services
 
             await _context.SaveChangesAsync();
             return true;
+        }
+        public int GetUserId(HttpRequest request)
+        {
+            var token = request.Cookies["AuthToken"];
+            if (string.IsNullOrEmpty(token))
+            {
+                throw new NotFoundException("Cannot find token");
+            }
+
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(token);
+
+            var userIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
+
+            if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
+            {
+                throw new NotFoundException("Wrong userId");
+            }
+
+            return userId;
         }
 
         public Task<UserGET> getUser(string email, string password)

@@ -10,6 +10,7 @@ namespace Havoc_API.Services
         Task<UserToken> verifyUser(UserLogin user);
         Task<UserGET> getUser(string email, string password);
         Task<bool> verifyEmail(string email);
+        int GetUserId(HttpRequest request);
 
     }
 }
