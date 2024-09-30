@@ -25,8 +25,8 @@ namespace Havoc_API.Controllers
         public async Task<ActionResult> registerUser(UserPOST user)
         {
             if (await _userService.addUser(user))
-                return Ok("User registered successfully!");
-            return BadRequest("User with entered email already exists");
+                return Ok(new { message = "User registered successfully!"});
+            return BadRequest(new { message = "User with entered email already exists"});
 
         }
 
