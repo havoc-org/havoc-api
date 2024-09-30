@@ -51,6 +51,14 @@ namespace Havoc_API.Services
         {
             throw new NotImplementedException();
         }
+        public async Task<UserGET> getUserById(int userId)
+        {
+            var user= _context.Users.FirstOrDefault(u=>u.UserId == userId);
+            if (user == null)
+                throw new NotFoundException("Cannot find user by Id "+userId);
+            var result= new UserGET(user.UserId, user.FirstName, user.LastName, user.Email);
+            return result;
+        }
 
         public async Task<bool> verifyEmail(string email)
         {
