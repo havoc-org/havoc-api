@@ -28,7 +28,7 @@ namespace Havoc_API.Services
         }
         public int GetUserId(HttpRequest request)
         {
-            var token = request.Cookies["AuthToken"];
+            var token = request.Headers.Authorization.ToString()["Bearer ".Length..].Trim();
             if (string.IsNullOrEmpty(token))
             {
                 throw new NotFoundException("Cannot find token");

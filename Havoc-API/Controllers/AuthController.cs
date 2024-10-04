@@ -55,7 +55,6 @@ namespace Havoc_API.Controllers
                     Expires = DateTime.UtcNow.AddDays(3) // Время жизни куки
                 };
 
-                Response.Cookies.Append("AuthToken", accessToken, AccessCookieOptions);
                 Response.Cookies.Append("RefreshToken", refreshToken, RefreshCookieOptions);
 
                 return Ok(new { accessToken });
@@ -65,7 +64,7 @@ namespace Havoc_API.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpPost("refreshToken")]
+        [HttpPost("refresh")]
         public ActionResult RefreshToken()
         {
             var oldToken = Request.Cookies["RefreshToken"];
@@ -105,19 +104,15 @@ namespace Havoc_API.Controllers
 
             // Токен валиден, генерируем новый access token
             
-
-            Response.Cookies.Append("AuthToken", newAccessToken, AccessCookieOptions);
             Response.Cookies.Append("RefreshToken", newRefreshToken, RefreshCookieOptions);
 
-            return Ok(new { accessToken = newAccessToken, refreshToken = newRefreshToken });
+            return Ok(new { accessToken = newAccessToken});
         }
 
 
         [HttpPost("logout")]
         public IActionResult LogoutUser()
         {
-
-            Response.Cookies.Delete("AuthToken");
             Response.Cookies.Delete("RefreshToken");
             // Возврат ответа, например, с сообщением об успешном выходе
             return Ok(new { message = "User logged out successfully" });
