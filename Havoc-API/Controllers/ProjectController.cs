@@ -22,27 +22,27 @@ namespace Havoc_API.Controllers
 
 
         [HttpGet("all")]
-        public async Task<ActionResult> getProjects()
+        public async Task<ActionResult> GetProjectsAsync()
         {
-            return Ok(await _projectService.getProjectsAsync());
+            return Ok(await _projectService.GetProjectsAsync());
         }
 
 
         [HttpGet]
-        public async Task<ActionResult> getProjectByUser()
+        public async Task<ActionResult> GetProjectByUserAsync()
         {
             var userId = _userService.GetUserId(Request);
             
-            var projects = await _projectService.getProjectsByUser(userId);
+            var projects = await _projectService.GetProjectsByUserAsync(userId);
             return Ok(projects);
         }
 
         [HttpPost]
-        public async Task<ActionResult> addProject(ProjectPOST newProject)
+        public async Task<ActionResult> AddProjectAsync(ProjectPOST newProject)
         {
             try
             {
-                return Ok(await _projectService.addProjectAsync(newProject));
+                return Ok(await _projectService.AddProjectAsync(newProject));
             }
             catch (Exception ex)
             {
@@ -51,9 +51,9 @@ namespace Havoc_API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult> deleteProject(int id)
+        public async Task<ActionResult> DeleteProjectAsync(int id)
         {
-            return Ok();
+            throw new NotImplementedException();
         }
 
     }

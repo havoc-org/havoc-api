@@ -21,21 +21,22 @@ namespace Havoc_API.Controllers
             _tokenService = tokenService;
             _userService = userService;
         }
+
         [HttpPost("register")]
-        public async Task<ActionResult> registerUser(UserPOST user)
+        public async Task<ActionResult> RegisterUserAsync(UserPOST user)
         {
-            if (await _userService.addUser(user))
+            if (await _userService.AddUserAsync(user))
                 return Ok(new { message = "User registered successfully!"});
             return BadRequest(new { message = "User with entered email already exists"});
 
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult> loginUser(UserLogin user)
+        public async Task<ActionResult> LoginUserAsync(UserLogin user)
         {
             try
             {
-                UserToken userToken = await _userService.verifyUser(user);
+                UserToken userToken = await _userService.VerifyUserAsync(user);
                 var accessToken = _tokenService.GenerateAccessToken(userToken);
 
                 var refreshToken = _tokenService.GenerateRefreshToken(userToken.Id); // Если нужно, можешь сгенерировать новый refresh token
@@ -64,6 +65,7 @@ namespace Havoc_API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
         [HttpPost("refresh")]
         public ActionResult RefreshToken()
         {
@@ -80,9 +82,9 @@ namespace Havoc_API.Controllers
             if (userIdClaim == null)
                 return BadRequest(); // Возвращаем ID пользователя
 
-            
-            int.TryParse(userIdClaim.Value, out int userId);
-            var user = _userService.getUserById(userId).Result;
+
+            _ = int.TryParse(userIdClaim.Value, out int userId);
+            var user = _userService.GetUserByIdAsync(userId).Result;
             var newAccessToken = _tokenService.GenerateAccessToken(new UserToken(user.UserId, user.FirstName, user.LastName, user.Email));
             var newRefreshToken = _tokenService.GenerateRefreshToken(userId); // Если нужно, можешь сгенерировать новый refresh token
 

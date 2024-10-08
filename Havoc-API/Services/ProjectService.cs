@@ -22,7 +22,7 @@ namespace Havoc_API.Services
         }
 
 
-        public async Task<int> addProjectAsync(ProjectPOST project)
+        public async Task<int> AddProjectAsync(ProjectPOST project)
         {
             using (var transaction = _havocContext.Database.BeginTransaction())
             {
@@ -51,7 +51,7 @@ namespace Havoc_API.Services
                     if (user == null)
                         throw new NotFoundException("User not found");
 
-                    await _participationService.addParticipationAsync(new ParticipationPOST(newProject.ProjectId,user.UserId,devRole.RoleId));
+                    await _participationService.AddParticipationAsync(new ParticipationPOST(newProject.ProjectId,user.UserId,devRole.RoleId));
                 }
 
                 await _havocContext.SaveChangesAsync();
@@ -62,7 +62,7 @@ namespace Havoc_API.Services
 
         }
 
-        public async Task<List<ProjectGET>> getProjectsByUser(int userId)
+        public async Task<List<ProjectGET>> GetProjectsByUserAsync(int userId)
         {
             
             var project = await _havocContext.Projects.Where(p => p.Participations.Any(par => par.UserId == userId)).Select(project => new ProjectGET(
@@ -102,7 +102,7 @@ namespace Havoc_API.Services
             return project;
         }
 
-        public async Task<List<ProjectGET>> getProjectsAsync()
+        public async Task<List<ProjectGET>> GetProjectsAsync()
         {
             
             var project = await _havocContext.Projects.Select(project => new ProjectGET(

@@ -4,8 +4,8 @@ namespace Havoc_API.Services
 {
     public interface IParticipationService
     {
-        public Task<ICollection<ParticipationGET>> GetParticipationsByProjectID(int projectId);
+        public Task<ICollection<ParticipationGET>> GetParticipationsByProjectIDAsync(int projectId);
         public ICollection<ParticipationGET> GetParticipationsByUserID(string userId);
-        public Task<bool> addParticipationAsync(ParticipationPOST participation);
+        public Task<bool> AddParticipationAsync(ParticipationPOST participation);
     }
 }
