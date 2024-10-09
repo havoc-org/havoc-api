@@ -16,7 +16,7 @@ namespace Havoc_API.Controllers
         private readonly ITokenService _tokenService;
         private readonly IUserService _userService;
 
-        public AuthController(ITokenService tokenService, IUserService userService)
+        public AuthController(ITokenService tokenService, IUserService userService, IConfiguration configuration)
         {
             _tokenService = tokenService;
             _userService = userService;
@@ -61,7 +61,7 @@ namespace Havoc_API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new {message = ex.Message});
             }
         }
         [HttpPost("refresh")]
@@ -69,11 +69,11 @@ namespace Havoc_API.Controllers
         {
             var oldToken = Request.Cookies["RefreshToken"];
             if (oldToken == null)
-                return Unauthorized();
+                return Unauthorized(new {message = "You dont have a refresh token"});
             var principal = _tokenService.ValidateRefreshToken(oldToken);
             
             if (principal == null)
-                return Unauthorized("Invalid refresh token");
+                return Unauthorized(new {message = "Invalid refresh token"});
             
             var userIdClaim = principal.Claims.FirstOrDefault(claim => claim.Type == "UserId");
 
