@@ -15,9 +15,9 @@ namespace Havoc_API.Services
             _context = context;
         }
 
-        public async Task<bool> addUser(UserPOST user)
+        public async Task<bool> AddUserAsync(UserPOST user)
         {
-            if (await verifyEmail(user.Email))
+            if (await VerifyEmailAsync(user.Email))
                 return false;
 
             var password = BCrypt.Net.BCrypt.HashPassword(user.Password);
@@ -47,26 +47,26 @@ namespace Havoc_API.Services
             return userId;
         }
 
-        public Task<UserGET> getUser(string email, string password)
+        public Task<UserGET> GetUserAsync(string email, string password)
         {
             throw new NotImplementedException();
         }
-        public async Task<UserGET> getUserById(int userId)
+        public async Task<UserGET> GetUserByIdAsync(int userId)
         {
-            var user= _context.Users.FirstOrDefault(u=>u.UserId == userId);
+            var user= await _context.Users.FirstOrDefaultAsync(u=>u.UserId == userId);
             if (user == null)
                 throw new NotFoundException("Cannot find user by Id "+userId);
             var result= new UserGET(user.UserId, user.FirstName, user.LastName, user.Email);
             return result;
         }
 
-        public async Task<bool> verifyEmail(string email)
+        public async Task<bool> VerifyEmailAsync(string email)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
             return user == null ? false : true;
         }
 
-        public async Task<UserToken> verifyUser(UserLogin user)
+        public async Task<UserToken> VerifyUserAsync(UserLogin user)
         {
             var resultUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
             if (resultUser == null || !BCrypt.Net.BCrypt.Verify(user.Password,resultUser.Password ))

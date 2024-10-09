@@ -6,11 +6,11 @@ namespace Havoc_API.Services
 {
     public interface IUserService
     {
-        Task<bool> addUser(UserPOST user);
-        Task<UserToken> verifyUser(UserLogin user);
-        Task<UserGET> getUser(string email, string password);
-        Task<UserGET> getUserById(int userId);
-        Task<bool> verifyEmail(string email);
+        Task<bool> AddUserAsync(UserPOST user);
+        Task<UserToken> VerifyUserAsync(UserLogin user);
+        Task<UserGET> GetUserAsync(string email, string password);
+        Task<UserGET> GetUserByIdAsync(int userId);
+        Task<bool> VerifyEmailAsync(string email);
         int GetUserId(HttpRequest request);
 
     }

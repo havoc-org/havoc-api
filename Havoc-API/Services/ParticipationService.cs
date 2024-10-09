@@ -16,7 +16,7 @@ namespace Havoc_API.Services
         }
 
 
-        public async Task<bool> addParticipationAsync(ParticipationPOST participation)
+        public async Task<bool> AddParticipationAsync(ParticipationPOST participation)
         {
             var role = await _havocContext.Roles.Where(r => r.Name == "Developer").FirstAsync();
             if (role == null)
@@ -41,7 +41,7 @@ namespace Havoc_API.Services
 
         }
 
-        public async Task<ICollection<ParticipationGET>> GetParticipationsByProjectID(int projectId)
+        public async Task<ICollection<ParticipationGET>> GetParticipationsByProjectIDAsync(int projectId)
         {
            return await _havocContext.Participations.Where(p => p.ProjectId == projectId)
                                              .Select(p => new ParticipationGET(

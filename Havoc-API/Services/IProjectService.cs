@@ -6,8 +6,8 @@ namespace Havoc_API.Services
 {
     public interface IProjectService
     {
-        public Task<int> addProjectAsync(ProjectPOST project);
-        public Task<List<ProjectGET>> getProjectsAsync();
-        Task<List<ProjectGET>> getProjectsByUser(int userId);
+        public Task<int> AddProjectAsync(ProjectPOST project);
+        public Task<List<ProjectGET>> GetProjectsAsync();
+        Task<List<ProjectGET>> GetProjectsByUserAsync(int userId);
     }
 }
