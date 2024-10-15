@@ -20,9 +20,12 @@ namespace Havoc_API.Models
             get => _name;
             private set
             {
-                if (value.Length > 25)
+                string trimmedValue = value.Trim();
+
+                if (trimmedValue.Length > 25 || trimmedValue.Length == 0)
                     throw new StringLengthException(nameof(Name));
-                _name = value;
+
+                _name = trimmedValue;
             }
         }
 
@@ -31,8 +34,15 @@ namespace Havoc_API.Models
             get => _description;
             private set
             {
-                if (value != null && value.Length > 200)
-                    throw new StringLengthException(nameof(Description));
+                if (value != null)
+                {
+                    string trimmedValue = value.Trim();
+
+                    if (trimmedValue.Length > 200 || trimmedValue.Length == 0)
+                        throw new StringLengthException(nameof(Description));
+
+                    _description = trimmedValue;
+                }
                 _description = value;
             }
         }
@@ -59,8 +69,6 @@ namespace Havoc_API.Models
             get => _deadline;
             private set
             {
-                if (value <= Start)
-                    throw new WrongDateException("Start is after or equal to deadline");
                 if (value < DateTime.Now)
                     throw new WrongDateException(nameof(Deadline) + ": " + value + "  Now: " + DateTime.Now);
                 _deadline = value;
