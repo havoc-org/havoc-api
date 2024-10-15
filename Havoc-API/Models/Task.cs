@@ -65,7 +65,7 @@ public partial class Task
         {
             if (value < DateTime.Now)
                 throw new WrongDateException(nameof(Deadline) + ": " + value + "  Now: " + DateTime.Now);
-                
+
             _deadline = value;
         }
     }
@@ -87,4 +87,17 @@ public partial class Task
     public virtual TaskStatus TaskStatus { get; set; } = null!;
 
     public virtual ICollection<Tag> Tags { get; set; } = new List<Tag>();
+
+
+    private Task(){}
+
+    public Task(string name, string? description, DateTime? start, DateTime? deadline, User creator, Project project, TaskStatus taskStatus){
+        Name = name;
+        Description = description;
+        Start = start;
+        Deadline = deadline;
+        Creator = creator;
+        Project = project;
+        TaskStatus = taskStatus;
+    }
 }
