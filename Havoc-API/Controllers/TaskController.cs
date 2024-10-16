@@ -1,3 +1,4 @@
+using Havoc_API.Exceptions;
 using Havoc_API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,5 +14,18 @@ public class TaskController : ControllerBase
     public TaskController(ITaskService taskService)
     {
         _taskService = taskService;
+    }
+
+    [HttpGet("{projectId}")]
+    public async Task<ActionResult> GetTasksByProjectIdAsync(int projectId)
+    {
+        try
+        {
+            return Ok(await _taskService.GetTasksByProjectIdAsync(projectId));
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
     }
 }
