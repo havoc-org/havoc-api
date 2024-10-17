@@ -8,19 +8,10 @@ namespace Havoc_API.Models;
 
 public partial class User
 {
-    private string _firstName;
-    private string _lastName;
-    private string _password;
-    private string _email;
-
-
-    public User(string firstName, string lastName, string email, string password)
-    {
-        FirstName = firstName;  
-        LastName = lastName;    
-        Email = email;          
-        Password = password;    
-    }
+    private string _firstName = null!;
+    private string _lastName = null!;
+    private string _password = null!;
+    private string _email = null!;
 
     public int UserId { get; private set; }
 
@@ -29,9 +20,12 @@ public partial class User
         get => _firstName;
         private set
         {
-            if (value.Length > 50)
+            string trimmedValue = value.Trim();
+
+            if (trimmedValue.Length > 50 || trimmedValue.Length == 0)
                 throw new StringLengthException(nameof(FirstName));
-            _firstName = value;
+
+            _firstName = trimmedValue;
         }
     }
 
@@ -40,9 +34,12 @@ public partial class User
         get => _lastName;
         private set
         {
-            if (value.Length > 50)
+            string trimmedValue = value.Trim();
+
+            if (trimmedValue.Length > 50 || trimmedValue.Length == 0)
                 throw new StringLengthException(nameof(LastName));
-            _lastName = value;
+
+            _lastName = trimmedValue;
         }
     }
 
@@ -51,13 +48,16 @@ public partial class User
         get => _email;
         private set
         {
-            Regex EmailRegex = new Regex(
+            var EmailRegex = new Regex(
            @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
             if (value.Length > 100)
                 throw new StringLengthException(nameof(Email));
+            
             if (!EmailRegex.IsMatch(value))
-                throw new DomainException("wrong email format");
+                throw new MismatchedRegexException(nameof(Email));
+                
             _email = value;
         }
     }
@@ -67,9 +67,12 @@ public partial class User
         get => _password;
         private set
         {
-            if (value.Length > 128)
+            string trimmedValue = value.Trim();
+
+            if (trimmedValue.Length > 128 || trimmedValue.Length == 0)
                 throw new StringLengthException(nameof(Password));
-            _password = value;
+
+            _password = trimmedValue;
         }
     }
 
@@ -86,4 +89,15 @@ public partial class User
     public virtual ICollection<Project> Projects { get; private set; } = new List<Project>();
 
     public virtual ICollection<Task> Tasks { get; private set; } = new List<Task>();
+
+    private User() { }
+
+    public User(string firstName, string lastName, string email, string password)
+    {
+        FirstName = firstName;  
+        LastName = lastName;    
+        Email = email;          
+        Password = password;    
+    }
+
 }

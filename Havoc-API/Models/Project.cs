@@ -7,7 +7,7 @@ namespace Havoc_API.Models
 {
     public partial class Project
     {
-        private string _name;
+        private string _name = null!;
         private string? _description;
         private DateTime? _start;
         private DateTime? _deadline;
@@ -56,10 +56,9 @@ namespace Havoc_API.Models
             get => _start;
             private set
             {
-                if (value >= Deadline)
+                if (value.HasValue && Deadline.HasValue && value >= Deadline)
                     throw new WrongDateException("Start is after or equal to deadline");
-                /*if (value < DateTime.Now)
-                    throw new WrongDateException(nameof(Start) + ": " + value + "  Now: " + DateTime.Now);*/
+            
                 _start = value;
             }
         }

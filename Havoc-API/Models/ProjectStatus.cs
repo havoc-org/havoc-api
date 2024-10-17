@@ -6,27 +6,30 @@ namespace Havoc_API.Models;
 
 public partial class ProjectStatus
 {
-    private string _name;
+    private string _name = null!;
 
-    public int ProjectStatusId { get;private set; }
+    public int ProjectStatusId { get; private set; }
 
-    public string Name {
-        get=>_name;
-        private set 
-        {  
-            if(value.Length>20)
+    public string Name 
+    {
+        get => _name;
+        private set
+        {
+            string trimmedValue = value.Trim();
+
+            if (trimmedValue.Length > 20 || trimmedValue.Length == 0)
                 throw new StringLengthException(nameof(Name));
-            _name=value;
+
+            _name = trimmedValue;
         }
     }
 
     public virtual ICollection<Project> Projects { get; private set; } = new List<Project>();
 
     private ProjectStatus() { }
-    public ProjectStatus(string Name)
+    
+    public ProjectStatus(string name)
     {
-        if (Name.Length > 20)
-            throw new StringLengthException(nameof(Name));
-        this.Name = Name;   
+        Name = name;   
     }
 }

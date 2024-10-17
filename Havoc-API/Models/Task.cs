@@ -6,13 +6,14 @@ namespace Havoc_API.Models;
 
 public partial class Task
 {
-    private string _name;
+    private string _name = null!;
     private string? _description;
     private DateTime? _start;
     private DateTime? _deadline;
-    public int TaskId { get; set; }
 
-    public int ProjectId { get; set; }
+    public int TaskId { get; private set; }
+
+    public int ProjectId { get; private set; }
 
     public string Name
     {
@@ -62,7 +63,7 @@ public partial class Task
     {
         get => _deadline;
         private set
-        {
+        {   
             if (value < DateTime.Now)
                 throw new WrongDateException(nameof(Deadline) + ": " + value + "  Now: " + DateTime.Now);
 
@@ -70,23 +71,23 @@ public partial class Task
         }
     }
 
-    public int CreatorId { get; set; }
+    public int CreatorId { get; private set; }
 
-    public int TaskStatusId { get; set; }
+    public int TaskStatusId { get; private set; }
 
-    public virtual ICollection<Assignment> Assignments { get; set; } = new List<Assignment>();
+    public virtual ICollection<Assignment> Assignments { get; private set; } = new List<Assignment>();
 
-    public virtual ICollection<Attachment> Attachments { get; set; } = new List<Attachment>();
+    public virtual ICollection<Attachment> Attachments { get; private set; } = new List<Attachment>();
 
-    public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
+    public virtual ICollection<Comment> Comments { get; private set; } = new List<Comment>();
 
-    public virtual User Creator { get; set; } = null!;
+    public virtual User Creator { get; private set; } = null!;
 
-    public virtual Project Project { get; set; } = null!;
+    public virtual Project Project { get; private set; } = null!;
 
-    public virtual TaskStatus TaskStatus { get; set; } = null!;
+    public virtual TaskStatus TaskStatus { get; private set; } = null!;
 
-    public virtual ICollection<Tag> Tags { get; set; } = new List<Tag>();
+    public virtual ICollection<Tag> Tags { get; private set; } = new List<Tag>();
 
 
     private Task(){}

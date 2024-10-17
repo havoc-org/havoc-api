@@ -1,13 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
+using Havoc_API.Exceptions;
 
 namespace Havoc_API.Models;
 
 public partial class TaskStatus
 {
-    public int TaskStatusId { get; set; }
+    private string _name = null!;
 
-    public string Name { get; set; } = null!;
+    public int TaskStatusId { get; private set; }
 
-    public virtual ICollection<Task> Tasks { get; set; } = new List<Task>();
+    public string Name
+    {
+        get => _name;
+        private set
+        {
+            string trimmedValue = value.Trim();
+
+            if (trimmedValue.Length > 20 || trimmedValue.Length == 0)
+                throw new StringLengthException(nameof(Name));
+
+            _name = trimmedValue;
+        }
+    }
+
+    public virtual ICollection<Task> Tasks { get; private set; } = new List<Task>();
+
+    private TaskStatus() {  }
+
+    public TaskStatus(string name)
+    {
+        Name = name;
+    }
 }
