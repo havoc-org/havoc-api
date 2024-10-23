@@ -31,7 +31,7 @@ namespace Havoc_API.Services
             var token = request.Headers.Authorization.ToString()["Bearer ".Length..].Trim();
             if (string.IsNullOrEmpty(token))
             {
-                throw new NotFoundException("Cannot find token");
+                throw new UnauthorizedAccessException("Cannot find token");
             }
 
             var handler = new JwtSecurityTokenHandler();
@@ -41,7 +41,7 @@ namespace Havoc_API.Services
 
             if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
             {
-                throw new NotFoundException("Wrong userId");
+                throw new UnauthorizedAccessException("Invalid or missing userId");
             }
 
             return userId;
@@ -63,7 +63,7 @@ namespace Havoc_API.Services
         public async Task<bool> VerifyEmailAsync(string email)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
-            return user == null ? false : true;
+            return user != null;
         }
 
         public async Task<UserToken> VerifyUserAsync(UserLogin user)

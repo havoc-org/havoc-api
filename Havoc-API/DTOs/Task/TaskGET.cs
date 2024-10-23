@@ -12,8 +12,6 @@ public class TaskGET
 {
     public int TaskId { get; set; }
 
-    // public int ProjectId { get; set; }
-
     public string Name { get; set; } = null!;
 
     public string? Description { get; set; }
@@ -21,10 +19,6 @@ public class TaskGET
     public DateTime? Start { get; set; }
 
     public DateTime? Deadline { get; set; }
-
-    // public int CreatorId { get; set; }
-
-    // public int TaskStatusId { get; set; }
 
     public virtual ICollection<AssignmentGET> Assignments { get; set; } = new List<AssignmentGET>();
 

@@ -102,6 +102,9 @@ namespace Havoc_API.Models
 
         public Project(string name, string? description, byte[]? background, DateTime? start, DateTime? deadline, User creator, ProjectStatus projectStatus)
         {
+            if (start.HasValue && deadline.HasValue && start >= deadline)
+                throw new WrongDateException("Start is after or equal to deadline");
+
             Name = name;
             Description = description;
             Background = background;

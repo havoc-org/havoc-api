@@ -93,6 +93,9 @@ public partial class Task
     private Task(){}
 
     public Task(string name, string? description, DateTime? start, DateTime? deadline, User creator, Project project, TaskStatus taskStatus){
+        if (start.HasValue && deadline.HasValue && start >= deadline)
+            throw new WrongDateException("Start is after or equal to deadline");
+        
         Name = name;
         Description = description;
         Start = start;

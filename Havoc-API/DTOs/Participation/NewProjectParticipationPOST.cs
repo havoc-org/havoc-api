@@ -6,11 +6,11 @@ namespace Havoc_API.DTOs.Participation
     {
         [Required][MaxLength(100)]
         [RegularExpression(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", ErrorMessage = "The Email field is not a valid e-mail address.")]
-        public string Email  { get; private set; }
+        public string Email  { get; private set; } = null!;
         private NewProjectParticipationPOST() { }
         public NewProjectParticipationPOST(string email)
         {
-            this.Email = email;
+            Email = email;
         }
 
     }
