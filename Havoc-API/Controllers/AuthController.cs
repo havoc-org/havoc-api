@@ -58,7 +58,7 @@ namespace Havoc_API.Controllers
 
                 Response.Cookies.Append("RefreshToken", refreshToken, RefreshCookieOptions);
 
-                return Ok(new { accessToken });
+                return Ok(new { accessToken, userId = userToken.Id, email = userToken.Email  });
             }
             catch (Exception ex)
             {
