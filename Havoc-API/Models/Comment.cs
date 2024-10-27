@@ -7,7 +7,6 @@ namespace Havoc_API.Models;
 public partial class Comment
 {
     private string _content = null!;
-    private DateTime _commentDate;
 
     public int CommentId { get; private set; }
 
@@ -28,18 +27,7 @@ public partial class Comment
         } 
     }
 
-    public DateTime CommentDate 
-    { 
-        get => _commentDate;
-        private set
-        {
-            if (value > DateTime.Now)
-                throw new WrongDateException("Comment Date is before current date.\n" +
-                    "Comment Date: "+value+"\n" +
-                    "Now: "+DateTime.Now);
-            _commentDate = value;
-        }
-    }
+    public DateTime CommentDate { get; private set; }
 
     public virtual Task Task { get; private set; } = null!;
 
@@ -47,13 +35,13 @@ public partial class Comment
 
     private Comment() { }
 
-    public Comment(string content, DateTime commentDate, Task task, User user)
+    public Comment(string content, Task task, User user)
     {
         Content = content;
-        CommentDate = commentDate;
         Task = task;
         TaskId = task.TaskId;
         User = user;
         UserId = user.UserId;
+        CommentDate = DateTime.Now;
     }
 }

@@ -11,7 +11,6 @@ namespace Havoc_API.Models
         private string? _description;
         private DateTime? _start;
         private DateTime? _deadline;
-        private DateTime _lastModified;
 
         public int ProjectId { get; private set; }
 
@@ -74,19 +73,7 @@ namespace Havoc_API.Models
             }
         }
 
-        public DateTime LastModified 
-        {
-            get=>_lastModified;
-            private set
-            {
-                if (value > DateTime.Now)
-                    throw new WrongDateException("Last modified date is before current date.\n" +
-                        "Last modified: "+value+"\n" +
-                        "Now: "+DateTime.Now);
-                _lastModified = value;
-            }
-
-        }
+        public DateTime LastModified { get; private set; }
 
         public int ProjectStatusId { get; private set; }
 
