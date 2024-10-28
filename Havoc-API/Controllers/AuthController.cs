@@ -1,10 +1,13 @@
 ﻿using Azure.Core;
 using Havoc_API.DTOs.Tokens;
 using Havoc_API.DTOs.User;
+using Havoc_API.Exceptions;
 using Havoc_API.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace Havoc_API.Controllers
@@ -25,9 +28,24 @@ namespace Havoc_API.Controllers
         [HttpPost("register")]
         public async Task<ActionResult> RegisterUserAsync(UserPOST user)
         {
-            if (await _userService.AddUserAsync(user))
-                return Ok(new { message = "User registered successfully!"});
-            return BadRequest(new { message = "User with entered email already exists"});
+            try
+            {
+                if (await _userService.AddUserAsync(user))
+                    return Ok(new { message = "User registered successfully!" });
+                return BadRequest(new { message = "User with entered email already exists" });
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (DbUpdateException ex)
+            {
+                return StatusCode(500, ex);
+            }
+            catch (SqlException ex)
+            {
+                return StatusCode(500, ex);
+            }
 
         }
 
@@ -45,7 +63,7 @@ namespace Havoc_API.Controllers
                 {
                     HttpOnly = true, //Если true - Ограничивает доступ к кукам только через HTTP, предотвращает доступ к кукам из JavaScript
                     Secure = true, // Устанавливает куку только по HTTPS (рекомендуется в продакшене)
-                    SameSite = SameSiteMode.Lax, // Политика SameSite для предотвращения CSRF-атак
+                    SameSite = SameSiteMode.Lax, // Политика SameSite для предотвращения CSRF-атакчффффффв
                     Expires = DateTime.UtcNow.AddHours(1) // Время жизни куки
                 };
                 var RefreshCookieOptions = new CookieOptions
@@ -58,66 +76,96 @@ namespace Havoc_API.Controllers
 
                 Response.Cookies.Append("RefreshToken", refreshToken, RefreshCookieOptions);
 
-                return Ok(new { accessToken, userId = userToken.Id, email = userToken.Email  });
+                return Ok(new { accessToken, userId = userToken.Id, email = userToken.Email });
             }
             catch (Exception ex)
             {
-                return BadRequest(new {message = ex.Message});
+                return BadRequest(new { message = ex.Message });
             }
         }
 
         [HttpPost("refresh")]
         public ActionResult RefreshToken()
         {
-            var oldToken = Request.Cookies["RefreshToken"];
-            if (oldToken == null)
-                return Unauthorized(new {message = "You dont have a refresh token"});
-            var principal = _tokenService.ValidateRefreshToken(oldToken);
-            
-            if (principal == null)
-                return Unauthorized(new {message = "Invalid refresh token"});
-            
-            var userIdClaim = principal.Claims.FirstOrDefault(claim => claim.Type == "UserId");
-
-            if (userIdClaim == null)
-                return BadRequest(); // Возвращаем ID пользователя
-
-
-            _ = int.TryParse(userIdClaim.Value, out int userId);
-            var user = _userService.GetUserByIdAsync(userId).Result;
-            var newAccessToken = _tokenService.GenerateAccessToken(new UserToken(user.UserId, user.FirstName, user.LastName, user.Email));
-            var newRefreshToken = _tokenService.GenerateRefreshToken(userId); // Если нужно, можешь сгенерировать новый refresh token
-
-            var AccessCookieOptions = new CookieOptions
+            try
             {
-                HttpOnly = true, //Если true - Ограничивает доступ к кукам только через HTTP, предотвращает доступ к кукам из JavaScript
-                Secure = true, // Устанавливает куку только по HTTPS (рекомендуется в продакшене)
-                SameSite = SameSiteMode.Lax, // Политика SameSite для предотвращения CSRF-атак
-                Expires = DateTime.UtcNow.AddHours(1) // Время жизни куки
-            };
+                var oldToken = Request.Cookies["RefreshToken"];
+                if (oldToken == null)
+                    return Unauthorized(new { message = "You dont have a refresh token" });
+                var principal = _tokenService.ValidateRefreshToken(oldToken);
 
-            var RefreshCookieOptions = new CookieOptions
+                if (principal == null)
+                    return Unauthorized(new { message = "Invalid refresh token" });
+
+                var userIdClaim = principal.Claims.FirstOrDefault(claim => claim.Type == "UserId");
+
+                if (userIdClaim == null)
+                    return BadRequest(); // Возвращаем ID пользователя
+
+
+                _ = int.TryParse(userIdClaim.Value, out int userId);
+                var user = _userService.GetUserByIdAsync(userId).Result;
+                var newAccessToken = _tokenService.GenerateAccessToken(new UserToken(user.UserId, user.FirstName, user.LastName, user.Email));
+                var newRefreshToken = _tokenService.GenerateRefreshToken(userId); // Если нужно, можешь сгенерировать новый refresh token
+
+                var AccessCookieOptions = new CookieOptions
+                {
+                    HttpOnly = true, //Если true - Ограничивает доступ к кукам только через HTTP, предотвращает доступ к кукам из JavaScript
+                    Secure = true, // Устанавливает куку только по HTTPS (рекомендуется в продакшене)
+                    SameSite = SameSiteMode.Lax, // Политика SameSite для предотвращения CSRF-атак
+                    Expires = DateTime.UtcNow.AddHours(1) // Время жизни куки
+                };
+
+                var RefreshCookieOptions = new CookieOptions
+                {
+                    HttpOnly = true, //Если true - Ограничивает доступ к кукам только через HTTP, предотвращает доступ к кукам из JavaScript
+                    Secure = true, // Устанавливает куку только по HTTPS (рекомендуется в продакшене)
+                    SameSite = SameSiteMode.Lax, // Политика SameSite для предотвращения CSRF-атак
+                    Expires = DateTime.UtcNow.AddDays(3) // Время жизни куки
+                };
+
+                // Токен валиден, генерируем новый access token
+
+                Response.Cookies.Append("RefreshToken", newRefreshToken, RefreshCookieOptions);
+
+                return Ok(new { accessToken = newAccessToken });
+            }
+            catch (NotFoundException ex)
             {
-                HttpOnly = true, //Если true - Ограничивает доступ к кукам только через HTTP, предотвращает доступ к кукам из JavaScript
-                Secure = true, // Устанавливает куку только по HTTPS (рекомендуется в продакшене)
-                SameSite = SameSiteMode.Lax, // Политика SameSite для предотвращения CSRF-атак
-                Expires = DateTime.UtcNow.AddDays(3) // Время жизни куки
-            };
-
-            // Токен валиден, генерируем новый access token
-            
-            Response.Cookies.Append("RefreshToken", newRefreshToken, RefreshCookieOptions);
-
-            return Ok(new { accessToken = newAccessToken});
+                return NotFound(ex.Message);
+            }
+            catch (DbUpdateException ex)
+            {
+                return StatusCode(500, ex);
+            }
+            catch (SqlException ex)
+            {
+                return StatusCode(500, ex);
+            }
         }
 
 
         [HttpPost("logout")]
         public IActionResult LogoutUser()
         {
-            Response.Cookies.Delete("RefreshToken");
-            // Возврат ответа, например, с сообщением об успешном выходе
-            return Ok(new { message = "User logged out successfully" });
+            try
+            {
+                Response.Cookies.Delete("RefreshToken");
+                // Возврат ответа, например, с сообщением об успешном выходе
+                return Ok(new { message = "User logged out successfully" });
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (DbUpdateException ex)
+            {
+                return StatusCode(500, ex);
+            }
+            catch (SqlException ex)
+            {
+                return StatusCode(500, ex);
+            }
         }
     }
 }

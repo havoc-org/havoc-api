@@ -1,8 +1,11 @@
 ﻿using Havoc_API.DTOs.Project;
+using Havoc_API.Exceptions;
 using Havoc_API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 
 namespace Havoc_API.Controllers
 {
@@ -24,17 +27,47 @@ namespace Havoc_API.Controllers
         [HttpGet("all")]
         public async Task<ActionResult> GetProjectsAsync()
         {
-            return Ok(await _projectService.GetProjectsAsync());
+            try
+            {
+                return Ok(await _projectService.GetProjectsAsync());
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (DbUpdateException ex)
+            {
+                return StatusCode(500, ex);
+            }
+            catch (SqlException ex)
+            {
+                return StatusCode(500, ex);
+            }
         }
 
 
         [HttpGet]
         public async Task<ActionResult> GetProjectByUserAsync()
         {
-            var userId = _userService.GetUserId(Request);
-            
-            var projects = await _projectService.GetProjectsByUserAsync(userId);
-            return Ok(projects);
+            try
+            {
+                var userId = _userService.GetUserId(Request);
+
+                var projects = await _projectService.GetProjectsByUserAsync(userId);
+                return Ok(projects);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (DbUpdateException ex)
+            {
+                return StatusCode(500, ex);
+            }
+            catch (SqlException ex)
+            {
+                return StatusCode(500, ex);
+            }
         }
 
         [HttpPost]
@@ -43,10 +76,19 @@ namespace Havoc_API.Controllers
             try
             {
                 return Ok(await _projectService.AddProjectAsync(newProject));
+
             }
-            catch (Exception ex)
+            catch (NotFoundException ex)
             {
-                return BadRequest(ex.Message);
+                return NotFound(ex.Message);
+            }
+            catch (DbUpdateException ex)
+            {
+                return StatusCode(500, ex);
+            }
+            catch (SqlException ex)
+            {
+                return StatusCode(500, ex);
             }
         }
 

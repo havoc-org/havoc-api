@@ -27,9 +27,13 @@ namespace Havoc_API.Services
             using (var transaction = _havocContext.Database.BeginTransaction())
             {
                 var creator = await _havocContext.Users.FindAsync(project.CreatorId);
+                var existingStatus = await _havocContext.ProjectStatuses.FirstOrDefaultAsync(st=>st.Name.Equals(project.ProjectStatus));
                 if (creator == null)
                     throw new Exception("User not found");
-                ProjectStatus status = new ProjectStatus(project.ProjectStatus.Name);
+
+                ProjectStatus status = existingStatus == null ?  new ProjectStatus(project.ProjectStatus.Name) : existingStatus;
+                
+                if (existingStatus == null)
                 await _havocContext.ProjectStatuses.AddAsync(status);
 
                 Project newProject = new Project(
