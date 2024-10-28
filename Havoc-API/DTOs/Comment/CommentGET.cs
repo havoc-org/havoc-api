@@ -7,10 +7,6 @@ public class CommentGET
 {
     public int CommentId { get; set; }
 
-    // public int TaskId { get; set; }
-
-    // public int UserId { get; set; }
-
     public string Content { get; set; } = null!;
 
     public DateTime CommentDate { get; set; }
@@ -19,10 +15,11 @@ public class CommentGET
 
     public virtual UserGET User { get; set; } = null!;
 
-    public CommentGET(int commentId, string content, DateTime commentDate)
+    public CommentGET(int commentId, string content, DateTime commentDate, UserGET user)
     {
         CommentId = commentId;
         Content = content;
         CommentDate = commentDate;
+        User = user;
     }
 }

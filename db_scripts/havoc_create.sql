@@ -1,5 +1,5 @@
 -- Created by Vertabelo (http://vertabelo.com)
--- Last modification date: 2024-07-14 18:35:45.32
+-- Last modification date: 2024-10-27 17:59:47.511
 
 -- tables
 -- Table: Assignment
@@ -15,7 +15,7 @@ CREATE TABLE Attachment (
     AttachmentId int  NOT NULL IDENTITY,
     UserId int  NOT NULL,
     TaskId int  NOT NULL,
-    FileLink varchar(255)  NOT NULL,
+    FileLink varchar(255)  NOT NULL CHECK (LEN(LTRIM(RTRIM(FileLink))) > 0),
     CONSTRAINT Attachment_pk PRIMARY KEY  (AttachmentId)
 );
 
@@ -25,7 +25,7 @@ CREATE TABLE Comment (
     TaskId int  NOT NULL,
     UserId int  NOT NULL,
     Content varchar(200)  NOT NULL CHECK (LEN(LTRIM(RTRIM(Content))) > 0),
-    CommentDate datetime  NOT NULL CHECK (CommentDate >= GETDATE()),
+    CommentDate datetime  NOT NULL DEFAULT GETDATE(),
     CONSTRAINT Comment_pk PRIMARY KEY  (CommentId)
 );
 
@@ -44,9 +44,9 @@ CREATE TABLE Project (
     Description varchar(200)  NULL CHECK (LEN(LTRIM(RTRIM(Description))) > 0),
     Background varbinary(max)  NULL,
     CreatorId int  NOT NULL,
-    Start datetime  NULL CHECK (Start >= GETDATE()),
+    Start datetime  NULL CHECK (Deadline IS NULL OR Start < Deadline),
     Deadline datetime  NULL CHECK (Deadline >= GETDATE()),
-    LastModified datetime  NOT NULL CHECK (LastModified >= GETDATE()),
+    LastModified datetime  NOT NULL DEFAULT GETDATE(),
     ProjectStatusId int  NOT NULL,
     CONSTRAINT Project_pk PRIMARY KEY  (ProjectId)
 );
@@ -79,7 +79,7 @@ CREATE TABLE Task (
     ProjectId int  NOT NULL,
     Name varchar(25)  NOT NULL CHECK (LEN(LTRIM(RTRIM(Name))) > 0),
     Description varchar(200)  NULL CHECK (LEN(LTRIM(RTRIM(Description))) > 0),
-    Start datetime  NULL CHECK (Start >= GETDATE()),
+    Start datetime  NULL CHECK (Deadline IS NULL OR Start < Deadline),
     Deadline datetime  NULL CHECK (Deadline >= GETDATE()),
     CreatorId int  NOT NULL,
     TaskStatusId int  NOT NULL,
