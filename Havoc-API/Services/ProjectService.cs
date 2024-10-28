@@ -48,6 +48,8 @@ namespace Havoc_API.Services
                 await _havocContext.Projects.AddAsync(newProject);
                 await _havocContext.SaveChangesAsync();
 
+                project.Participations.Add(new NewProjectParticipationPOST(creator.Email));
+
                 foreach (var par in project.Participations)
                 {
                     var devRole = await _havocContext.Roles.Where(r => r.Name == "Developer").FirstAsync();
