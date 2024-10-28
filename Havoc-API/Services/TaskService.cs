@@ -144,4 +144,13 @@ public class TaskService : ITaskService
         return newTask.TaskId;
     }
 
+    public async Task<int> DeleteTaskByIdAsync(int taskId)
+    {
+        var project = await _havocContext.Tasks
+        .FindAsync(taskId) ?? throw new NotFoundException("Task not found");
+        
+        _havocContext.Tasks.Remove(project);
+        return await _havocContext.SaveChangesAsync();
+        
+    }
 }
