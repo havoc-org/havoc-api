@@ -75,7 +75,9 @@ namespace Havoc_API.Controllers
         {
             try
             {
-                return Ok(await _projectService.AddProjectAsync(newProject));
+                var userId = _userService.GetUserId(Request);
+                var creator = await _userService.GetUserByIdAsync(userId);
+                return Ok(await _projectService.AddProjectAsync(newProject,creator));
 
             }
             catch (NotFoundException ex)

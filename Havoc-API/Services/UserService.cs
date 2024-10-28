@@ -2,6 +2,7 @@
 using Havoc_API.DTOs.Tokens;
 using Havoc_API.DTOs.User;
 using Havoc_API.Exceptions;
+using Havoc_API.Models;
 using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 
@@ -42,13 +43,13 @@ namespace Havoc_API.Services
         {
             throw new NotImplementedException();
         }
-        public async Task<UserGET> GetUserByIdAsync(int userId)
+        public async Task<User> GetUserByIdAsync(int userId)
         {
             var user= await _context.Users.FirstOrDefaultAsync(u=>u.UserId == userId);
             if (user == null)
                 throw new NotFoundException("Cannot find user by Id "+userId);
-            var result= new UserGET(user.UserId, user.FirstName, user.LastName, user.Email);
-            return result;
+            
+            return user;
         }
 
         public async Task<bool> VerifyEmailAsync(string email)

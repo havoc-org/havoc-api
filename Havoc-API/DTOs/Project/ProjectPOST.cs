@@ -15,8 +15,8 @@ namespace Havoc_API.DTOs.Project
 
         public byte[]? Background { get; set; }
 
-        [Required]
-        public int CreatorId { get; set; }
+        /*[Required]
+        public int CreatorId { get; set; }*/
 
         public DateTime? Start { get; set; }
 

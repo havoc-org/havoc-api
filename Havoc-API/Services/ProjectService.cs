@@ -22,14 +22,14 @@ namespace Havoc_API.Services
         }
 
 
-        public async Task<int> AddProjectAsync(ProjectPOST project)
+        public async Task<int> AddProjectAsync(ProjectPOST project,User creator)
         {
             using (var transaction = _havocContext.Database.BeginTransaction())
             {
-                var creator = await _havocContext.Users.FindAsync(project.CreatorId);
+                
                 var existingStatus = await _havocContext.ProjectStatuses.FirstOrDefaultAsync(st=>st.Name.Equals(project.ProjectStatus));
                 if (creator == null)
-                    throw new Exception("User not found");
+                    throw new NotFoundException("Creator not found");
 
                 ProjectStatus status = existingStatus == null ?  new ProjectStatus(project.ProjectStatus.Name) : existingStatus;
                 
@@ -55,7 +55,7 @@ namespace Havoc_API.Services
                     var devRole = await _havocContext.Roles.Where(r => r.Name == "Developer").FirstAsync();
                     var user = await _havocContext.Users.Where(user=>user.Email==par.Email).FirstAsync();
                     if (user == null)
-                        throw new NotFoundException("User not found");
+                        throw new NotFoundException("User for participation not found");
 
                     await _participationService.AddParticipationAsync(new ParticipationPOST(newProject.ProjectId,user.UserId,devRole.RoleId));
                 }
