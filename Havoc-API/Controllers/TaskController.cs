@@ -77,4 +77,26 @@ public class TaskController : ControllerBase
             return StatusCode(500, ex.Message);
         }
     }
+
+    [HttpDelete("{taskId}")]
+    public async Task<ActionResult> DeleteTaskByIdAsync(int taskId)
+    {
+        try
+        {
+            var result = await _taskService.DeleteTaskByIdAsync(taskId);
+            return Ok("Deleted records: " + result);
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (DbUpdateException ex)
+        {
+            return StatusCode(500, ex);
+        }
+        catch (SqlException ex)
+        {
+            return StatusCode(500, ex);
+        }   
+    }
 }
