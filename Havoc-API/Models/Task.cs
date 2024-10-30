@@ -104,4 +104,17 @@ public partial class Task
         Project = project;
         TaskStatus = taskStatus;
     }
+
+    public void UpdateValue(string name, string? description, DateTime? start, DateTime? deadline)
+    {
+        Name = name;
+        Description = description;
+        Start = start;
+        Deadline = deadline;
+    }
+
+    public void UpdateStatus(TaskStatus taskStatus)
+    {
+        TaskStatus = taskStatus;
+    }
 }
