@@ -1,4 +1,5 @@
 using Havoc_API.DTOs.Task;
+using Havoc_API.DTOs.TaskStatus;
 using Havoc_API.Exceptions;
 using Havoc_API.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -54,7 +55,7 @@ public class TaskController : ControllerBase
             task.CreatorId = creatorId;
 
             var result = await _taskService.AddTaskAsync(task);
-            return Ok(result);
+            return Ok("Task Id: " + result);
         }
         catch (UnauthorizedAccessException ex)
         {
@@ -84,7 +85,7 @@ public class TaskController : ControllerBase
         try
         {
             var result = await _taskService.DeleteTaskByIdAsync(taskId);
-            return Ok("Deleted records: " + result);
+            return Ok("Affected rows: " + result);
         }
         catch (NotFoundException ex)
         {
@@ -98,5 +99,49 @@ public class TaskController : ControllerBase
         {
             return StatusCode(500, ex);
         }   
+    }
+
+    [HttpPatch]
+    public async Task<ActionResult> UpdateTaskByIdAsync(TaskPATCH task)
+    {
+        try
+        {
+            var result = await _taskService.UpdateTaskByIdAsync(task);
+            return Ok("Affected rows: " + result);
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (DbUpdateException ex)
+        {
+            return StatusCode(500, ex);
+        }
+        catch (SqlException ex)
+        {
+            return StatusCode(500, ex);
+        }
+    }
+
+    [HttpPatch("{taskId}/updateStatus")]
+    public async Task<ActionResult> UpdateStatusByIdAsync(int taskId, TaskStatusPATCH taskStatus)
+    {
+        try
+        {
+            var result = await _taskService.UpdateStatusByIdAsync(taskId, taskStatus);
+            return Ok("Affected rows: " + result);
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (DbUpdateException ex)
+        {
+            return StatusCode(500, ex);
+        }
+        catch (SqlException ex)
+        {
+            return StatusCode(500, ex);
+        }
     }
 }

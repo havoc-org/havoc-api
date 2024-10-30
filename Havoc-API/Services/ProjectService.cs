@@ -141,5 +141,13 @@ namespace Havoc_API.Services
             return project;
         }
 
+        public async Task<int> DeleteProjectByIdAsync(int projectId)
+        {
+            var project = await _havocContext.Projects
+            .FindAsync(projectId) ?? throw new NotFoundException("Project not found");
+        
+            _havocContext.Projects.Remove(project);
+            return await _havocContext.SaveChangesAsync();
+        }
     }
 }
