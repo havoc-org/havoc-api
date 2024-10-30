@@ -43,6 +43,14 @@ namespace Havoc_API.Services
 
         }
 
+        public async Task<bool> AddParticipationListAsync(List<ParticipationPOST> participationList)
+        {
+            foreach (var par in participationList)
+                await AddParticipationAsync(new ParticipationPOST(par.ProjectId, par.Email, par.Role));
+            return true;
+        }
+
+
         public async Task<ICollection<ParticipationGET>> GetParticipationsByProjectIDAsync(int projectId)
         {
            return await _havocContext.Participations.Where(p => p.ProjectId == projectId)
