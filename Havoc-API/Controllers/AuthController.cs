@@ -68,7 +68,7 @@ namespace Havoc_API.Controllers
                 };
 
                 Response.Cookies.Append("RefreshToken", refreshToken, RefreshCookieOptions);
-                Response.Cookies.Append("UserId", userToken.Id.ToString(), RefreshCookieOptions);
+                //Response.Cookies.Append("UserId", userToken.Id.ToString(), RefreshCookieOptions);
                 return Ok(new { accessToken, userId = userToken.Id, email = userToken.Email });
             }
             catch (Exception ex)
@@ -101,13 +101,6 @@ namespace Havoc_API.Controllers
                 var newAccessToken = _tokenService.GenerateAccessToken(new UserToken(user.UserId, user.FirstName, user.LastName, user.Email));
                 var newRefreshToken = _tokenService.GenerateRefreshToken(userId); // Если нужно, можешь сгенерировать новый refresh token
 
-                /*var AccessCookieOptions = new CookieOptions
-                {
-                    HttpOnly = true, //Если true - Ограничивает доступ к кукам только через HTTP, предотвращает доступ к кукам из JavaScript
-                    Secure = true, // Устанавливает куку только по HTTPS (рекомендуется в продакшене)
-                    SameSite = SameSiteMode.Lax, // Политика SameSite для предотвращения CSRF-атак
-                    Expires = DateTime.UtcNow.AddHours(1) // Время жизни куки
-                };*/
 
                 var RefreshCookieOptions = new CookieOptions
                 {
@@ -117,10 +110,7 @@ namespace Havoc_API.Controllers
                     Expires = DateTime.UtcNow.AddDays(3) // Время жизни куки
                 };
 
-                // Токен валиден, генерируем новый access token
-
                 Response.Cookies.Append("RefreshToken", newRefreshToken, RefreshCookieOptions);
-                Response.Cookies.Append("UserId", user.UserId.ToString(), RefreshCookieOptions);
                 return Ok(new { accessToken = newAccessToken,userId=user.UserId });
             }
             catch (NotFoundException ex)

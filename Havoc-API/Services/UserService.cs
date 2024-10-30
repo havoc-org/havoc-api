@@ -29,9 +29,16 @@ namespace Havoc_API.Services
         }
         public int GetUserId(HttpRequest request)
         {
-            var userIdCookie = request.Cookies["UserId"]; ;
-            
-            if (userIdCookie == null || !int.TryParse(userIdCookie, out int userId))
+            var token = request.Cookies["RefreshToken"];
+            if (string.IsNullOrEmpty(token))
+            {
+                throw new UnauthorizedAccessException("Cannot find token");
+            }
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(token);
+            var userIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
+
+            if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
             {
                 throw new UnauthorizedAccessException("Invalid or missing userId");
             }
