@@ -84,7 +84,7 @@ public class TaskController : ControllerBase
         try
         {
             var result = await _taskService.DeleteTaskByIdAsync(taskId);
-            return Ok("Deleted records: " + result);
+            return Ok("Affected rows: " + result);
         }
         catch (NotFoundException ex)
         {

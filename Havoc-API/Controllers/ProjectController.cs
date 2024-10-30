@@ -94,10 +94,26 @@ namespace Havoc_API.Controllers
             }
         }
 
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteProjectAsync(int id)
+        [HttpDelete("{projectId}")]
+        public async Task<ActionResult> DeleteProjectByIdAsync(int projectId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var result = await _projectService.DeleteProjectByIdAsync(projectId);
+                return Ok("Affected rows: " + result);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (DbUpdateException ex)
+            {
+                return StatusCode(500, ex);
+            }
+            catch (SqlException ex)
+            {
+                return StatusCode(500, ex);
+            }   
         }
 
     }

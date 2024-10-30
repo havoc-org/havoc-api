@@ -146,10 +146,10 @@ public class TaskService : ITaskService
 
     public async Task<int> DeleteTaskByIdAsync(int taskId)
     {
-        var project = await _havocContext.Tasks
+        var task = await _havocContext.Tasks
         .FindAsync(taskId) ?? throw new NotFoundException("Task not found");
         
-        _havocContext.Tasks.Remove(project);
+        _havocContext.Tasks.Remove(task);
         return await _havocContext.SaveChangesAsync();
         
     }
