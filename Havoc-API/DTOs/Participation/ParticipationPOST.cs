@@ -4,17 +4,17 @@
     {
         public int ProjectId { get; private set; }
 
-        public int UserId { get; private set; }
+        public string Email { get; private set; }
 
-        public int RoleId { get; private set; }
+        public string Role { get; private set; }
 
         private ParticipationPOST() { }
 
-        public ParticipationPOST(int projectId, int userId, int roleId)
+        public ParticipationPOST(int projectId, string email, string role)
         {
             ProjectId = projectId;
-            UserId = userId;
-            RoleId = roleId;
+            Email = email;
+            Role = role;
 
         }
     }

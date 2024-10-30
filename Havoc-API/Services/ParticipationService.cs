@@ -4,6 +4,7 @@ using Havoc_API.Models;
 using Havoc_API.DTOs.Role;
 using Havoc_API.DTOs.User;
 using Microsoft.EntityFrameworkCore;
+using Havoc_API.Exceptions;
 
 namespace Havoc_API.Services
 {
@@ -18,20 +19,21 @@ namespace Havoc_API.Services
 
         public async Task<bool> AddParticipationAsync(ParticipationPOST participation)
         {
-            var role = await _havocContext.Roles.Where(r => r.Name == "Developer").FirstAsync();
+            var role = await _havocContext.Roles.Where(r => r.Name.Equals(participation.Role)).FirstAsync();
             if (role == null)
-                throw new Exception("Role not found");
+                throw new NotFoundException("Cannot find Role: " + participation.Role);
 
-            var user = await _havocContext.Users.FindAsync(participation.UserId);
+            var user = await _havocContext.Users.FirstAsync(us=>us.Email.Equals(participation.Email));
             if (user == null)
                 throw new Exception("User not found");
 
-            var existingParticipation = await _havocContext.Participations.FindAsync(participation.ProjectId, participation.UserId);
+            var existingParticipation = await _havocContext.Participations.FindAsync(participation.ProjectId, user.UserId);
             if (existingParticipation != null)
                 throw new Exception("This participation already exists userID: " + existingParticipation.UserId + " projectID: " + existingParticipation.ProjectId);
             var project = await _havocContext.Projects.FindAsync(participation.ProjectId);
             if (project == null)
                 throw new Exception("Project not found");
+
             await _havocContext.Participations.AddAsync(new Participation(
                 project,
                 role,
