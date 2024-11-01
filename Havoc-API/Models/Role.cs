@@ -1,35 +1,53 @@
-﻿using System;
-using System.Collections.Generic;
-using Havoc_API.Exceptions;
+﻿using System.Text.Json.Serialization;
+
 
 namespace Havoc_API.Models;
 
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum RoleType
+    {
+        Owner,
+        Manager,
+        Developer
+    }
+    
 public partial class Role
 {
-    private string _name = null!;
-
     public int RoleId { get; private set; }
 
-    public string Name 
-    {
-        get => _name;
-        private set
-        {
-            string trimmedValue = value.Trim();
-
-            if (trimmedValue.Length > 25 || trimmedValue.Length == 0)
-                throw new StringLengthException(nameof(Name));
-
-            _name = trimmedValue;
-        } 
-    }
+    public RoleType Name {get; private set;}
 
     public virtual ICollection<Participation> Participations { get; set; } = new List<Participation>();
 
     private Role() { }
 
-    public Role(string name)
+    public Role(RoleType name)
     {
         Name = name;
+    }
+
+    public bool CanCreateTask()
+    {
+        return Name == RoleType.Owner || Name == RoleType.Manager;
+    }
+
+    public bool CanDeleteProject()
+    {
+        return Name == RoleType.Owner;
+    }
+
+    public bool CanDeleteTask()
+    {
+        return Name == RoleType.Owner || Name == RoleType.Manager;
+    }
+
+    public bool CanEditProject()
+    {
+        return Name == RoleType.Owner;
+    }
+
+    public bool CanEditTask()
+    {
+        return Name == RoleType.Owner || Name == RoleType.Manager;
     }
 }

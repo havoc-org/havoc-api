@@ -154,7 +154,7 @@ public class TaskService : ITaskService
         
     }
 
-    public async Task<int> UpdateTaskByIdAsync(TaskPATCH taskPatch)
+    public async Task<int> UpdateTaskAsync(TaskPATCH taskPatch)
     {
         var task = await _havocContext.Tasks
         .FindAsync(taskPatch.TaskId) ?? throw new NotFoundException("Task not found");
@@ -183,5 +183,11 @@ public class TaskService : ITaskService
         _havocContext.Tasks.Update(task);
         return await _havocContext.SaveChangesAsync();
 
+    }
+
+    public async Task<Models.Task> GetTaskByIdAsync(int taskId)
+    {
+        return await _havocContext.Tasks
+                .FindAsync(taskId) ?? throw new NotFoundException("Task not found");
     }
 }

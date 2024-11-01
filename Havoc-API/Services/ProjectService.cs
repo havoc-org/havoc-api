@@ -48,7 +48,7 @@ namespace Havoc_API.Services
                 await _havocContext.Projects.AddAsync(newProject);
                 await _havocContext.SaveChangesAsync();
 
-                project.Participations.Add(new NewProjectParticipationPOST(creator.Email,"Creator"));
+                project.Participations.Add(new NewProjectParticipationPOST(creator.Email,RoleType.Owner));
 
                 foreach (var par in project.Participations)
                     await _participationService.AddParticipationAsync(new ParticipationPOST(newProject.ProjectId,par.Email,par.Role));

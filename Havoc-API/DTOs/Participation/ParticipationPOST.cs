@@ -1,4 +1,6 @@
-﻿namespace Havoc_API.DTOs.Participation
+﻿using Havoc_API.Models;
+
+namespace Havoc_API.DTOs.Participation
 {
     public class ParticipationPOST
     {
@@ -6,11 +8,11 @@
 
         public string Email { get; private set; }
 
-        public string Role { get; private set; }
+        public RoleType Role { get; private set; }
 
         private ParticipationPOST() { }
 
-        public ParticipationPOST(int projectId, string email, string role)
+        public ParticipationPOST(int projectId, string email, RoleType role)
         {
             ProjectId = projectId;
             Email = email;

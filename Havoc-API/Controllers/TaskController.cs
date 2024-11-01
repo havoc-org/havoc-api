@@ -17,11 +17,16 @@ public class TaskController : ControllerBase
 {
     private readonly ITaskService _taskService;
     private readonly IUserService _userService;
+    private readonly IParticipationService _participationService;
 
-    public TaskController(ITaskService taskService, IUserService userService)
+    public TaskController(
+        ITaskService taskService, 
+        IUserService userService, 
+        IParticipationService participationService)
     {
         _taskService = taskService;
         _userService = userService;
+        _participationService = participationService;
     }
 
     [HttpGet("{projectId}")]
@@ -47,19 +52,19 @@ public class TaskController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult> AddProjectAsync(TaskPOST task)
+    public async Task<ActionResult> AddTaskAsync(TaskPOST task)
     {
         try
         {
             var creatorId = _userService.GetUserId(Request);
             task.CreatorId = creatorId;
 
+            var role = await _participationService.GetUserRoleInProjectAsync(creatorId, task.ProjectId);
+            if(!role.CanCreateTask()) 
+                return Unauthorized("You have no permission to create tasks");
+
             var result = await _taskService.AddTaskAsync(task);
             return Ok("Task Id: " + result);
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            return Unauthorized(ex.Message);
         }
         catch (NotFoundException ex)
         {
@@ -84,6 +89,13 @@ public class TaskController : ControllerBase
     {
         try
         {
+            var userId = _userService.GetUserId(Request);
+            var task = await _taskService.GetTaskByIdAsync(taskId);
+
+            var role = await _participationService.GetUserRoleInProjectAsync(userId, task.ProjectId);
+            if(!role.CanDeleteTask()) 
+                return Unauthorized("You have no permission to delete tasks");
+
             var result = await _taskService.DeleteTaskByIdAsync(taskId);
             return Ok("Affected rows: " + result);
         }
@@ -102,11 +114,18 @@ public class TaskController : ControllerBase
     }
 
     [HttpPatch]
-    public async Task<ActionResult> UpdateTaskByIdAsync(TaskPATCH task)
+    public async Task<ActionResult> UpdateTaskAsync(TaskPATCH taskUpdate)
     {
         try
         {
-            var result = await _taskService.UpdateTaskByIdAsync(task);
+            var userId = _userService.GetUserId(Request);
+            var task = await _taskService.GetTaskByIdAsync(taskUpdate.TaskId);
+
+            var role = await _participationService.GetUserRoleInProjectAsync(userId, task.ProjectId);
+            if(!role.CanEditTask()) 
+                return Unauthorized("You have no permission to edit tasks");
+
+            var result = await _taskService.UpdateTaskAsync(taskUpdate);
             return Ok("Affected rows: " + result);
         }
         catch (NotFoundException ex)
@@ -128,6 +147,13 @@ public class TaskController : ControllerBase
     {
         try
         {
+            var userId = _userService.GetUserId(Request);
+            var task = await _taskService.GetTaskByIdAsync(taskId);
+
+            var role = await _participationService.GetUserRoleInProjectAsync(userId, task.ProjectId);
+            if(!role.CanEditTask()) 
+                return Unauthorized("You have no permission to edit tasks");
+
             var result = await _taskService.UpdateStatusByIdAsync(taskId, taskStatus);
             return Ok("Affected rows: " + result);
         }

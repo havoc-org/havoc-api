@@ -173,6 +173,7 @@ public partial class HavocContext : DbContext, IHavocContext
             entity.ToTable("Role");
 
             entity.Property(e => e.Name)
+                .HasConversion<string>()
                 .HasMaxLength(25)
                 .IsUnicode(false);
         });

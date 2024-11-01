@@ -1,4 +1,5 @@
 ﻿using Havoc_API.DTOs.Participation;
+using Havoc_API.Models;
 
 namespace Havoc_API.Services
 {
@@ -8,5 +9,7 @@ namespace Havoc_API.Services
         public ICollection<ParticipationGET> GetParticipationsByUserID(string userId);
         public Task<bool> AddParticipationAsync(ParticipationPOST participation);
         public Task<bool> AddParticipationListAsync(List<ParticipationPOST> participationList);
+        public Task<Role> GetUserRoleInProjectAsync(int userId, int projectId);
+
     }
 }

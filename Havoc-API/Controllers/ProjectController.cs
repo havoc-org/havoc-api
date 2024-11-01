@@ -16,11 +16,16 @@ namespace Havoc_API.Controllers
     {
         private readonly IProjectService _projectService;
         private readonly IUserService _userService;
+        private readonly IParticipationService _participationService;
 
-        public ProjectController(IProjectService projectService, IUserService userService)
+        public ProjectController(
+            IProjectService projectService, 
+            IUserService userService,
+            IParticipationService participationService)
         {
             _projectService = projectService;
             _userService = userService;
+            _participationService = participationService;
         }
 
 
@@ -77,7 +82,7 @@ namespace Havoc_API.Controllers
             {
                 var userId = _userService.GetUserId(Request);
                 var creator = await _userService.GetUserByIdAsync(userId);
-                return Ok(await _projectService.AddProjectAsync(newProject,creator));
+                return Ok(await _projectService.AddProjectAsync(newProject, creator));
 
             }
             catch (NotFoundException ex)
@@ -99,6 +104,11 @@ namespace Havoc_API.Controllers
         {
             try
             {
+                var creatorId = _userService.GetUserId(Request);
+                var role = await _participationService.GetUserRoleInProjectAsync(creatorId, projectId);
+                if(!role.CanDeleteProject()) 
+                    return Unauthorized("You have no permission to delete this project");
+
                 var result = await _projectService.DeleteProjectByIdAsync(projectId);
                 return Ok("Affected rows: " + result);
             }

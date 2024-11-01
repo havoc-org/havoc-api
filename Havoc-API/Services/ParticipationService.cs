@@ -74,5 +74,15 @@ namespace Havoc_API.Services
         {
             throw new NotImplementedException();
         }
+
+        public async Task<Role> GetUserRoleInProjectAsync(int userId, int projectId)
+        {
+            var participation = await _havocContext.Participations
+                .Include(p => p.Role)
+                .FirstOrDefaultAsync(p => p.ProjectId == projectId && p.UserId == userId)
+                ?? throw new NotFoundException("Participation not found");
+
+            return participation.Role;
+        }
     }
 }
