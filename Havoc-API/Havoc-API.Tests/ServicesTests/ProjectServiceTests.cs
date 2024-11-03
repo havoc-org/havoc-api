@@ -36,8 +36,8 @@ public class ProjectServiceTests
                 new byte[1234],
                 DateTime.Now,
                 DateTime.Now.AddDays(34),
-                new Mock<User>().Object,
-                new Mock<ProjectStatus>().Object
+                new User("Test", "Test", "test@test.test", "test"),
+                new ProjectStatus("test")
             );
         await _context.Projects.AddAsync(project);
         await _context.SaveChangesAsync();
@@ -52,20 +52,10 @@ public class ProjectServiceTests
     public async void ProjectService_DeleteProjectByIdAsync_ThrowsNotFoundException_WhenProjectDidntExist()
     {
         //Arrange
-        var project = new Project
-            (
-                "Test",
-                "test",
-                new byte[1234],
-                DateTime.Now,
-                DateTime.Now.AddDays(34),
-                new Mock<User>().Object,
-                new Mock<ProjectStatus>().Object
-            );
-        await _context.Projects.AddAsync(project);
-        await _context.SaveChangesAsync();
+        _context.Projects.RemoveRange(_context.Projects.Select(p => p).ToList());
+        var nonExistentProjectId = 0;
         //Act
-        var deletion = async () => await _projectService.DeleteProjectByIdAsync(project.ProjectId);
+        var deletion = async () => await _projectService.DeleteProjectByIdAsync(nonExistentProjectId);
 
         //Assert
         await deletion.Should().ThrowAsync<NotFoundException>("Project not found");
