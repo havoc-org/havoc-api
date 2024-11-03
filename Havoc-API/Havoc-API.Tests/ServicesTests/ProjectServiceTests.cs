@@ -7,6 +7,7 @@ using Havoc_API.Exceptions;
 using Havoc_API.Models;
 using Havoc_API.Services;
 using Havoc_API.Tests.TestData;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
 
@@ -330,13 +331,149 @@ public class ProjectServiceTests
             .And.ContainEquivalentOf(projectOwnedByUserGET);
     }
 
+
     [Fact]
-    public async void ProjectService_AddProjectAsync_ShouldCreateNewProjectStatus_WhenDatabaseDoesntHaveItAlready()
+    public async void ProjectService_AddProjectAsync_ShouldThrowNotFoundExceptionAndNotCreateProject_WhenCreatorIsNullAndProjectStatusExistsInDb()
     {
         //Arrange
-        var user = new User("Test", "Test", "test@test.test", "test");
+        _context.ProjectStatuses.RemoveRange(_context.ProjectStatuses.ToList());
+        var projectStatus = new ProjectStatus("TestStatus");
+        await _context.ProjectStatuses.AddAsync(projectStatus);
+        await _context.SaveChangesAsync();
+        var projectStatusCount = _context.ProjectStatuses.Count();
+        User creator = null!;
+        var newProject = new ProjectPOST()
+        {
+            Name = "Test",
+            Description = "test",
+            Background = new byte[1234],
+            Start = DateTime.Now,
+            Deadline = DateTime.Now.AddDays(34),
+            ProjectStatus = new DTOs.ProjectStatus.ProjectStatusPOST() { Name = "TestStatus" },
+            Participations =
+                [
+                    new NewProjectParticipationPOST( "test2@test.test", RoleType.Manager),
+                    new NewProjectParticipationPOST( "test3@test.test", RoleType.Developer),
+                    new NewProjectParticipationPOST( "test4@test.test", RoleType.Owner)
+                ]
+        };
+        _participationService.Setup(s => s.AddParticipationAsync(It.IsAny<ParticipationPOST>())).ReturnsAsync(true);
         //Act
+        var creation = async () => await _projectService.AddProjectAsync(newProject, creator);
         //Assert
-        user.Should().Be(user);
+        await creation.Should().ThrowAsync<NotFoundException>("Creator not found");
+        _context.ProjectStatuses.Should().ContainEquivalentOf(projectStatus).And.HaveCount(projectStatusCount);
+    }
+
+    [Fact]
+    public async void ProjectService_AddProjectAsync_ShouldReturnIdOfCreatedProject_WhenStatusExists()
+    {
+        //Arrange
+        var creator = new User("Test", "Test", "test@test.test", "test");
+        await _context.Users.AddAsync(creator);
+        _context.ProjectStatuses.RemoveRange(_context.ProjectStatuses.ToList());
+        var projectStatus = new ProjectStatus("TestStatus");
+        await _context.ProjectStatuses.AddAsync(projectStatus);
+        await _context.SaveChangesAsync();
+        var projectStatusCount = _context.ProjectStatuses.Count();
+        var newProject = new ProjectPOST()
+        {
+            Name = "Test",
+            Description = "test",
+            Background = new byte[1234],
+            Start = DateTime.Now,
+            Deadline = DateTime.Now.AddDays(34),
+            ProjectStatus = new DTOs.ProjectStatus.ProjectStatusPOST() { Name = "TestStatus" },
+            Participations =
+                [
+                    new NewProjectParticipationPOST( "test2@test.test", RoleType.Manager),
+                    new NewProjectParticipationPOST( "test3@test.test", RoleType.Developer),
+                    new NewProjectParticipationPOST( "test4@test.test", RoleType.Owner)
+                ]
+        };
+        _participationService.Setup(s => s.AddParticipationAsync(It.IsAny<ParticipationPOST>()));
+        //Act
+        var newProjectId = await _projectService.AddProjectAsync(newProject, creator);
+        var createdProject = await _context.Projects.FirstAsync(p => p.ProjectId == newProjectId);
+        //Assert
+        createdProject.Should().NotBeNull();
+        createdProject.ProjectId.Should().Be(newProjectId);
+        createdProject.Description.Should().BeEquivalentTo(newProject.Description);
+        createdProject.Name.Should().BeEquivalentTo(newProject.Name);
+        createdProject.Deadline.Should().Be(newProject.Deadline);
+        createdProject.Start.Should().Be(newProject.Start);
+        createdProject.ProjectStatus.Should().BeEquivalentTo(newProject.ProjectStatus);
+        _context.ProjectStatuses.Should().ContainEquivalentOf(projectStatus).And.HaveCount(projectStatusCount);
+    }
+
+    [Fact]
+    public async void ProjectService_AddProjectAsync_ShouldCreateNewProjectStatusWithNewProjectInTransaction_WhenDatabaseDoesntHaveItAlready()
+    {
+        //Arrange
+        var creator = new User("Test", "Test", "test@test.test", "test");
+        await _context.Users.AddAsync(creator);
+        _context.ProjectStatuses.RemoveRange(_context.ProjectStatuses.ToList());
+        await _context.SaveChangesAsync();
+        var projectStatusCount = _context.ProjectStatuses.Count();
+        var newProject = new ProjectPOST()
+        {
+            Name = "Test",
+            Description = "test",
+            Background = new byte[1234],
+            Start = DateTime.Now,
+            Deadline = DateTime.Now.AddDays(34),
+            ProjectStatus = new DTOs.ProjectStatus.ProjectStatusPOST() { Name = "TestStatus" },
+            Participations =
+                [
+                    new NewProjectParticipationPOST( "test2@test.test", RoleType.Manager),
+                    new NewProjectParticipationPOST( "test3@test.test", RoleType.Developer),
+                    new NewProjectParticipationPOST( "test4@test.test", RoleType.Owner)
+                ]
+        };
+        _participationService.Setup(s => s.AddParticipationAsync(It.IsAny<ParticipationPOST>()));
+        //Act
+        var newProjectId = await _projectService.AddProjectAsync(newProject, creator);
+        var createdProject = await _context.Projects.FirstAsync(p => p.ProjectId == newProjectId);
+        //Assert
+        createdProject.Should().NotBeNull();
+        createdProject.ProjectId.Should().Be(newProjectId);
+        createdProject.Description.Should().BeEquivalentTo(newProject.Description);
+        createdProject.Name.Should().BeEquivalentTo(newProject.Name);
+        createdProject.Deadline.Should().Be(newProject.Deadline);
+        createdProject.Start.Should().Be(newProject.Start);
+        createdProject.ProjectStatus.Should().BeEquivalentTo(newProject.ProjectStatus);
+        _context.ProjectStatuses.Should().HaveCount(projectStatusCount + 1);
+        _context.ProjectStatuses.First().Name.Should().BeEquivalentTo("TestStatus");
+    }
+
+    [Fact]
+    public async void ProjectService_AddProjectAsync_ShouldNotCreateNewProjectStatusWithNewProjectInTransaction_WhenDatabaseDoesntHaveItAlreadyAndCreatorIsNull()
+    {
+        _context.ProjectStatuses.RemoveRange(_context.ProjectStatuses.ToList());
+        await _context.SaveChangesAsync();
+        //Arrange
+        await _context.SaveChangesAsync();
+        User creator = null!;
+        var newProject = new ProjectPOST()
+        {
+            Name = "Test",
+            Description = "test",
+            Background = new byte[1234],
+            Start = DateTime.Now,
+            Deadline = DateTime.Now.AddDays(34),
+            ProjectStatus = new DTOs.ProjectStatus.ProjectStatusPOST() { Name = "TestStatus" },
+            Participations =
+                [
+                    new NewProjectParticipationPOST( "test2@test.test", RoleType.Manager),
+                    new NewProjectParticipationPOST( "test3@test.test", RoleType.Developer),
+                    new NewProjectParticipationPOST( "test4@test.test", RoleType.Owner)
+                ]
+        };
+        _participationService.Setup(s => s.AddParticipationAsync(It.IsAny<ParticipationPOST>())).ReturnsAsync(true);
+        //Act
+        var creation = async () => await _projectService.AddProjectAsync(newProject, creator);
+        //Assert
+        await creation.Should().ThrowAsync<NotFoundException>("Creator not found");
+        _context.ProjectStatuses.Should().BeEmpty();
     }
 }
