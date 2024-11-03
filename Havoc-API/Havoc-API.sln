@@ -5,6 +5,8 @@ VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Havoc-API", "Havoc-API\Havoc-API.csproj", "{F4100247-E693-4CF3-83B2-7DB974A6F2D7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Havoc-API.Tests", "Havoc-API.Tests\Havoc-API.Tests.csproj", "{C6E5F5EA-1226-4111-81B7-54AAAA5EB682}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{F4100247-E693-4CF3-83B2-7DB974A6F2D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F4100247-E693-4CF3-83B2-7DB974A6F2D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F4100247-E693-4CF3-83B2-7DB974A6F2D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6E5F5EA-1226-4111-81B7-54AAAA5EB682}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6E5F5EA-1226-4111-81B7-54AAAA5EB682}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6E5F5EA-1226-4111-81B7-54AAAA5EB682}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6E5F5EA-1226-4111-81B7-54AAAA5EB682}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
