@@ -375,4 +375,73 @@ public class ParticipationServiceTests
         _context.Participations.Should().HaveCount(participationsCount + 1);
         _context.Participations.Should().ContainEquivalentOf(participationOwner).And.ContainEquivalentOf(newParticipation);
     }
+
+    [Fact]
+    public async void ParticipationService_GetParticipationsByProjectIDAsync_ShouldReturnUsersParticipations()
+    {
+        //Arange
+        var role1 = new Role(RoleType.Owner);
+        var role2 = new Role(RoleType.Developer);
+        await _context.Roles.AddRangeAsync(role1, role2);
+
+        _context.Users.RemoveRange(_context.Users.ToList());
+        var user1 = new User("Test", "Test", "test@test.test", "test");
+        var user2 = new User("Test2", "Test2", "test2@test.test", "test");
+        await _context.Users.AddRangeAsync(user1, user2);
+
+        var project = new Project
+           (
+               "Test",
+               "test",
+               new byte[1234],
+               DateTime.Now,
+               DateTime.Now.AddDays(34),
+               user1,
+               new ProjectStatus("test")
+           );
+
+        var participationOwner = new Participation
+            (
+                project,
+                role1,
+                user1
+            );
+        var nonOwnerParticipation = new Participation
+            (
+                project,
+                role2,
+                user2
+            );
+
+        await _context.Participations.AddRangeAsync(participationOwner, nonOwnerParticipation);
+        await _context.SaveChangesAsync();
+
+        var participationGet1 = new ParticipationGET(
+            project.ProjectId,
+            new DTOs.User.UserParticipationGET(
+                user1.UserId,
+                user1.FirstName,
+                user1.LastName,
+                user1.Email,
+                new DTOs.Role.RoleGET(role1.RoleId, role1.Name)
+            )
+        );
+        var participationGet2 = new ParticipationGET(
+            project.ProjectId,
+            new DTOs.User.UserParticipationGET(
+                user2.UserId,
+                user2.FirstName,
+                user2.LastName,
+                user2.Email,
+                new DTOs.Role.RoleGET(role2.RoleId, role2.Name)
+            )
+        );
+        //Act
+        var participations = await _participationService.GetParticipationsByProjectIDAsync(project.ProjectId);
+        //Assert
+        participations.Should()
+            .HaveCount(_context.Participations.Where(p => p.ProjectId == project.ProjectId).Count())
+            .And.ContainEquivalentOf(participationGet1)
+            .And.ContainEquivalentOf(participationGet2);
+    }
 }
