@@ -1,10 +1,12 @@
 using System;
 using FluentAssertions;
 using Havoc_API.Data;
+using Havoc_API.DTOs.Participation;
 using Havoc_API.Exceptions;
 using Havoc_API.Models;
 using Havoc_API.Services;
 using Havoc_API.Tests.TestData;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
 
@@ -26,7 +28,7 @@ public class ParticipationServiceTests
     public async void ParticipationService_GetUserRoleInProjectAsync_ShouldReturnUsersRole()
     {
         //Arange
-        var role1 = new Role(RoleType.Manager);
+        var role1 = new Role(RoleType.Owner);
         var role2 = new Role(RoleType.Developer);
         await _context.Roles.AddRangeAsync(role1, role2);
 
@@ -72,7 +74,7 @@ public class ParticipationServiceTests
     public async void ParticipationService_GetUserRoleInProjectAsync_ShouldThrowNotFoundException_WhenParticipationDidntExist()
     {
         //Arange
-        var role1 = new Role(RoleType.Manager);
+        var role1 = new Role(RoleType.Owner);
         var role2 = new Role(RoleType.Developer);
         await _context.Roles.AddRangeAsync(role1, role2);
 
@@ -115,5 +117,262 @@ public class ParticipationServiceTests
         //Assert
         await ownerRoleGetting.Should().ThrowAsync<NotFoundException>("Participation not found");
         await participantRoleGetting.Should().ThrowAsync<NotFoundException>("Participation not found");
+    }
+
+    [Fact]
+    public async void ParticipationService_AddParticipationAsync_ShouldThrowNotFoundException_WhenRoleCannotBeFound()
+    {
+        //Arange
+        var role1 = new Role(RoleType.Owner);
+        var role2 = new Role(RoleType.Developer);
+        await _context.Roles.AddRangeAsync(role1, role2);
+
+        _context.Users.RemoveRange(_context.Users.ToList());
+        var user1 = new User("Test", "Test", "test@test.test", "test");
+        var user2 = new User("Test2", "Test2", "test2@test.test", "test");
+        await _context.Users.AddRangeAsync(user1, user2);
+
+        var project = new Project
+           (
+               "Test",
+               "test",
+               new byte[1234],
+               DateTime.Now,
+               DateTime.Now.AddDays(34),
+               user1,
+               new ProjectStatus("test")
+           );
+
+        var participationOwner = new Participation
+            (
+                project,
+                role1,
+                user1
+            );
+
+        await _context.Participations.AddAsync(participationOwner);
+        await _context.SaveChangesAsync();
+
+        var participationsCount = _context.Participations.Count();
+        var roleNotInDb = new Role(RoleType.Manager);
+        var participationPost = new ParticipationPOST(project.ProjectId, user2.Email, roleNotInDb.Name);
+
+        //Act
+        var action = async () => await _participationService.AddParticipationAsync(participationPost);
+
+        //Asert
+        await action.Should().ThrowAsync<NotFoundException>("Cannot find Role: " + roleNotInDb.Name);
+        _context.Participations.Should().HaveCount(participationsCount);
+        _context.Participations.Should().ContainEquivalentOf(participationOwner);
+    }
+
+    [Fact]
+    public async void ParticipationService_AddParticipationAsync_ShouldThrowException_WhenUserNotFound()
+    {
+        //Arange
+        var role1 = new Role(RoleType.Owner);
+        var role2 = new Role(RoleType.Developer);
+        await _context.Roles.AddRangeAsync(role1, role2);
+
+        _context.Users.RemoveRange(_context.Users.ToList());
+        var user1 = new User("Test", "Test", "test@test.test", "test");
+        var user2 = new User("Test2", "Test2", "test2@test.test", "test");
+        await _context.Users.AddRangeAsync(user1, user2);
+
+        var project = new Project
+           (
+               "Test",
+               "test",
+               new byte[1234],
+               DateTime.Now,
+               DateTime.Now.AddDays(34),
+               user1,
+               new ProjectStatus("test")
+           );
+
+        var participationOwner = new Participation
+            (
+                project,
+                role1,
+                user1
+            );
+
+        await _context.Participations.AddAsync(participationOwner);
+        await _context.SaveChangesAsync();
+
+        var participationsCount = _context.Participations.Count();
+        var participationPost = new ParticipationPOST
+        (
+            project.ProjectId,
+            It.Is<string>(email => email != "test@test.test" && email != "test2@test.test"),
+            role2.Name
+        );
+
+        //Act
+        var action = async () => await _participationService.AddParticipationAsync(participationPost);
+
+        //Asert
+        await action.Should().ThrowAsync<Exception>("User not found");
+        _context.Participations.Should().HaveCount(participationsCount);
+        _context.Participations.Should().ContainEquivalentOf(participationOwner);
+    }
+
+    [Fact]
+    public async void ParticipationService_AddParticipationAsync_ShouldThrowException_WhenProjectNotFound()
+    {
+        //Arange
+        var role1 = new Role(RoleType.Owner);
+        var role2 = new Role(RoleType.Developer);
+        await _context.Roles.AddRangeAsync(role1, role2);
+
+        _context.Users.RemoveRange(_context.Users.ToList());
+        var user1 = new User("Test", "Test", "test@test.test", "test");
+        var user2 = new User("Test2", "Test2", "test2@test.test", "test");
+        await _context.Users.AddRangeAsync(user1, user2);
+
+        var project = new Project
+           (
+               "Test",
+               "test",
+               new byte[1234],
+               DateTime.Now,
+               DateTime.Now.AddDays(34),
+               user1,
+               new ProjectStatus("test")
+           );
+
+        var participationOwner = new Participation
+            (
+                project,
+                role1,
+                user1
+            );
+
+        await _context.Participations.AddAsync(participationOwner);
+        await _context.SaveChangesAsync();
+
+        var participationsCount = _context.Participations.Count();
+        var participationPost = new ParticipationPOST
+        (
+            It.Is<int>(projectId => projectId != project.ProjectId),
+            user2.Email,
+            role2.Name
+        );
+
+        //Act
+        var action = async () => await _participationService.AddParticipationAsync(participationPost);
+
+        //Asert
+        await action.Should().ThrowAsync<Exception>("Project not found");
+        _context.Participations.Should().HaveCount(participationsCount);
+        _context.Participations.Should().ContainEquivalentOf(participationOwner);
+    }
+
+    [Fact]
+    public async void ParticipationService_AddParticipationAsync_ShouldThrowException_WhenParticipationtAlreadyExists()
+    {
+        //Arange
+        var role1 = new Role(RoleType.Owner);
+        var role2 = new Role(RoleType.Developer);
+        await _context.Roles.AddRangeAsync(role1, role2);
+
+        _context.Users.RemoveRange(_context.Users.ToList());
+        var user1 = new User("Test", "Test", "test@test.test", "test");
+        var user2 = new User("Test2", "Test2", "test2@test.test", "test");
+        await _context.Users.AddRangeAsync(user1, user2);
+
+        var project = new Project
+           (
+               "Test",
+               "test",
+               new byte[1234],
+               DateTime.Now,
+               DateTime.Now.AddDays(34),
+               user1,
+               new ProjectStatus("test")
+           );
+
+        var participationOwner = new Participation
+            (
+                project,
+                role1,
+                user1
+            );
+        var existingParticipation = new Participation
+            (
+                project,
+                role2,
+                user2
+            );
+
+        await _context.Participations.AddRangeAsync(participationOwner, existingParticipation);
+        await _context.SaveChangesAsync();
+
+        var participationsCount = _context.Participations.Count();
+        var participationPost = new ParticipationPOST
+        (
+            It.Is<int>(projectId => projectId != project.ProjectId),
+            user2.Email,
+            role2.Name
+        );
+
+        //Act
+        var action = async () => await _participationService.AddParticipationAsync(participationPost);
+
+        //Asert
+        await action.Should().ThrowAsync<Exception>("This participation already exists userID: " + existingParticipation.UserId + " projectID: " + existingParticipation.ProjectId);
+        _context.Participations.Should().HaveCount(participationsCount);
+        _context.Participations.Should().ContainEquivalentOf(participationOwner);
+    }
+
+    [Fact]
+    public async void ParticipationService_AddParticipationAsync_ShouldThrowException_WhenParticipationtSuccessfullyCreated()
+    {
+        //Arange
+        var role1 = new Role(RoleType.Owner);
+        var role2 = new Role(RoleType.Developer);
+        await _context.Roles.AddRangeAsync(role1, role2);
+
+        _context.Users.RemoveRange(_context.Users.ToList());
+        var user1 = new User("Test", "Test", "test@test.test", "test");
+        var user2 = new User("Test2", "Test2", "test2@test.test", "test");
+        await _context.Users.AddRangeAsync(user1, user2);
+
+        var project = new Project
+           (
+               "Test",
+               "test",
+               new byte[1234],
+               DateTime.Now,
+               DateTime.Now.AddDays(34),
+               user1,
+               new ProjectStatus("test")
+           );
+
+        var participationOwner = new Participation
+            (
+                project,
+                role1,
+                user1
+            );
+
+        await _context.Participations.AddRangeAsync(participationOwner);
+        await _context.SaveChangesAsync();
+
+        var participationsCount = _context.Participations.Count();
+        var participationPost = new ParticipationPOST
+        (
+            project.ProjectId,
+            user2.Email,
+            role2.Name
+        );
+
+        //Act
+        var addParticipation = await _participationService.AddParticipationAsync(participationPost);
+        var newParticipation = await _context.Participations.Where(p => p.UserId != user1.UserId).FirstOrDefaultAsync();
+        //Asert
+        addParticipation.Should().BeTrue();
+        _context.Participations.Should().HaveCount(participationsCount + 1);
+        _context.Participations.Should().ContainEquivalentOf(participationOwner).And.ContainEquivalentOf(newParticipation);
     }
 }

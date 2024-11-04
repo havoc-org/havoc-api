@@ -19,11 +19,11 @@ namespace Havoc_API.Services
 
         public async Task<bool> AddParticipationAsync(ParticipationPOST participation)
         {
-            var role = await _havocContext.Roles.Where(r => r.Name.Equals(participation.Role)).FirstAsync();
+            var role = await _havocContext.Roles.Where(r => r.Name.Equals(participation.Role)).FirstOrDefaultAsync();
             if (role == null)
                 throw new NotFoundException("Cannot find Role: " + participation.Role);
 
-            var user = await _havocContext.Users.FirstAsync(us=>us.Email.Equals(participation.Email));
+            var user = await _havocContext.Users.FirstAsync(us => us.Email.Equals(participation.Email));
             if (user == null)
                 throw new Exception("User not found");
 
@@ -39,6 +39,7 @@ namespace Havoc_API.Services
                 role,
                 user
                 ));
+            await _havocContext.SaveChangesAsync();
             return true;
 
         }
@@ -53,20 +54,20 @@ namespace Havoc_API.Services
 
         public async Task<ICollection<ParticipationGET>> GetParticipationsByProjectIDAsync(int projectId)
         {
-           return await _havocContext.Participations.Where(p => p.ProjectId == projectId)
-                                             .Select(p => new ParticipationGET(
-                    p.ProjectId,
-                    new UserParticipationGET(
-                        p.User.UserId,
-                        p.User.FirstName,
-                        p.User.LastName,
-                        p.User.Email,
-                        new RoleGET(
-                        p.Role.RoleId,
-                        p.Role.Name
-                        )
-                        )
-                )).ToListAsync();
+            return await _havocContext.Participations.Where(p => p.ProjectId == projectId)
+                                              .Select(p => new ParticipationGET(
+                     p.ProjectId,
+                     new UserParticipationGET(
+                         p.User.UserId,
+                         p.User.FirstName,
+                         p.User.LastName,
+                         p.User.Email,
+                         new RoleGET(
+                         p.Role.RoleId,
+                         p.Role.Name
+                         )
+                         )
+                 )).ToListAsync();
         }
 
 
