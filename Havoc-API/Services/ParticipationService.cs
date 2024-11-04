@@ -25,8 +25,11 @@ namespace Havoc_API.Services
 
             var user = await _havocContext.Users.FirstAsync(us=>us.Email.Equals(participation.Email));
             if (user == null)
-                throw new Exception("User not found");
+            {
+                return false;   // change when need to implement if there is no participant in database
 
+                throw new Exception("User not found");
+            }
             var existingParticipation = await _havocContext.Participations.FindAsync(participation.ProjectId, user.UserId);
             if (existingParticipation != null)
                 throw new Exception("This participation already exists userID: " + existingParticipation.UserId + " projectID: " + existingParticipation.ProjectId);
