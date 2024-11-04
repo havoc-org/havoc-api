@@ -7,9 +7,11 @@ namespace Havoc_API.Services
     public interface ITokenService
     {
         string GenerateAccessToken(UserToken user);
-        string GenerateAccessToken(ClaimsPrincipal principal);
+
         string GenerateRefreshToken(int userId);
-        ClaimsPrincipal ValidateRefreshToken(string token);
+        ClaimsPrincipal? ValidateRefreshToken(string token);
+        //Useless
+        string GenerateAccessToken(ClaimsPrincipal principal);
 
     }
 }

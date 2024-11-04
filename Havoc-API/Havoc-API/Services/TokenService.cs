@@ -35,24 +35,24 @@ namespace Havoc_API.Services
 
         public string GenerateAccessToken(UserToken user)
         {
-             var claims = new List<Claim>
+            var claims = new List<Claim>
              {
-                 new Claim("UserId",user.Id.ToString()),
+                new Claim("UserId",user.Id.ToString()),
                 new Claim("Email", user.Email),
                 new Claim("FirstName", user.FirstName),
                 new Claim("LastName", user.LastName),
-                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                  // Add more claims as necessary
               };
-            
-             return GenerateToken(claims, DateTime.UtcNow.AddHours(1));
+
+            return GenerateToken(claims, DateTime.UtcNow.AddHours(1));
         }
 
         public string GenerateAccessToken(ClaimsPrincipal principal)
         {
             var claims = principal.Claims.ToList();
             return GenerateToken(claims, DateTime.UtcNow.AddHours(1));
-        }   
+        }
 
 
         public string GenerateRefreshToken(int userId)
@@ -79,7 +79,7 @@ namespace Havoc_API.Services
 
 
 
-        public ClaimsPrincipal ValidateRefreshToken(string token)
+        public ClaimsPrincipal? ValidateRefreshToken(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Key"]!));

@@ -17,7 +17,6 @@ namespace Havoc_API.DTOs.Participation
             ProjectId = projectId;
             Email = email;
             Role = role;
-
         }
     }
 }
