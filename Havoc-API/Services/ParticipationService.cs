@@ -23,7 +23,7 @@ namespace Havoc_API.Services
             if (role == null)
                 throw new NotFoundException("Cannot find Role: " + participation.Role);
 
-            var user = await _havocContext.Users.FirstAsync(us=>us.Email.Equals(participation.Email));
+            var user = await _havocContext.Users.FirstOrDefaultAsync(us=>us.Email.Equals(participation.Email));
             if (user == null)
             {
                 return false;   // change when need to implement if there is no participant in database
