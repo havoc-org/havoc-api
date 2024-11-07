@@ -111,7 +111,7 @@ namespace Havoc_API.Controllers
                 };
 
                 Response.Cookies.Append("RefreshToken", newRefreshToken, RefreshCookieOptions);
-                return Ok(new { accessToken = newAccessToken,userId=user.UserId,userEmail=user.Email });
+                return Ok(new { accessToken = newAccessToken, userId = user.UserId, email = user.Email });
             }
             catch (NotFoundException ex)
             {
