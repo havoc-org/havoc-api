@@ -34,20 +34,23 @@ public class TaskController : ControllerBase
     {
         try
         {
+            var userId = _userService.GetUserId(Request);
+            await _participationService.GetUserRoleInProjectAsync(userId, projectId);
+
             var result = await _taskService.GetTasksByProjectIdAsync(projectId);
             return Ok(result);
         }
         catch (NotFoundException ex)
         {
-            return NotFound(ex.Message);
+            return NotFound(new { ex.Message });
         }
         catch (DbUpdateException ex)
         {
-            return StatusCode(500, ex);
+            return StatusCode(500, new { ex.Message });
         }
         catch (SqlException ex)
         {
-            return StatusCode(500, ex);
+            return StatusCode(500, new { ex.Message });
         }
     }
 
@@ -61,26 +64,26 @@ public class TaskController : ControllerBase
 
             var role = await _participationService.GetUserRoleInProjectAsync(creatorId, task.ProjectId);
             if(!role.CanCreateTask()) 
-                return Unauthorized("You have no permission to create tasks");
+                return Unauthorized(new { Message = "You have no permission to create tasks" });
 
             var result = await _taskService.AddTaskAsync(task);
-            return Ok("Task Id: " + result);
+            return Ok(new { TaskId = result });
         }
         catch (NotFoundException ex)
         {
-            return  NotFound(ex.Message);
+            return NotFound(new { ex.Message });
         }
         catch (DomainException ex)
         {
-            return BadRequest(ex.Message);
+            return BadRequest(new { ex.Message });
         }
         catch (DbUpdateException ex)
         {
-            return StatusCode(500, ex.Message);
+            return StatusCode(500, new { ex.Message });
         }
         catch (SqlException ex)
         {
-            return StatusCode(500, ex.Message);
+            return StatusCode(500, new { ex.Message });
         }
     }
 
@@ -94,22 +97,22 @@ public class TaskController : ControllerBase
 
             var role = await _participationService.GetUserRoleInProjectAsync(userId, task.ProjectId);
             if(!role.CanDeleteTask()) 
-                return Unauthorized("You have no permission to delete tasks");
+                return Unauthorized(new { Message = "You have no permission to delete tasks"});
 
             var result = await _taskService.DeleteTaskByIdAsync(taskId);
-            return Ok("Affected rows: " + result);
+            return Ok(new { AffectedRows = result });
         }
         catch (NotFoundException ex)
         {
-            return NotFound(ex.Message);
+            return NotFound(new { ex.Message });
         }
         catch (DbUpdateException ex)
         {
-            return StatusCode(500, ex);
+            return StatusCode(500, new { ex.Message });
         }
         catch (SqlException ex)
         {
-            return StatusCode(500, ex);
+            return StatusCode(500, new { ex.Message });
         }   
     }
 
@@ -123,22 +126,22 @@ public class TaskController : ControllerBase
 
             var role = await _participationService.GetUserRoleInProjectAsync(userId, task.ProjectId);
             if(!role.CanEditTask()) 
-                return Unauthorized("You have no permission to edit tasks");
+                return Unauthorized(new { Message = "You have no permission to edit tasks" });
 
             var result = await _taskService.UpdateTaskAsync(taskUpdate);
-            return Ok("Affected rows: " + result);
+            return Ok(new { AffectedRows = result} );
         }
         catch (NotFoundException ex)
         {
-            return NotFound(ex.Message);
+            return NotFound(new { ex.Message });
         }
         catch (DbUpdateException ex)
         {
-            return StatusCode(500, ex);
+            return StatusCode(500, new { ex.Message });
         }
         catch (SqlException ex)
         {
-            return StatusCode(500, ex);
+            return StatusCode(500, new { ex.Message });
         }
     }
 
@@ -152,22 +155,22 @@ public class TaskController : ControllerBase
 
             var role = await _participationService.GetUserRoleInProjectAsync(userId, task.ProjectId);
             if(!role.CanEditTask()) 
-                return Unauthorized("You have no permission to edit tasks");
+                return Unauthorized(new {Message = "You have no permission to edit tasks"} );
 
             var result = await _taskService.UpdateStatusByIdAsync(taskId, taskStatus);
-            return Ok("Affected rows: " + result);
+            return Ok(new { AffectedRows = result} );
         }
         catch (NotFoundException ex)
         {
-            return NotFound(ex.Message);
+            return NotFound(new { ex.Message });
         }
         catch (DbUpdateException ex)
         {
-            return StatusCode(500, ex);
+            return StatusCode(500, new { ex.Message });
         }
         catch (SqlException ex)
         {
-            return StatusCode(500, ex);
+            return StatusCode(500, new { ex.Message });
         }
     }
 }
