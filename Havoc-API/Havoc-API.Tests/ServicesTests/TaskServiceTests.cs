@@ -1,20 +1,13 @@
-using System;
 using FluentAssertions;
 using Havoc_API.Data;
-using Havoc_API.DTOs.Assignment;
-using Havoc_API.DTOs.Attachment;
-using Havoc_API.DTOs.Comment;
-using Havoc_API.DTOs.Tag;
 using Havoc_API.DTOs.Task;
-using Havoc_API.DTOs.TaskStatus;
-using Havoc_API.DTOs.User;
 using Havoc_API.Exceptions;
-using Havoc_API.Models;
 using Havoc_API.Services;
 using Havoc_API.Tests.TestData;
 using Xunit;
 using Task = Havoc_API.Models.Task;
-using TaskStatus = Havoc_API.Models.TaskStatus;
+using AsyncTask = System.Threading.Tasks.Task;
+using System.Runtime.CompilerServices;
 
 namespace Havoc_API.Tests.ServicesTests;
 
@@ -31,16 +24,11 @@ public class TaskServiceTests
     }
 
     [Fact]
-    public async System.Threading.Tasks.Task TaskService_GetTasksByProjectIdAsync_ReturnsAllTasksInProject_WhenProjectExisted()
+    public async AsyncTask TaskService_GetTasksByProjectIdAsync_ReturnsAllTasksInProject_WhenProjectExisted()
     {
         //Arange
         var user = HavocTestContextFactory.CreateTestUser();
-        await _context.Users.AddAsync(user);
-        await _context.SaveChangesAsync();
-
         var project = HavocTestContextFactory.CreateTestProject(user);
-        await _context.Projects.AddAsync(project);
-        await _context.SaveChangesAsync();
 
         var task1 = HavocTestContextFactory.CreateTestTask(user, project);
         var task2 = HavocTestContextFactory.CreateTestTask(user, project);
@@ -64,7 +52,7 @@ public class TaskServiceTests
     }
 
     [Fact]
-    public async void TaskService_GetTasksByProjectIdAsync_ThrowsNotFoundExeption_WhenProjectDidntExist()
+    public async AsyncTask TaskService_GetTasksByProjectIdAsync_ThrowsNotFoundExeption_WhenProjectDidntExist()
     {
         //Arange
         _context.Projects.RemoveRange(_context.Projects);
@@ -73,6 +61,75 @@ public class TaskServiceTests
         // Act & Assert
         await Assert.ThrowsAsync<NotFoundException>(
             () => _taskService.GetTasksByProjectIdAsync(0));
+    }
 
+    [Fact]
+    public async AsyncTask TaskService_DeleteTaskByIdAsync_ReturnsNumberOfAffectedRows_WhenTaskExisted()
+    {
+        //Arrange
+        var user = HavocTestContextFactory.CreateTestUser();
+        var project = HavocTestContextFactory.CreateTestProject(user);
+
+        var task = HavocTestContextFactory.CreateTestTask(user, project);
+        await _context.Tasks.AddAsync(task);
+        await _context.SaveChangesAsync();
+
+        //Act
+        var numberOfLines = await _taskService.DeleteTaskByIdAsync(task.TaskId);
+
+        //Assert
+        numberOfLines.Should().BePositive();
+        _context.Tasks.Should().NotContainEquivalentOf(task);
+    }
+
+    [Fact]
+    public async AsyncTask TaskService_DeleteTaskByIdAsync_ThrowsNotFoundException_WhenTaskDidntExist()
+    {
+        //Arange
+        _context.Tasks.RemoveRange(_context.Tasks);
+        await _context.SaveChangesAsync();
+
+        // Act & Assert
+        await Assert.ThrowsAsync<NotFoundException>(
+            () => _taskService.DeleteTaskByIdAsync(0));
+    }
+
+    [Fact]
+    public async AsyncTask TaskService_UpdateTaskAsync_ReturnsNumberOfAffectedRows_WhenTaskExisted()
+    {
+        //Arrange
+        var user = HavocTestContextFactory.CreateTestUser();
+        var project = HavocTestContextFactory.CreateTestProject(user);
+
+        var task = HavocTestContextFactory.CreateTestTask(user, project);
+        await _context.Tasks.AddAsync(task);
+        await _context.SaveChangesAsync();
+
+        var taskPatch = HavocTestContextFactory.CreateTestTaskPATCH();
+        taskPatch.TaskId = task.TaskId;
+
+        //Act
+        var numberOfLines = await _taskService.UpdateTaskAsync(taskPatch);
+
+        //Assert
+        numberOfLines.Should().BePositive();
+        
+        var updatedTask = await _context.Tasks.FindAsync(task.TaskId);
+        updatedTask.Should().NotBeNull();
+        updatedTask!.Name.Should().Be(taskPatch.Name);
+        updatedTask.Description.Should().Be(taskPatch.Description);
+        updatedTask.Start.Should().Be(taskPatch.Start);
+        updatedTask.Deadline.Should().Be(taskPatch.Deadline);
+    }
+
+    [Fact]
+    public async AsyncTask TaskService_UpdateTaskAsync_ThrowsNotFoundException_WhenTaskDidntExist()
+    {
+        //Arange
+        var taskPatch = HavocTestContextFactory.CreateTestTaskPATCH();
+
+        // Act & Assert
+        await Assert.ThrowsAsync<NotFoundException>(
+            () => _taskService.UpdateTaskAsync(taskPatch));
     }
 }

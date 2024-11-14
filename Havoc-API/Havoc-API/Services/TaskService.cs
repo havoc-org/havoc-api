@@ -151,7 +151,6 @@ public class TaskService : ITaskService
         
         _havocContext.Tasks.Remove(task);
         return await _havocContext.SaveChangesAsync();
-        
     }
 
     public async Task<int> UpdateTaskAsync(TaskPATCH taskPatch)
@@ -182,7 +181,6 @@ public class TaskService : ITaskService
         task.UpdateStatus(status);
         _havocContext.Tasks.Update(task);
         return await _havocContext.SaveChangesAsync();
-
     }
 
     public async Task<Models.Task> GetTaskByIdAsync(int taskId)

@@ -121,4 +121,17 @@ public static class HavocTestContextFactory
 
         return taskGet;
     }
+
+    public static TaskPATCH CreateTestTaskPATCH()
+    {
+        var taskPatch = new TaskPATCH
+        {
+            Name = "test",
+            Description = "test",
+            Start = DateTime.Now,
+            Deadline = DateTime.Now.AddDays(7)
+        };
+
+        return taskPatch;
+    }
 }
