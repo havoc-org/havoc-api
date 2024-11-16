@@ -37,8 +37,9 @@ public class TaskController : ControllerBase
             var userId = _userService.GetUserId(Request);
             await _participationService.GetUserRoleInProjectAsync(userId, projectId);
 
-            var result = await _taskService.GetTasksByProjectIdAsync(projectId);
-            return Ok(result);
+            var tasks = await _taskService.GetTasksByProjectIdAsync(projectId);
+            var statuses = await _taskService.GetAllTaskStatusesAsync();
+            return Ok(new {statuses, tasks});
         }
         catch (NotFoundException ex)
         {

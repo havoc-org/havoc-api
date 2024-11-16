@@ -8,8 +8,6 @@ public class TaskStatusGET
 
     public string Name { get; set; } = null!;
 
-    public virtual ICollection<TaskGET> Tasks { get; set; } = new List<TaskGET>();
-
     public TaskStatusGET(int taskStatusId, string name)
     {
         TaskStatusId = taskStatusId;

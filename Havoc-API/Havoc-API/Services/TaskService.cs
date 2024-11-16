@@ -98,14 +98,8 @@ public class TaskService : ITaskService
         .FindAsync(task.ProjectId) ?? throw new NotFoundException("Project not found");
 
         var status = await _havocContext.TaskStatuses
-        .FirstOrDefaultAsync(ts => ts.Name == task.TaskStatus.Name);
-
-        if (status == null)
-        {
-            status = new Models.TaskStatus(task.TaskStatus.Name);
-            await _havocContext.TaskStatuses.AddAsync(status);
-            await _havocContext.SaveChangesAsync();
-        }
+        .FirstOrDefaultAsync(ts => ts.Name == task.TaskStatus.Name)
+        ?? throw new NotFoundException("Task Status not found");
 
         var newTask = new Models.Task(
             task.Name,
@@ -169,14 +163,8 @@ public class TaskService : ITaskService
         .FindAsync(taskId) ?? throw new NotFoundException("Task not found");
 
         var status = await _havocContext.TaskStatuses
-        .FirstOrDefaultAsync(ts => ts.Name == taskStatus.Name);
-
-        if (status == null)
-        {
-            status = new Models.TaskStatus(taskStatus.Name);
-            await _havocContext.TaskStatuses.AddAsync(status);
-            await _havocContext.SaveChangesAsync();
-        }
+        .FirstOrDefaultAsync(ts => ts.Name == taskStatus.Name)
+        ?? throw new NotFoundException("Task Status not found");
 
         task.UpdateStatus(status);
         _havocContext.Tasks.Update(task);
@@ -187,5 +175,16 @@ public class TaskService : ITaskService
     {
         return await _havocContext.Tasks
                 .FindAsync(taskId) ?? throw new NotFoundException("Task not found");
+    }
+
+    public async Task<List<TaskStatusGET>> GetAllTaskStatusesAsync()
+    {
+        var taskStatuses = await _havocContext.TaskStatuses
+        .Select(ts => new TaskStatusGET(
+            ts.TaskStatusId,
+            ts.Name
+        )).ToListAsync();
+
+        return taskStatuses;
     }
 }
