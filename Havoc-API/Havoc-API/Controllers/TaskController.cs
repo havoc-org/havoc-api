@@ -29,6 +29,29 @@ public class TaskController : ControllerBase
         _participationService = participationService;
     }
 
+    [HttpGet()]
+    public async Task<ActionResult> GetTasksAsync()
+    {
+        try
+        {
+           var tasks = await _taskService.GetTasksAsync();
+            var statuses = await _taskService.GetAllTaskStatusesAsync();
+            return Ok(new { statuses, tasks });
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(new { ex.Message });
+        }
+        catch (DbUpdateException ex)
+        {
+            return StatusCode(500, new { ex.Message });
+        }
+        catch (SqlException ex)
+        {
+            return StatusCode(500, new { ex.Message });
+        }
+    }
+
     [HttpGet("{projectId}")]
     public async Task<ActionResult> GetTasksByProjectIdAsync(int projectId)
     {

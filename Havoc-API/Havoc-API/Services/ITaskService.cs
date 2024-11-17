@@ -12,4 +12,5 @@ public interface ITaskService
     public Task<int> UpdateTaskStatusAsync(TaskStatusPATCH taskStatus);
     public Task<Models.Task> GetTaskByIdAsync(int taskId);
     public Task<List<TaskStatusGET>> GetAllTaskStatusesAsync();
+    public Task<List<TaskGET>> GetTasksAsync();
 }

@@ -22,6 +22,66 @@ public class TaskService : ITaskService
         _havocContext = havocContext;
     }
 
+    public async Task<List<TaskGET>> GetTasksAsync()
+    {
+        
+        var tasks = await _havocContext.Tasks
+        .Select(task => new TaskGET(
+            task.TaskId,
+            task.Name,
+            task.Description,
+            task.Start,
+            task.Deadline,
+            new UserGET(
+                task.Creator.UserId,
+                task.Creator.FirstName,
+                task.Creator.LastName,
+                task.Creator.Email
+            ),
+            new TaskStatusGET(
+                task.TaskStatus.TaskStatusId,
+                task.TaskStatus.Name
+            ),
+            task.Assignments.Select(assignment => new AssignmentGET(
+                new UserGET(
+                    assignment.UserId,
+                    assignment.User.FirstName,
+                    assignment.User.LastName,
+                    assignment.User.Email
+                ),
+                assignment.Description
+            )).ToList(),
+            task.Attachments.Select(attachment => new AttachmentGET(
+                attachment.AttachmentId,
+                attachment.FileLink,
+                new UserGET(
+                    attachment.UserId,
+                    attachment.User.FirstName,
+                    attachment.User.LastName,
+                    attachment.User.Email
+                )
+            )).ToList(),
+            task.Comments.Select(comment => new CommentGET(
+                comment.CommentId,
+                comment.Content,
+                comment.CommentDate,
+                new UserGET(
+                    comment.UserId,
+                    comment.User.FirstName,
+                    comment.User.LastName,
+                    comment.User.Email
+                )
+            )).ToList(),
+            task.Tags.Select(tag => new TagGET(
+                tag.TagId,
+                tag.Name,
+                tag.ColorHex
+            )).ToList()
+        )).ToListAsync();
+
+        return tasks;
+    }
+
     public async Task<List<TaskGET>> GetTasksByProjectIdAsync(int projectId)
     {
         bool isProjectExist = await _havocContext.Projects.AnyAsync(p => p.ProjectId == projectId);
