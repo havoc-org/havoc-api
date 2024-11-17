@@ -32,8 +32,8 @@ public class ParticipationServiceTests
         var role2 = new Role(RoleType.Developer);
         await _context.Roles.AddRangeAsync(role1, role2);
 
-        var user1 = new User("Test", "Test", "test@test.test", "test");
-        var user2 = new User("Test2", "Test2", "test2@test.test", "test");
+        var user1 = HavocTestContextFactory.CreateTestUser("test@test.com");
+        var user2 = HavocTestContextFactory.CreateTestUser("test2@test.com");
         await _context.Users.AddRangeAsync(user1, user2);
 
         var project = new Project
@@ -79,20 +79,11 @@ public class ParticipationServiceTests
         await _context.Roles.AddRangeAsync(role1, role2);
 
         _context.Users.RemoveRange(_context.Users.ToList());
-        var user1 = new User("Test", "Test", "test@test.test", "test");
-        var user2 = new User("Test2", "Test2", "test2@test.test", "test");
+        var user1 = HavocTestContextFactory.CreateTestUser("test@test.com");
+        var user2 = HavocTestContextFactory.CreateTestUser("test2@test.com");
         await _context.Users.AddRangeAsync(user1, user2);
 
-        var project = new Project
-           (
-               "Test",
-               "test",
-               new byte[1234],
-               DateTime.Now,
-               DateTime.Now.AddDays(34),
-               user1,
-               new ProjectStatus("test")
-           );
+        var project = HavocTestContextFactory.CreateTestProject(user1);
 
         var participationOwner = new Participation
             (
@@ -128,20 +119,11 @@ public class ParticipationServiceTests
         await _context.Roles.AddRangeAsync(role1, role2);
 
         _context.Users.RemoveRange(_context.Users.ToList());
-        var user1 = new User("Test", "Test", "test@test.test", "test");
-        var user2 = new User("Test2", "Test2", "test2@test.test", "test");
+        var user1 = HavocTestContextFactory.CreateTestUser("test@test.com");
+        var user2 = HavocTestContextFactory.CreateTestUser("test2@test.com");
         await _context.Users.AddRangeAsync(user1, user2);
 
-        var project = new Project
-           (
-               "Test",
-               "test",
-               new byte[1234],
-               DateTime.Now,
-               DateTime.Now.AddDays(34),
-               user1,
-               new ProjectStatus("test")
-           );
+        var project = HavocTestContextFactory.CreateTestProject(user1);
 
         var participationOwner = new Participation
             (
@@ -175,20 +157,11 @@ public class ParticipationServiceTests
         await _context.Roles.AddRangeAsync(role1, role2);
 
         _context.Users.RemoveRange(_context.Users.ToList());
-        var user1 = new User("Test", "Test", "test@test.test", "test");
-        var user2 = new User("Test2", "Test2", "test2@test.test", "test");
+        var user1 = HavocTestContextFactory.CreateTestUser("test@test.com");
+        var user2 = HavocTestContextFactory.CreateTestUser("test2@test.com");
         await _context.Users.AddRangeAsync(user1, user2);
 
-        var project = new Project
-           (
-               "Test",
-               "test",
-               new byte[1234],
-               DateTime.Now,
-               DateTime.Now.AddDays(34),
-               user1,
-               new ProjectStatus("test")
-           );
+        var project = HavocTestContextFactory.CreateTestProject(user1);
 
         var participationOwner = new Participation
             (
@@ -226,20 +199,11 @@ public class ParticipationServiceTests
         await _context.Roles.AddRangeAsync(role1, role2);
 
         _context.Users.RemoveRange(_context.Users.ToList());
-        var user1 = new User("Test", "Test", "test@test.test", "test");
-        var user2 = new User("Test2", "Test2", "test2@test.test", "test");
+        var user1 = HavocTestContextFactory.CreateTestUser("test@test.com");
+        var user2 = HavocTestContextFactory.CreateTestUser("test2@test.com");
         await _context.Users.AddRangeAsync(user1, user2);
 
-        var project = new Project
-           (
-               "Test",
-               "test",
-               new byte[1234],
-               DateTime.Now,
-               DateTime.Now.AddDays(34),
-               user1,
-               new ProjectStatus("test")
-           );
+        var project = HavocTestContextFactory.CreateTestProject(user1);
 
         var participationOwner = new Participation
             (
@@ -277,20 +241,11 @@ public class ParticipationServiceTests
         await _context.Roles.AddRangeAsync(role1, role2);
 
         _context.Users.RemoveRange(_context.Users.ToList());
-        var user1 = new User("Test", "Test", "test@test.test", "test");
-        var user2 = new User("Test2", "Test2", "test2@test.test", "test");
+        var user1 = HavocTestContextFactory.CreateTestUser("test@test.com");
+        var user2 = HavocTestContextFactory.CreateTestUser("test2@test.com");
         await _context.Users.AddRangeAsync(user1, user2);
 
-        var project = new Project
-           (
-               "Test",
-               "test",
-               new byte[1234],
-               DateTime.Now,
-               DateTime.Now.AddDays(34),
-               user1,
-               new ProjectStatus("test")
-           );
+        var project = HavocTestContextFactory.CreateTestProject(user1);
 
         var participationOwner = new Participation
             (
@@ -334,20 +289,14 @@ public class ParticipationServiceTests
         await _context.Roles.AddRangeAsync(role1, role2);
 
         _context.Users.RemoveRange(_context.Users.ToList());
-        var user1 = new User("Test", "Test", "test@test.test", "test");
-        var user2 = new User("Test2", "Test2", "test2@test.test", "test");
+        var user1 = HavocTestContextFactory.CreateTestUser("test@test.com");
+        var user2 = HavocTestContextFactory.CreateTestUser("test2@test.com");
         await _context.Users.AddRangeAsync(user1, user2);
 
-        var project = new Project
-           (
-               "Test",
-               "test",
-               new byte[1234],
-               DateTime.Now,
-               DateTime.Now.AddDays(34),
-               user1,
-               new ProjectStatus("test")
-           );
+        var project = HavocTestContextFactory.CreateTestProject(user1);
+
+        await _context.Projects.AddAsync(project);
+        await _context.SaveChangesAsync();
 
         var participationOwner = new Participation
             (
@@ -385,20 +334,14 @@ public class ParticipationServiceTests
         await _context.Roles.AddRangeAsync(role1, role2);
 
         _context.Users.RemoveRange(_context.Users.ToList());
-        var user1 = new User("Test", "Test", "test@test.test", "test");
-        var user2 = new User("Test2", "Test2", "test2@test.test", "test");
+        var user1 = HavocTestContextFactory.CreateTestUser("test@test.com");
+        var user2 = HavocTestContextFactory.CreateTestUser("test2@test.com");
         await _context.Users.AddRangeAsync(user1, user2);
 
-        var project = new Project
-           (
-               "Test",
-               "test",
-               new byte[1234],
-               DateTime.Now,
-               DateTime.Now.AddDays(34),
-               user1,
-               new ProjectStatus("test")
-           );
+        var project = HavocTestContextFactory.CreateTestProject(user1);
+
+        await _context.Projects.AddAsync(project);
+        await _context.SaveChangesAsync();
 
         var participationOwner = new Participation
             (
