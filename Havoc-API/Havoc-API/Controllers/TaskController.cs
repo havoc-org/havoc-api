@@ -146,19 +146,19 @@ public class TaskController : ControllerBase
         }
     }
 
-    [HttpPatch("{taskId}/updateStatus")]
-    public async Task<ActionResult> UpdateStatusByIdAsync(int taskId, TaskStatusPATCH taskStatus)
+    [HttpPatch("updateStatus")]
+    public async Task<ActionResult> UpdateStatusByIdAsync(TaskStatusPATCH taskStatus)
     {
         try
         {
             var userId = _userService.GetUserId(Request);
-            var task = await _taskService.GetTaskByIdAsync(taskId);
+            var task = await _taskService.GetTaskByIdAsync(taskStatus.TaskId);
 
             var role = await _participationService.GetUserRoleInProjectAsync(userId, task.ProjectId);
             if(!role.CanEditTask()) 
                 return Unauthorized(new {Message = "You have no permission to edit tasks"} );
 
-            var result = await _taskService.UpdateStatusByIdAsync(taskId, taskStatus);
+            var result = await _taskService.UpdateTaskStatusAsync(taskStatus);
             return Ok(new { AffectedRows = result} );
         }
         catch (NotFoundException ex)

@@ -157,13 +157,13 @@ public class TaskService : ITaskService
         return await _havocContext.SaveChangesAsync();
     }
 
-    public async Task<int> UpdateStatusByIdAsync(int taskId, TaskStatusPATCH taskStatus)
+    public async Task<int> UpdateTaskStatusAsync(TaskStatusPATCH taskStatus)
     {
         var task = await _havocContext.Tasks
-        .FindAsync(taskId) ?? throw new NotFoundException("Task not found");
+        .FindAsync(taskStatus.TaskId) ?? throw new NotFoundException("Task not found");
 
         var status = await _havocContext.TaskStatuses
-        .FirstOrDefaultAsync(ts => ts.Name == taskStatus.Name)
+        .FirstOrDefaultAsync(ts => EF.Functions.Like(ts.Name, taskStatus.Name))
         ?? throw new NotFoundException("Task Status not found");
 
         task.UpdateStatus(status);
@@ -180,6 +180,7 @@ public class TaskService : ITaskService
     public async Task<List<TaskStatusGET>> GetAllTaskStatusesAsync()
     {
         var taskStatuses = await _havocContext.TaskStatuses
+        .OrderBy(ts => ts.TaskStatusId)
         .Select(ts => new TaskStatusGET(
             ts.TaskStatusId,
             ts.Name

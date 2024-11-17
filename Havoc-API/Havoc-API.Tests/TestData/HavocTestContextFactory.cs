@@ -30,20 +30,20 @@ public static class HavocTestContextFactory
 
     public static User CreateTestUser()
     {
-        var user = new User("Test", "Test", "test@test.test", "test");
+        var user = new User("TestName", "TestLastName", "test@test.test", "testPass");
 
         return user;
     }
     public static Project CreateTestProject(User creator)
     {
         var project = new Project(
-            "Test",
-            "test",
+            "TestName",
+            "Test desciption",
             new byte[1234],
             DateTime.Now,
             DateTime.Now.AddDays(34),
             creator,
-            new ProjectStatus("test")
+            new ProjectStatus("TestProjectStatus")
         );
 
         return project;
@@ -52,13 +52,13 @@ public static class HavocTestContextFactory
     public static Task CreateTestTask(User creator, Project project)
     {
         var task = new Task(
-            "Test",
-            "Test",
+            "TestName",
+            "Test desciption",
             DateTime.Now,
             DateTime.Now.AddDays(34),
             creator,
             project,
-            new TaskStatus("test")
+            new TaskStatus("TestTaskStatus")
         );
         
         return task;
@@ -122,12 +122,22 @@ public static class HavocTestContextFactory
         return taskGet;
     }
 
+    public static TaskStatusPATCH CreateTestTaskStatusPatch()
+    {
+        var taskStatusPatch = new TaskStatusPATCH()
+        {
+            Name = "NewTaskStatus"
+        };
+
+        return taskStatusPatch;
+    }
+
     public static TaskPATCH CreateTestTaskPATCH()
     {
         var taskPatch = new TaskPATCH
         {
-            Name = "test",
-            Description = "test",
+            Name = "TestNewName",
+            Description = "Test new description",
             Start = DateTime.Now,
             Deadline = DateTime.Now.AddDays(7)
         };
