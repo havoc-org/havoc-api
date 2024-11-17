@@ -28,9 +28,9 @@ public static class HavocTestContextFactory
         return databaseContext;
     }
 
-    public static User CreateTestUser()
+    public static User CreateTestUser(string email = "test@test.test")
     {
-        var user = new User("Test", "Test", "test@test.test", "test");
+        var user = new User("Test", "Test", email, "test");
 
         return user;
     }
@@ -60,7 +60,7 @@ public static class HavocTestContextFactory
             project,
             new TaskStatus("test")
         );
-        
+
         return task;
     }
 

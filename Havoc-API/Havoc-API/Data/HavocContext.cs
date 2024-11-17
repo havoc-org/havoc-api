@@ -39,7 +39,7 @@ public partial class HavocContext : DbContext, IHavocContext
 
     public virtual DbSet<User> Users { get; set; }
 
-   
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Assignment>(entity =>
@@ -270,6 +270,8 @@ public partial class HavocContext : DbContext, IHavocContext
             entity.Property(e => e.Password)
                 .HasMaxLength(128)
                 .IsUnicode(false);
+
+            entity.HasAlternateKey(e => e.Email);
         });
 
         OnModelCreatingPartial(modelBuilder);

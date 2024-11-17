@@ -205,32 +205,15 @@ public class ProjectServiceTests
         _context.Projects.RemoveRange(_context.Projects.ToList());
         _context.Participations.RemoveRange(_context.Participations.ToList());
 
-        var user = new User("Test", "Test", "test@test.test", "test");
-        var user2 = new User("Test2", "Test2", "test2@test.test", "test2");
+        var user = HavocTestContextFactory.CreateTestUser("test@test.test");
+        var user2 = HavocTestContextFactory.CreateTestUser("test2@test.test");
         await _context.Users.AddRangeAsync(user, user2);
         await _context.SaveChangesAsync();
 
-        var projectOwnedByUser = new Project
-            (
-                "Test",
-                "test",
-                new byte[1234],
-                DateTime.Now,
-                DateTime.Now.AddDays(34),
-                user,
-                new ProjectStatus("test")
-            );
+        var projectOwnedByUser = HavocTestContextFactory.CreateTestProject(user);
 
-        var projectWithUsersParticipation = new Project
-            (
-                "Test",
-                "test",
-                new byte[1234],
-                DateTime.Now,
-                DateTime.Now.AddDays(34),
-                user2,
-                new ProjectStatus("test")
-            );
+        var projectWithUsersParticipation = HavocTestContextFactory.CreateTestProject(user2);
+
         var projectList = new List<Project>([projectOwnedByUser, projectWithUsersParticipation]);
         await _context.Projects.AddRangeAsync(projectList);
         await _context.SaveChangesAsync();
