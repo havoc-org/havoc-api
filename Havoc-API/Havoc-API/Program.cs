@@ -54,7 +54,7 @@ builder.Services.AddScoped<IHavocContext, HavocContext>();
 
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 
-
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

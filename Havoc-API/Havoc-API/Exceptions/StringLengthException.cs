@@ -1,6 +1,4 @@
-﻿using WarehouseApp2.Exceptions;
-
-namespace Havoc_API.Exceptions
+﻿namespace Havoc_API.Exceptions
 {
-    public class StringLengthException(Object o) :DomainException("Wrong argument length: " + o);
+    public class StringLengthException(Object o) : DomainException("Wrong argument length: " + o);
 }

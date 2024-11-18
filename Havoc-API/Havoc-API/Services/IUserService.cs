@@ -12,7 +12,7 @@ namespace Havoc_API.Services
         Task<UserGET> GetUserAsync(string email, string password);
         Task<User> GetUserByIdAsync(int userId);
         Task<bool> VerifyEmailAsync(string email);
-        int GetUserId(HttpRequest request);
+        int GetUserId();
 
     }
 }

@@ -1,6 +1,4 @@
-using System.Runtime.Serialization;
-
-namespace WarehouseApp2.Exceptions;
+namespace Havoc_API.Exceptions;
 
 public class DomainException : Exception
 {

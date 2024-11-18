@@ -56,8 +56,7 @@ namespace Havoc_API.Controllers
         {
             try
             {
-                var userId = _userService.GetUserId(Request);
-
+                var userId = _userService.GetUserId();
                 var projects = await _projectService.GetProjectsByUserAsync(userId);
                 return Ok(projects);
             }
@@ -72,7 +71,7 @@ namespace Havoc_API.Controllers
         {
             try
             {
-                var userId = _userService.GetUserId(Request);
+                var userId = _userService.GetUserId();
                 var creator = await _userService.GetUserByIdAsync(userId);
                 return Ok(await _projectService.AddProjectAsync(newProject, creator));
 
@@ -96,7 +95,7 @@ namespace Havoc_API.Controllers
         {
             try
             {
-                var creatorId = _userService.GetUserId(Request);
+                var creatorId = _userService.GetUserId();
                 var role = await _participationService.GetUserRoleInProjectAsync(creatorId, projectId);
                 if (!role.CanDeleteProject())
                     return Unauthorized("You have no permission to delete this project");

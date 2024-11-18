@@ -20,8 +20,8 @@ public class TaskController : ControllerBase
     private readonly IParticipationService _participationService;
 
     public TaskController(
-        ITaskService taskService, 
-        IUserService userService, 
+        ITaskService taskService,
+        IUserService userService,
         IParticipationService participationService)
     {
         _taskService = taskService;
@@ -34,7 +34,7 @@ public class TaskController : ControllerBase
     {
         try
         {
-            var userId = _userService.GetUserId(Request);
+            var userId = _userService.GetUserId();
             await _participationService.GetUserRoleInProjectAsync(userId, projectId);
 
             var result = await _taskService.GetTasksByProjectIdAsync(projectId);
@@ -59,11 +59,11 @@ public class TaskController : ControllerBase
     {
         try
         {
-            var creatorId = _userService.GetUserId(Request);
+            var creatorId = _userService.GetUserId();
             task.CreatorId = creatorId;
 
             var role = await _participationService.GetUserRoleInProjectAsync(creatorId, task.ProjectId);
-            if(!role.CanCreateTask()) 
+            if (!role.CanCreateTask())
                 return Unauthorized(new { Message = "You have no permission to create tasks" });
 
             var result = await _taskService.AddTaskAsync(task);
@@ -92,12 +92,12 @@ public class TaskController : ControllerBase
     {
         try
         {
-            var userId = _userService.GetUserId(Request);
+            var userId = _userService.GetUserId();
             var task = await _taskService.GetTaskByIdAsync(taskId);
 
             var role = await _participationService.GetUserRoleInProjectAsync(userId, task.ProjectId);
-            if(!role.CanDeleteTask()) 
-                return Unauthorized(new { Message = "You have no permission to delete tasks"});
+            if (!role.CanDeleteTask())
+                return Unauthorized(new { Message = "You have no permission to delete tasks" });
 
             var result = await _taskService.DeleteTaskByIdAsync(taskId);
             return Ok(new { AffectedRows = result });
@@ -113,7 +113,7 @@ public class TaskController : ControllerBase
         catch (SqlException ex)
         {
             return StatusCode(500, new { ex.Message });
-        }   
+        }
     }
 
     [HttpPatch]
@@ -121,15 +121,15 @@ public class TaskController : ControllerBase
     {
         try
         {
-            var userId = _userService.GetUserId(Request);
+            var userId = _userService.GetUserId();
             var task = await _taskService.GetTaskByIdAsync(taskUpdate.TaskId);
 
             var role = await _participationService.GetUserRoleInProjectAsync(userId, task.ProjectId);
-            if(!role.CanEditTask()) 
+            if (!role.CanEditTask())
                 return Unauthorized(new { Message = "You have no permission to edit tasks" });
 
             var result = await _taskService.UpdateTaskAsync(taskUpdate);
-            return Ok(new { AffectedRows = result} );
+            return Ok(new { AffectedRows = result });
         }
         catch (NotFoundException ex)
         {
@@ -150,15 +150,15 @@ public class TaskController : ControllerBase
     {
         try
         {
-            var userId = _userService.GetUserId(Request);
+            var userId = _userService.GetUserId();
             var task = await _taskService.GetTaskByIdAsync(taskId);
 
             var role = await _participationService.GetUserRoleInProjectAsync(userId, task.ProjectId);
-            if(!role.CanEditTask()) 
-                return Unauthorized(new {Message = "You have no permission to edit tasks"} );
+            if (!role.CanEditTask())
+                return Unauthorized(new { Message = "You have no permission to edit tasks" });
 
             var result = await _taskService.UpdateStatusByIdAsync(taskId, taskStatus);
-            return Ok(new { AffectedRows = result} );
+            return Ok(new { AffectedRows = result });
         }
         catch (NotFoundException ex)
         {

@@ -1,6 +1,4 @@
-﻿using System.Runtime.Serialization;
-
-namespace Havoc_API.Exceptions
+﻿namespace Havoc_API.Exceptions
 {
     public class NotFoundException : Exception
     {
