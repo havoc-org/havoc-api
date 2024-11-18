@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using WarehouseApp2.Exceptions;
-
 namespace Havoc_API.Models;
 
 public partial class User
@@ -54,10 +52,10 @@ public partial class User
 
             if (value.Length > 100)
                 throw new StringLengthException(nameof(Email));
-            
+
             if (!EmailRegex.IsMatch(value))
                 throw new MismatchedRegexException(nameof(Email));
-                
+
             _email = value;
         }
     }
@@ -94,10 +92,10 @@ public partial class User
 
     public User(string firstName, string lastName, string email, string password)
     {
-        FirstName = firstName;  
-        LastName = lastName;    
-        Email = email;          
-        Password = password;    
+        FirstName = firstName;
+        LastName = lastName;
+        Email = email;
+        Password = password;
     }
 
 }

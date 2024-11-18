@@ -3,6 +3,7 @@ using Havoc_API.DTOs.Tokens;
 using Havoc_API.DTOs.User;
 using Havoc_API.Exceptions;
 using Havoc_API.Models;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 
@@ -20,14 +21,25 @@ namespace Havoc_API.Services
 
         public async Task<bool> AddUserAsync(UserPOST user)
         {
-            if (await VerifyEmailAsync(user.Email))
-                return false;
+            try
+            {
+                if (await VerifyEmailAsync(user.Email))
+                    return false;
 
-            var password = BCrypt.Net.BCrypt.HashPassword(user.Password);
-            await _context.Users.AddAsync(new Models.User(user.FirstName, user.LastName, user.Email, password));
+                var password = BCrypt.Net.BCrypt.HashPassword(user.Password);
+                await _context.Users.AddAsync(new Models.User(user.FirstName, user.LastName, user.Email, password));
 
-            await _context.SaveChangesAsync();
-            return true;
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (SqlException e)
+            {
+                throw new DataAccessException(e.Message);
+            }
+            catch (DbUpdateException e)
+            {
+                throw new DataAccessException(e.Message);
+            }
         }
         public int GetUserId()
         {
@@ -54,31 +66,52 @@ namespace Havoc_API.Services
         }
         public async Task<User> GetUserByIdAsync(int userId)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId == userId);
-            if (user == null)
-                throw new NotFoundException("Cannot find user by Id " + userId);
+            try
+            {
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId == userId);
+                if (user == null)
+                    throw new NotFoundException("Cannot find user by Id " + userId);
 
-            return user;
+                return user;
+            }
+            catch (SqlException e)
+            {
+                throw new DataAccessException(e.Message);
+            }
         }
 
         public async Task<bool> VerifyEmailAsync(string email)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
-            return user != null;
+            try
+            {
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+                return user != null;
+            }
+            catch (SqlException e)
+            {
+                throw new DataAccessException(e.Message);
+            }
         }
 
         public async Task<UserToken> VerifyUserAsync(UserLogin user)
         {
-            var resultUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
-            if (resultUser == null || !BCrypt.Net.BCrypt.Verify(user.Password, resultUser.Password))
-                throw new NotFoundException("Wrong email or password");
-            else
-                return new UserToken(
-                   resultUser.UserId,
-                   resultUser.FirstName,
-                   resultUser.LastName,
-                   resultUser.Email
-                );
+            try
+            {
+                var resultUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
+                if (resultUser == null || !BCrypt.Net.BCrypt.Verify(user.Password, resultUser.Password))
+                    throw new NotFoundException("Wrong email or password");
+                else
+                    return new UserToken(
+                       resultUser.UserId,
+                       resultUser.FirstName,
+                       resultUser.LastName,
+                       resultUser.Email
+                    );
+            }
+            catch (SqlException e)
+            {
+                throw new DataAccessException(e.Message);
+            }
         }
     }
 }

@@ -38,13 +38,9 @@ namespace Havoc_API.Controllers
             {
                 return NotFound(ex.Message);
             }
-            catch (DbUpdateException ex)
+            catch (DataAccessException ex)
             {
-                return StatusCode(500, ex);
-            }
-            catch (SqlException ex)
-            {
-                return StatusCode(500, ex);
+                return StatusCode(500, new { ex.Message });
             }
 
         }
@@ -71,10 +67,15 @@ namespace Havoc_API.Controllers
                 //Response.Cookies.Append("UserId", userToken.Id.ToString(), RefreshCookieOptions);
                 return Ok(new { accessToken, userId = userToken.Id, email = userToken.Email });
             }
+            catch (DataAccessException ex)
+            {
+                return StatusCode(500, new { ex.Message });
+            }
             catch (Exception ex)
             {
                 return BadRequest(new { message = ex.Message });
             }
+
         }
 
         [HttpPost("refresh")]
@@ -117,13 +118,9 @@ namespace Havoc_API.Controllers
             {
                 return NotFound(ex.Message);
             }
-            catch (DbUpdateException ex)
+            catch (DataAccessException ex)
             {
-                return StatusCode(500, ex);
-            }
-            catch (SqlException ex)
-            {
-                return StatusCode(500, ex);
+                return StatusCode(500, new { ex.Message });
             }
         }
 
@@ -141,13 +138,9 @@ namespace Havoc_API.Controllers
             {
                 return NotFound(ex.Message);
             }
-            catch (DbUpdateException ex)
+            catch (DataAccessException ex)
             {
-                return StatusCode(500, ex);
-            }
-            catch (SqlException ex)
-            {
-                return StatusCode(500, ex);
+                return StatusCode(500, new { ex.Message });
             }
         }
     }

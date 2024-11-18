@@ -40,13 +40,9 @@ namespace Havoc_API.Controllers
             {
                 return NotFound(ex.Message);
             }
-            catch (DbUpdateException ex)
+            catch (DataAccessException ex)
             {
-                return StatusCode(500, ex);
-            }
-            catch (SqlException ex)
-            {
-                return StatusCode(500, ex);
+                return StatusCode(500, new { ex.Message });
             }
         }
 
@@ -60,9 +56,9 @@ namespace Havoc_API.Controllers
                 var projects = await _projectService.GetProjectsByUserAsync(userId);
                 return Ok(projects);
             }
-            catch (SqlException ex)
+            catch (DataAccessException ex)
             {
-                return StatusCode(500, ex);
+                return StatusCode(500, new { ex.Message });
             }
         }
 
@@ -80,13 +76,9 @@ namespace Havoc_API.Controllers
             {
                 return NotFound(ex.Message);
             }
-            catch (DbUpdateException ex)
+            catch (DataAccessException ex)
             {
-                return StatusCode(500, ex);
-            }
-            catch (SqlException ex)
-            {
-                return StatusCode(500, ex);
+                return StatusCode(500, new { ex.Message });
             }
         }
 
@@ -107,13 +99,9 @@ namespace Havoc_API.Controllers
             {
                 return NotFound(ex.Message);
             }
-            catch (DbUpdateException ex)
+            catch (DataAccessException ex)
             {
-                return StatusCode(500, ex);
-            }
-            catch (SqlException ex)
-            {
-                return StatusCode(500, ex);
+                return StatusCode(500, new { ex.Message });
             }
         }
 

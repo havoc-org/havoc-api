@@ -6,9 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using System.Net;
 using System.Text;
-using WarehouseApp2.Middlewares;
+using Havoc_API.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 

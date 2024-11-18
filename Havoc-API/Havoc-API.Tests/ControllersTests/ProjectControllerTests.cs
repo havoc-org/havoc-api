@@ -2,8 +2,10 @@ using System;
 using FluentAssertions;
 using Havoc_API.Controllers;
 using Havoc_API.DTOs.Project;
+using Havoc_API.Exceptions;
 using Havoc_API.Models;
 using Havoc_API.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Moq;
@@ -64,15 +66,14 @@ public class ProjectControllerTests
     //# TODO change type of exception that Project Controller handles
     public async void GetProjectByUserAsync_RerturnsInternalError_WhenProjectServiceThrowsSqlError()
     {
-        // //Arrange
-        // var projects = new List<ProjectGET>();
-        // _userService.Setup(s => s.GetUserId()).Returns(It.IsAny<int>());
-        // _projectService.Setup(s => s.GetProjectsByUserAsync(It.IsAny<int>()))
-        //     .Throws<Exception>();
-        // //Act
-        // var response = await _projectController.GetProjectByUserAsync();
-        // //Assert
-        // response.Should().BeOfType<StatusCodeResult>().Which.StatusCode.Should().Be(500);
-        1.Should().Be(1);
+        //Arrange
+        var projects = new List<ProjectGET>();
+        _userService.Setup(s => s.GetUserId()).Returns(It.IsAny<int>());
+        _projectService.Setup(s => s.GetProjectsByUserAsync(It.IsAny<int>()))
+            .Throws<DataAccessException>();
+        //Act
+        var response = await _projectController.GetProjectByUserAsync();
+        //Assert
+        response.Should().BeOfType<ObjectResult>().Which.StatusCode.Should().Be(500);
     }
 }

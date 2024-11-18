@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using WarehouseApp2.Exceptions;
 
 namespace Havoc_API.Controllers;
 
@@ -77,11 +76,7 @@ public class TaskController : ControllerBase
         {
             return BadRequest(new { ex.Message });
         }
-        catch (DbUpdateException ex)
-        {
-            return StatusCode(500, new { ex.Message });
-        }
-        catch (SqlException ex)
+        catch (DataAccessException ex)
         {
             return StatusCode(500, new { ex.Message });
         }
@@ -106,11 +101,7 @@ public class TaskController : ControllerBase
         {
             return NotFound(new { ex.Message });
         }
-        catch (DbUpdateException ex)
-        {
-            return StatusCode(500, new { ex.Message });
-        }
-        catch (SqlException ex)
+        catch (DataAccessException ex)
         {
             return StatusCode(500, new { ex.Message });
         }
@@ -135,11 +126,7 @@ public class TaskController : ControllerBase
         {
             return NotFound(new { ex.Message });
         }
-        catch (DbUpdateException ex)
-        {
-            return StatusCode(500, new { ex.Message });
-        }
-        catch (SqlException ex)
+        catch (DataAccessException ex)
         {
             return StatusCode(500, new { ex.Message });
         }
@@ -164,11 +151,7 @@ public class TaskController : ControllerBase
         {
             return NotFound(new { ex.Message });
         }
-        catch (DbUpdateException ex)
-        {
-            return StatusCode(500, new { ex.Message });
-        }
-        catch (SqlException ex)
+        catch (DataAccessException ex)
         {
             return StatusCode(500, new { ex.Message });
         }

@@ -1,8 +1,7 @@
 using Havoc_API.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
-using WarehouseApp2.Exceptions;
 
-namespace WarehouseApp2.Middlewares;
+namespace Havoc_API.Middlewares;
 
 public class CustomExceptionHandler : IExceptionHandler
 {
@@ -25,11 +24,11 @@ public class CustomExceptionHandler : IExceptionHandler
             httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
             await httpContext.Response.WriteAsJsonAsync(new
             {
-                Message=$"Domain exception: {exceptionMessage}, Time of occurrence {DateTime.UtcNow}"
+                Message = $"Domain exception: {exceptionMessage}, Time of occurrence {DateTime.UtcNow}"
             }, cancellationToken: cancellationToken);
             return true;
         }
-        else if(exception is NotFoundException)
+        else if (exception is NotFoundException)
         {
             var exceptionMessage = exception.Message;
             _logger.LogError(
@@ -39,6 +38,19 @@ public class CustomExceptionHandler : IExceptionHandler
             await httpContext.Response.WriteAsJsonAsync(new
             {
                 Message = $"Not found exception: {exceptionMessage}, Time of occurrence {DateTime.UtcNow}"
+            }, cancellationToken: cancellationToken);
+            return true;
+        }
+        else if (exception is DataAccessException)
+        {
+            var exceptionMessage = exception.Message;
+            _logger.LogError(
+                "Data access exception: {exceptionMessage}, Time of occurrence {time}",
+                exceptionMessage, DateTime.UtcNow);
+            httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            await httpContext.Response.WriteAsJsonAsync(new
+            {
+                Message = $"Data access exception: {exceptionMessage}, Time of occurrence {DateTime.UtcNow}"
             }, cancellationToken: cancellationToken);
             return true;
         }
