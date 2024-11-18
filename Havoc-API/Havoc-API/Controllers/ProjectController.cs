@@ -51,7 +51,7 @@ namespace Havoc_API.Controllers
         }
 
 
-        [HttpGet]
+        [HttpGet("{id}")]
         public async Task<ActionResult> GetProjectByIdAsync(int id)
         {
             try
