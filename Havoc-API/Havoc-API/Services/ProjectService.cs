@@ -23,40 +23,43 @@ namespace Havoc_API.Services
 
         public async Task<ProjectGET> GetProjectByIdAsync(int id)
         {
-            var project = await _havocContext.Projects.FirstOrDefaultAsync(p => p.ProjectId==id).Select(project => new ProjectGET(
-               project.ProjectId,
-               project.Name,
-               project.Description,
-               project.Background,
-               project.Start,
-               project.Deadline,
-               project.LastModified,
-               new UserGET(
-                   project.Creator.UserId,
-                   project.Creator.FirstName,
-                   project.Creator.LastName,
-                   project.Creator.Email
-                   ),
-               new ProjectStatusGET(
-                   project.ProjectStatus.ProjectStatusId,
-                   project.ProjectStatus.Name
-                   ),
-                _havocContext.Participations.Where(par => par.ProjectId == project.ProjectId)
-                                            .Select(par => new ParticipationGET(
-                   par.ProjectId,
-                   new UserParticipationGET(
-                       par.User.UserId,
-                       par.User.FirstName,
-                       par.User.LastName,
-                       par.User.Email,
-                       new RoleGET(
-                       par.Role.RoleId,
-                       par.Role.Name
-                       )
-                       )
-               )).ToList()
-
-           ));
+            var project = await _havocContext.Projects
+        .Where(p => p.ProjectId == id)
+        .Select(project => new ProjectGET(
+            project.ProjectId,
+            project.Name,
+            project.Description,
+            project.Background,
+            project.Start,
+            project.Deadline,
+            project.LastModified,
+            new UserGET(
+                project.Creator.UserId,
+                project.Creator.FirstName,
+                project.Creator.LastName,
+                project.Creator.Email
+            ),
+            new ProjectStatusGET(
+                project.ProjectStatus.ProjectStatusId,
+                project.ProjectStatus.Name
+            ),
+            _havocContext.Participations
+                .Where(par => par.ProjectId == project.ProjectId)
+                .Select(par => new ParticipationGET(
+                    par.ProjectId,
+                    new UserParticipationGET(
+                        par.User.UserId,
+                        par.User.FirstName,
+                        par.User.LastName,
+                        par.User.Email,
+                        new RoleGET(
+                            par.Role.RoleId,
+                            par.Role.Name
+                        )
+                    )
+                )).ToList()
+        ))
+        .FirstOrDefaultAsync(); // Get the first matching result asynchronously
             return project;
         }
 
