@@ -10,5 +10,6 @@ namespace Havoc_API.Services
         public Task<List<ProjectGET>> GetProjectsAsync();
         public Task<List<ProjectGET>> GetProjectsByUserAsync(int userId);
         public Task<int> DeleteProjectByIdAsync(int projectId);
+        public Task<ProjectGET> GetProjectByIdAsync(int id);
     }
 }

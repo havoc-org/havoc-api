@@ -52,6 +52,28 @@ namespace Havoc_API.Controllers
 
 
         [HttpGet]
+        public async Task<ActionResult> GetProjectByIdAsync(int id)
+        {
+            try
+            {
+                var projects = await _projectService.GetProjectByIdAsync(id);
+                return Ok(projects);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (DbUpdateException ex)
+            {
+                return StatusCode(500, ex);
+            }
+            catch (SqlException ex)
+            {
+                return StatusCode(500, ex);
+            }
+        }
+
+        [HttpGet]
         public async Task<ActionResult> GetProjectByUserAsync()
         {
             try
