@@ -6,7 +6,7 @@ namespace Havoc_API.DTOs.Participation
     {
         public int ProjectId { get; private set; }
 
-        public string Email { get; private set; }
+        public string Email { get; private set; } = null!;
 
         public RoleType Role { get; private set; }
 

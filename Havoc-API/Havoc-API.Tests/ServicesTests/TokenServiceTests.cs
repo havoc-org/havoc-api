@@ -58,12 +58,6 @@ public class TokenServiceTests
             .And
             .BeAfter(DateTime.UtcNow.AddHours(1).AddMinutes(-1));
 
-        claimsPrincipal.Claims.FirstOrDefault(c => c.Type == "Email")?.Value
-            .Should().Be(userToken.Email);
-        claimsPrincipal.Claims.FirstOrDefault(c => c.Type == "FirstName")?.Value
-            .Should().Be(userToken.FirstName);
-        claimsPrincipal.Claims.FirstOrDefault(c => c.Type == "LastName")?.Value
-            .Should().Be(userToken.LastName);
         claimsPrincipal.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value
             .Should().Be(userToken.Id + "");
         claimsPrincipal.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Jti)?.Value
@@ -159,8 +153,7 @@ public class TokenServiceTests
         };
         var claims = new List<Claim>
             {
-                new Claim("UserId",userId.ToString()),
-                // Add more claims as necessary
+                new ("UserId",userId.ToString()),
             };
 
         var token = new JwtSecurityToken(

@@ -7,11 +7,6 @@ namespace Havoc_API.Exceptions
         public NotFoundException()
         {
         }
-
-        protected NotFoundException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
-
         public NotFoundException(string? message) : base(message)
         {
         }

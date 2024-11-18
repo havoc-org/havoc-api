@@ -38,11 +38,6 @@ namespace Havoc_API.Services
             var claims = new List<Claim>
              {
                 new Claim("UserId",user.Id.ToString()),
-                new Claim("Email", user.Email),
-                new Claim("FirstName", user.FirstName),
-                new Claim("LastName", user.LastName),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-                 // Add more claims as necessary
               };
 
             return GenerateToken(claims, DateTime.UtcNow.AddHours(1));
@@ -66,14 +61,7 @@ namespace Havoc_API.Services
                 // Add more claims as necessary
             };
 
-            var token = new JwtSecurityToken(
-               issuer: _configuration["JWT:Issuer"],
-               audience: _configuration["JWT:Audience"],
-               claims: claims,
-               expires: DateTime.UtcNow.AddDays(3),
-               signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature));
-
-            return tokenHandler.WriteToken(token);
+            return GenerateToken(claims, DateTime.UtcNow.AddDays(3));
         }
 
 
