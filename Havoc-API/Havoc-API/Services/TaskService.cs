@@ -193,6 +193,23 @@ public class TaskService : ITaskService
 
         await _havocContext.SaveChangesAsync();
 
+        foreach(var tag in task.Tags)
+        {
+            var newTag = await _havocContext.Tags
+            .FirstOrDefaultAsync(t => t.Name == tag.Name && t.ColorHex == tag.ColorHex);
+
+            if(newTag == null)
+            {
+                newTag = new Tag(tag.Name, tag.ColorHex);
+                await _havocContext.Tags.AddAsync(newTag);
+                await _havocContext.SaveChangesAsync();
+            }
+
+            newTask.Tags.Add(newTag);
+        }
+
+        await _havocContext.SaveChangesAsync();
+
         await transaction.CommitAsync();
 
         return newTask.TaskId;

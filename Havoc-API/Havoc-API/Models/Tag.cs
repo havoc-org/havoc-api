@@ -34,6 +34,8 @@ public partial class Tag
             var hexColorRegex = new Regex(@"^#[0-9A-Fa-f]{6}$");   
             if(!hexColorRegex.IsMatch(value))
                 throw new MismatchedRegexException(nameof(ColorHex));
+            
+            _colorHex = value; 
         }
     }
 
