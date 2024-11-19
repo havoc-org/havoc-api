@@ -41,7 +41,6 @@ public class ProjectControllerTests
         //Act
         var response = await _projectController.GetProjectByUserAsync();
         //Assert
-
         response.Should().BeOfType<OkObjectResult>().Which.Value.Should().BeEquivalentTo(projects);
     }
 
@@ -63,7 +62,6 @@ public class ProjectControllerTests
     }
 
     [Fact]
-    //# TODO change type of exception that Project Controller handles
     public async void GetProjectByUserAsync_RerturnsInternalError_WhenProjectServiceThrowsSqlError()
     {
         //Arrange
@@ -73,6 +71,117 @@ public class ProjectControllerTests
             .Throws<DataAccessException>();
         //Act
         var response = await _projectController.GetProjectByUserAsync();
+        //Assert
+        response.Should().BeOfType<ObjectResult>().Which.StatusCode.Should().Be(500);
+    }
+
+    [Fact]
+    public async void AddProjectAsync_ReturnsOkResponseWithIdOfCreatedProject_WhenProjectWasSuccessfullyCreated()
+    {
+        //Arrange
+        int userId = It.IsAny<int>();
+        var user = It.IsAny<User>();
+        var projectPost = It.IsAny<ProjectPOST>();
+        _userService.Setup(s => s.GetUserId()).Returns(userId);
+        _userService.Setup(s => s.GetUserByIdAsync(userId)).ReturnsAsync(user);
+        _projectService.Setup(s => s.AddProjectAsync(projectPost, user)).ReturnsAsync(It.IsAny<int>());
+        //Act
+        var response = await _projectController.AddProjectAsync(projectPost);
+        //Assert
+        response.Should().BeOfType<OkObjectResult>().Which.Value.Should().BeOfType<int>();
+    }
+
+    [Fact]
+    public async void AddProjectAsync_ReturnsNotFound_WhenCreatorCannotBeFoundInUserService()
+    {
+        //Arrange
+        int userId = It.IsAny<int>();
+        var projectPost = It.IsAny<ProjectPOST>();
+        _userService.Setup(s => s.GetUserId()).Returns(userId);
+        _userService.Setup(s => s.GetUserByIdAsync(userId)).ThrowsAsync(new NotFoundException());
+        _projectService.Setup(s => s.AddProjectAsync(projectPost, It.IsAny<User>()))
+            .ReturnsAsync(It.IsAny<int>());
+        //Act
+        var response = await _projectController.AddProjectAsync(projectPost);
+        //Assert
+        response.Should().BeOfType<NotFoundObjectResult>();
+    }
+    [Fact]
+    public async void AddProjectAsync_ReturnsNotFound_WhenCreatorInProjectServiceIsNull()
+    {
+        //Arrange
+        int userId = It.IsAny<int>();
+        var projectPost = It.IsAny<ProjectPOST>();
+        _userService.Setup(s => s.GetUserId()).Returns(userId);
+        _userService.Setup(s => s.GetUserByIdAsync(userId)).ReturnsAsync(It.IsAny<User>);
+        _projectService.Setup(s => s.AddProjectAsync(projectPost, It.IsAny<User>()))
+            .ThrowsAsync(new NotFoundException());
+        //Act
+        var response = await _projectController.AddProjectAsync(projectPost);
+        //Assert
+        response.Should().BeOfType<NotFoundObjectResult>();
+    }
+
+    [Fact]
+    public async void AddProjectAsync_ReturnsNotFound_WhenCreatorInProjectServiceIsNullAndWhenCreatorCannotBeFoundInUserService()
+    {
+        //Arrange
+        int userId = It.IsAny<int>();
+        var projectPost = It.IsAny<ProjectPOST>();
+        _userService.Setup(s => s.GetUserId()).Returns(userId);
+        _userService.Setup(s => s.GetUserByIdAsync(userId)).ThrowsAsync(new NotFoundException());
+        _projectService.Setup(s => s.AddProjectAsync(projectPost, It.IsAny<User>()))
+            .ThrowsAsync(new NotFoundException());
+        //Act
+        var response = await _projectController.AddProjectAsync(projectPost);
+        //Assert
+        response.Should().BeOfType<NotFoundObjectResult>();
+    }
+
+    [Fact]
+    public async void AddProjectAsync_ReturnsInternalError_WhenUserServiceThrowsDataAccessException()
+    {
+        //Arrange
+        int userId = It.IsAny<int>();
+        var projectPost = It.IsAny<ProjectPOST>();
+        _userService.Setup(s => s.GetUserId()).Returns(userId);
+        _userService.Setup(s => s.GetUserByIdAsync(userId)).ThrowsAsync(new DataAccessException());
+        _projectService.Setup(s => s.AddProjectAsync(projectPost, It.IsAny<User>()))
+            .ReturnsAsync(It.IsAny<int>());
+        //Act
+        var response = await _projectController.AddProjectAsync(projectPost);
+        //Assert
+        response.Should().BeOfType<ObjectResult>().Which.StatusCode.Should().Be(500);
+    }
+
+    [Fact]
+    public async void AddProjectAsync_ReturnsInternalError_WhenProjectServiceThrowsDataAccessException()
+    {
+        //Arrange
+        int userId = It.IsAny<int>();
+        var projectPost = It.IsAny<ProjectPOST>();
+        _userService.Setup(s => s.GetUserId()).Returns(userId);
+        _userService.Setup(s => s.GetUserByIdAsync(userId)).ReturnsAsync(It.IsAny<User>());
+        _projectService.Setup(s => s.AddProjectAsync(projectPost, It.IsAny<User>()))
+            .ThrowsAsync(new DataAccessException());
+        //Act
+        var response = await _projectController.AddProjectAsync(projectPost);
+        //Assert
+        response.Should().BeOfType<ObjectResult>().Which.StatusCode.Should().Be(500);
+    }
+
+    [Fact]
+    public async void AddProjectAsync_ReturnsInternalError_WhenProjectServiceThrowsDataAccessExceptionAndWhenUserServiceThrowsDataAccessException()
+    {
+        //Arrange
+        int userId = It.IsAny<int>();
+        var projectPost = It.IsAny<ProjectPOST>();
+        _userService.Setup(s => s.GetUserId()).Returns(userId);
+        _userService.Setup(s => s.GetUserByIdAsync(userId)).ThrowsAsync(new DataAccessException());
+        _projectService.Setup(s => s.AddProjectAsync(projectPost, It.IsAny<User>()))
+            .ThrowsAsync(new DataAccessException());
+        //Act
+        var response = await _projectController.AddProjectAsync(projectPost);
         //Assert
         response.Should().BeOfType<ObjectResult>().Which.StatusCode.Should().Be(500);
     }
