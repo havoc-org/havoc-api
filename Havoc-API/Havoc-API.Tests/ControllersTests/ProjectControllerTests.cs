@@ -185,4 +185,146 @@ public class ProjectControllerTests
         //Assert
         response.Should().BeOfType<ObjectResult>().Which.StatusCode.Should().Be(500);
     }
+
+
+    [Fact]
+    public async void DeleteProjectByIdAsync_ReturnsOkResponseWithMessageOfAffectedRows_WhenProjectWasSuccessfullyDeleted()
+    {
+        //Arrange
+        int userId = It.IsAny<int>();
+        int projectId = It.IsAny<int>();
+        var mockCanDeleteRole = new Mock<Role>();
+        mockCanDeleteRole.Setup(r => r.CanDeleteProject()).Returns(true);
+        _userService.Setup(s => s.GetUserId()).Returns(userId);
+        _participationService.Setup(s => s.GetUserRoleInProjectAsync(userId, projectId))
+            .ReturnsAsync(mockCanDeleteRole.Object);
+        _projectService.Setup(s => s.DeleteProjectByIdAsync(projectId))
+            .ReturnsAsync(It.IsAny<int>());
+        //Act
+        var response = await _projectController.DeleteProjectByIdAsync(projectId);
+        //Assert
+        response.Should().BeOfType<OkObjectResult>();
+    }
+
+    [Fact]
+    public async void DeleteProjectByIdAsync_ReturnsUnAuthorizedWithMessage_WhenUserHasntDeletePermitionOfProject()
+    {
+        //Arrange
+        int userId = It.IsAny<int>();
+        int projectId = It.IsAny<int>();
+        Role canDeleteRole = It.Is<Role>(r => r.CanDeleteProject() == false);
+        _userService.Setup(s => s.GetUserId()).Returns(userId);
+        _participationService.Setup(s => s.GetUserRoleInProjectAsync(userId, projectId))
+            .ReturnsAsync(canDeleteRole);
+        _projectService.Setup(s => s.DeleteProjectByIdAsync(projectId))
+            .ReturnsAsync(It.IsAny<int>());
+        //Act
+        var response = await _projectController.DeleteProjectByIdAsync(projectId);
+        //Assert
+        response.Should().BeOfType<UnauthorizedObjectResult>();
+    }
+
+    [Fact]
+    public async void DeleteProjectByIdAsync_ReturnsNotFound_WhenProjectServiceThrowsNotFoundException()
+    {
+        //Arrange
+        int userId = It.IsAny<int>();
+        int projectId = It.IsAny<int>();
+        Role canDeleteRole = It.Is<Role>(r => r.CanDeleteProject() == true);
+        _userService.Setup(s => s.GetUserId()).Returns(userId);
+        _participationService.Setup(s => s.GetUserRoleInProjectAsync(userId, projectId))
+            .ReturnsAsync(canDeleteRole);
+        _projectService.Setup(s => s.DeleteProjectByIdAsync(projectId))
+            .ThrowsAsync(new NotFoundException());
+        //Act
+        var response = await _projectController.DeleteProjectByIdAsync(projectId);
+        //Assert
+        response.Should().BeOfType<NotFoundObjectResult>();
+    }
+
+    [Fact]
+    public async void DeleteProjectByIdAsync_ReturnsNotFound_WhenParticipationServiceThrowsNotFoundException()
+    {
+        //Arrange
+        int userId = It.IsAny<int>();
+        int projectId = It.IsAny<int>();
+        _userService.Setup(s => s.GetUserId()).Returns(userId);
+        _participationService.Setup(s => s.GetUserRoleInProjectAsync(userId, projectId))
+            .ThrowsAsync(new NotFoundException());
+        _projectService.Setup(s => s.DeleteProjectByIdAsync(projectId))
+            .ReturnsAsync(It.IsAny<int>());
+        //Act
+        var response = await _projectController.DeleteProjectByIdAsync(projectId);
+        //Assert
+        response.Should().BeOfType<NotFoundObjectResult>();
+    }
+
+    [Fact]
+    public async void DeleteProjectByIdAsync_ReturnsNotFound_WhenParticipationServiceThrowsNotFoundExceptionAndProjectServiceThrowsNotFoundException()
+    {
+        //Arrange
+        int userId = It.IsAny<int>();
+        int projectId = It.IsAny<int>();
+        _userService.Setup(s => s.GetUserId()).Returns(userId);
+        _participationService.Setup(s => s.GetUserRoleInProjectAsync(userId, projectId))
+            .ThrowsAsync(new NotFoundException());
+        _projectService.Setup(s => s.DeleteProjectByIdAsync(projectId))
+            .ThrowsAsync(new NotFoundException());
+        //Act
+        var response = await _projectController.DeleteProjectByIdAsync(projectId);
+        //Assert
+        response.Should().BeOfType<NotFoundObjectResult>();
+    }
+
+    [Fact]
+    public async void DeleteProjectByIdAsync_ReturnsInternalError_WhenProjectServiceThrowsDataAccessException()
+    {
+        //Arrange
+        int userId = It.IsAny<int>();
+        int projectId = It.IsAny<int>();
+        Role canDeleteRole = It.Is<Role>(r => r.CanDeleteProject() == true);
+        _userService.Setup(s => s.GetUserId()).Returns(userId);
+        _participationService.Setup(s => s.GetUserRoleInProjectAsync(userId, projectId))
+            .ReturnsAsync(canDeleteRole);
+        _projectService.Setup(s => s.DeleteProjectByIdAsync(projectId))
+            .ThrowsAsync(new DataAccessException());
+        //Act
+        var response = await _projectController.DeleteProjectByIdAsync(projectId);
+        //Assert
+        response.Should().BeOfType<ObjectResult>().Which.StatusCode.Should().Be(500);
+    }
+
+    [Fact]
+    public async void DeleteProjectByIdAsync_ReturnsInternalError_WhenParticipationServiceThrowsDataAccessException()
+    {
+        //Arrange
+        int userId = It.IsAny<int>();
+        int projectId = It.IsAny<int>();
+        _userService.Setup(s => s.GetUserId()).Returns(userId);
+        _participationService.Setup(s => s.GetUserRoleInProjectAsync(userId, projectId))
+            .ThrowsAsync(new DataAccessException());
+        _projectService.Setup(s => s.DeleteProjectByIdAsync(projectId))
+            .ReturnsAsync(It.IsAny<int>());
+        //Act
+        var response = await _projectController.DeleteProjectByIdAsync(projectId);
+        //Assert
+        response.Should().BeOfType<ObjectResult>().Which.StatusCode.Should().Be(500);
+    }
+
+    [Fact]
+    public async void DeleteProjectByIdAsync_ReturnsInternalError_WhenParticipationServiceThrowsDataAccessExceptionAndProjectServiceThrowsDataAccessException()
+    {
+        //Arrange
+        int userId = It.IsAny<int>();
+        int projectId = It.IsAny<int>();
+        _userService.Setup(s => s.GetUserId()).Returns(userId);
+        _participationService.Setup(s => s.GetUserRoleInProjectAsync(userId, projectId))
+            .ThrowsAsync(new DataAccessException());
+        _projectService.Setup(s => s.DeleteProjectByIdAsync(projectId))
+            .ThrowsAsync(new DataAccessException());
+        //Act
+        var response = await _projectController.DeleteProjectByIdAsync(projectId);
+        //Assert
+        response.Should().BeOfType<ObjectResult>().Which.StatusCode.Should().Be(500);
+    }
 }
