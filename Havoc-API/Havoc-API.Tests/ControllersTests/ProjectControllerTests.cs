@@ -1,4 +1,5 @@
 using System;
+using Azure.Core;
 using FluentAssertions;
 using Havoc_API.Controllers;
 using Havoc_API.DTOs.Project;
@@ -35,7 +36,7 @@ public class ProjectControllerTests
     {
         //Arrange
         var projects = new List<ProjectGET>() { It.IsAny<ProjectGET>(), It.IsAny<ProjectGET>(), It.IsAny<ProjectGET>() };
-        _userService.Setup(s => s.GetUserId()).Returns(It.IsAny<int>());
+        _userService.Setup(s => s.GetUserId(It.IsAny<HttpRequest>())).Returns(It.IsAny<int>());
         _projectService.Setup(s => s.GetProjectsByUserAsync(It.IsAny<int>()))
         .ReturnsAsync(projects);
         //Act
@@ -50,7 +51,7 @@ public class ProjectControllerTests
         //Arrange
         var emptyProjectList = new List<ProjectGET>();
         var projects = new List<ProjectGET>() { It.IsAny<ProjectGET>(), It.IsAny<ProjectGET>(), It.IsAny<ProjectGET>() };
-        _userService.Setup(s => s.GetUserId()).Returns(It.IsAny<int>());
+        _userService.Setup(s => s.GetUserId(It.IsAny<HttpRequest>())).Returns(It.IsAny<int>());
         _projectService.Setup(s => s.GetProjectsByUserAsync(It.IsAny<int>()))
             .ReturnsAsync(emptyProjectList);
         //Act
@@ -66,7 +67,7 @@ public class ProjectControllerTests
     {
         //Arrange
         var projects = new List<ProjectGET>();
-        _userService.Setup(s => s.GetUserId()).Returns(It.IsAny<int>());
+        _userService.Setup(s => s.GetUserId(It.IsAny<HttpRequest>())).Returns(It.IsAny<int>());
         _projectService.Setup(s => s.GetProjectsByUserAsync(It.IsAny<int>()))
             .Throws<DataAccessException>();
         //Act
@@ -82,7 +83,7 @@ public class ProjectControllerTests
         int userId = It.IsAny<int>();
         var user = It.IsAny<User>();
         var projectPost = It.IsAny<ProjectPOST>();
-        _userService.Setup(s => s.GetUserId()).Returns(userId);
+        _userService.Setup(s => s.GetUserId(It.IsAny<HttpRequest>())).Returns(userId);
         _userService.Setup(s => s.GetUserByIdAsync(userId)).ReturnsAsync(user);
         _projectService.Setup(s => s.AddProjectAsync(projectPost, user)).ReturnsAsync(It.IsAny<int>());
         //Act
@@ -97,7 +98,7 @@ public class ProjectControllerTests
         //Arrange
         int userId = It.IsAny<int>();
         var projectPost = It.IsAny<ProjectPOST>();
-        _userService.Setup(s => s.GetUserId()).Returns(userId);
+        _userService.Setup(s => s.GetUserId(It.IsAny<HttpRequest>())).Returns(userId);
         _userService.Setup(s => s.GetUserByIdAsync(userId)).ThrowsAsync(new NotFoundException());
         _projectService.Setup(s => s.AddProjectAsync(projectPost, It.IsAny<User>()))
             .ReturnsAsync(It.IsAny<int>());
@@ -112,7 +113,7 @@ public class ProjectControllerTests
         //Arrange
         int userId = It.IsAny<int>();
         var projectPost = It.IsAny<ProjectPOST>();
-        _userService.Setup(s => s.GetUserId()).Returns(userId);
+        _userService.Setup(s => s.GetUserId(It.IsAny<HttpRequest>())).Returns(userId);
         _userService.Setup(s => s.GetUserByIdAsync(userId)).ReturnsAsync(It.IsAny<User>);
         _projectService.Setup(s => s.AddProjectAsync(projectPost, It.IsAny<User>()))
             .ThrowsAsync(new NotFoundException());
@@ -128,7 +129,7 @@ public class ProjectControllerTests
         //Arrange
         int userId = It.IsAny<int>();
         var projectPost = It.IsAny<ProjectPOST>();
-        _userService.Setup(s => s.GetUserId()).Returns(userId);
+        _userService.Setup(s => s.GetUserId(It.IsAny<HttpRequest>())).Returns(userId);
         _userService.Setup(s => s.GetUserByIdAsync(userId)).ThrowsAsync(new NotFoundException());
         _projectService.Setup(s => s.AddProjectAsync(projectPost, It.IsAny<User>()))
             .ThrowsAsync(new NotFoundException());
@@ -144,7 +145,7 @@ public class ProjectControllerTests
         //Arrange
         int userId = It.IsAny<int>();
         var projectPost = It.IsAny<ProjectPOST>();
-        _userService.Setup(s => s.GetUserId()).Returns(userId);
+        _userService.Setup(s => s.GetUserId(It.IsAny<HttpRequest>())).Returns(userId);
         _userService.Setup(s => s.GetUserByIdAsync(userId)).ThrowsAsync(new DataAccessException());
         _projectService.Setup(s => s.AddProjectAsync(projectPost, It.IsAny<User>()))
             .ReturnsAsync(It.IsAny<int>());
@@ -160,7 +161,7 @@ public class ProjectControllerTests
         //Arrange
         int userId = It.IsAny<int>();
         var projectPost = It.IsAny<ProjectPOST>();
-        _userService.Setup(s => s.GetUserId()).Returns(userId);
+        _userService.Setup(s => s.GetUserId(It.IsAny<HttpRequest>())).Returns(userId);
         _userService.Setup(s => s.GetUserByIdAsync(userId)).ReturnsAsync(It.IsAny<User>());
         _projectService.Setup(s => s.AddProjectAsync(projectPost, It.IsAny<User>()))
             .ThrowsAsync(new DataAccessException());
@@ -176,7 +177,7 @@ public class ProjectControllerTests
         //Arrange
         int userId = It.IsAny<int>();
         var projectPost = It.IsAny<ProjectPOST>();
-        _userService.Setup(s => s.GetUserId()).Returns(userId);
+        _userService.Setup(s => s.GetUserId(It.IsAny<HttpRequest>())).Returns(userId);
         _userService.Setup(s => s.GetUserByIdAsync(userId)).ThrowsAsync(new DataAccessException());
         _projectService.Setup(s => s.AddProjectAsync(projectPost, It.IsAny<User>()))
             .ThrowsAsync(new DataAccessException());
@@ -198,7 +199,7 @@ public class ProjectControllerTests
         int userId = It.IsAny<int>();
         int projectId = It.IsAny<int>();
         var canDeleteRole = new Role(RoleType.Owner);
-        _userService.Setup(s => s.GetUserId()).Returns(userId);
+        _userService.Setup(s => s.GetUserId(It.IsAny<HttpRequest>())).Returns(userId);
         _participationService.Setup(s => s.GetUserRoleInProjectAsync(userId, projectId))
             .ReturnsAsync(canDeleteRole);
         _projectService.Setup(s => s.DeleteProjectByIdAsync(projectId))
@@ -218,7 +219,7 @@ public class ProjectControllerTests
         int userId = It.IsAny<int>();
         int projectId = It.IsAny<int>();
         var canDeleteRole = new Role(notOwnerRoleType);
-        _userService.Setup(s => s.GetUserId()).Returns(userId);
+        _userService.Setup(s => s.GetUserId(It.IsAny<HttpRequest>())).Returns(userId);
         _participationService.Setup(s => s.GetUserRoleInProjectAsync(userId, projectId))
             .ReturnsAsync(canDeleteRole);
         _projectService.Setup(s => s.DeleteProjectByIdAsync(projectId))
@@ -236,7 +237,7 @@ public class ProjectControllerTests
         int userId = It.IsAny<int>();
         int projectId = It.IsAny<int>();
         var canDeleteRole = new Role(RoleType.Owner);
-        _userService.Setup(s => s.GetUserId()).Returns(userId);
+        _userService.Setup(s => s.GetUserId(It.IsAny<HttpRequest>())).Returns(userId);
         _participationService.Setup(s => s.GetUserRoleInProjectAsync(userId, projectId))
             .ReturnsAsync(canDeleteRole);
         _projectService.Setup(s => s.DeleteProjectByIdAsync(projectId))
@@ -253,7 +254,7 @@ public class ProjectControllerTests
         //Arrange
         int userId = It.IsAny<int>();
         int projectId = It.IsAny<int>();
-        _userService.Setup(s => s.GetUserId()).Returns(userId);
+        _userService.Setup(s => s.GetUserId(It.IsAny<HttpRequest>())).Returns(userId);
         _participationService.Setup(s => s.GetUserRoleInProjectAsync(userId, projectId))
             .ThrowsAsync(new NotFoundException());
         _projectService.Setup(s => s.DeleteProjectByIdAsync(projectId))
@@ -270,7 +271,7 @@ public class ProjectControllerTests
         //Arrange
         int userId = It.IsAny<int>();
         int projectId = It.IsAny<int>();
-        _userService.Setup(s => s.GetUserId()).Returns(userId);
+        _userService.Setup(s => s.GetUserId(It.IsAny<HttpRequest>())).Returns(userId);
         _participationService.Setup(s => s.GetUserRoleInProjectAsync(userId, projectId))
             .ThrowsAsync(new NotFoundException());
         _projectService.Setup(s => s.DeleteProjectByIdAsync(projectId))
@@ -288,7 +289,7 @@ public class ProjectControllerTests
         int userId = It.IsAny<int>();
         int projectId = It.IsAny<int>();
         var canDeleteRole = new Role(RoleType.Owner);
-        _userService.Setup(s => s.GetUserId()).Returns(userId);
+        _userService.Setup(s => s.GetUserId(It.IsAny<HttpRequest>())).Returns(userId);
         _participationService.Setup(s => s.GetUserRoleInProjectAsync(userId, projectId))
             .ReturnsAsync(canDeleteRole);
         _projectService.Setup(s => s.DeleteProjectByIdAsync(projectId))
@@ -305,7 +306,7 @@ public class ProjectControllerTests
         //Arrange
         int userId = It.IsAny<int>();
         int projectId = It.IsAny<int>();
-        _userService.Setup(s => s.GetUserId()).Returns(userId);
+        _userService.Setup(s => s.GetUserId(It.IsAny<HttpRequest>())).Returns(userId);
         _participationService.Setup(s => s.GetUserRoleInProjectAsync(userId, projectId))
             .ThrowsAsync(new DataAccessException());
         _projectService.Setup(s => s.DeleteProjectByIdAsync(projectId))
@@ -322,7 +323,7 @@ public class ProjectControllerTests
         //Arrange
         int userId = It.IsAny<int>();
         int projectId = It.IsAny<int>();
-        _userService.Setup(s => s.GetUserId()).Returns(userId);
+        _userService.Setup(s => s.GetUserId(It.IsAny<HttpRequest>())).Returns(userId);
         _participationService.Setup(s => s.GetUserRoleInProjectAsync(userId, projectId))
             .ThrowsAsync(new DataAccessException());
         _projectService.Setup(s => s.DeleteProjectByIdAsync(projectId))

@@ -33,7 +33,7 @@ public class TaskController : ControllerBase
     {
         try
         {
-            var userId = _userService.GetUserId();
+            var userId = _userService.GetUserId(Request);
             await _participationService.GetUserRoleInProjectAsync(userId, projectId);
 
             var result = await _taskService.GetTasksByProjectIdAsync(projectId);
@@ -58,7 +58,7 @@ public class TaskController : ControllerBase
     {
         try
         {
-            var creatorId = _userService.GetUserId();
+            var creatorId = _userService.GetUserId(Request);
             task.CreatorId = creatorId;
 
             var role = await _participationService.GetUserRoleInProjectAsync(creatorId, task.ProjectId);
@@ -87,7 +87,7 @@ public class TaskController : ControllerBase
     {
         try
         {
-            var userId = _userService.GetUserId();
+            var userId = _userService.GetUserId(Request);
             var task = await _taskService.GetTaskByIdAsync(taskId);
 
             var role = await _participationService.GetUserRoleInProjectAsync(userId, task.ProjectId);
@@ -112,7 +112,7 @@ public class TaskController : ControllerBase
     {
         try
         {
-            var userId = _userService.GetUserId();
+            var userId = _userService.GetUserId(Request);
             var task = await _taskService.GetTaskByIdAsync(taskUpdate.TaskId);
 
             var role = await _participationService.GetUserRoleInProjectAsync(userId, task.ProjectId);
@@ -137,7 +137,7 @@ public class TaskController : ControllerBase
     {
         try
         {
-            var userId = _userService.GetUserId();
+            var userId = _userService.GetUserId(Request);
             var task = await _taskService.GetTaskByIdAsync(taskId);
 
             var role = await _participationService.GetUserRoleInProjectAsync(userId, task.ProjectId);

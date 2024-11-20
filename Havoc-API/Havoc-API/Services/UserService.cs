@@ -12,11 +12,9 @@ namespace Havoc_API.Services
     public class UserService : IUserService
     {
         private readonly IHavocContext _context;
-        private readonly IHttpContextAccessor _httpContextAccesor;
-        public UserService(IHavocContext context, IHttpContextAccessor httpContextAccessor)
+        public UserService(IHavocContext context)
         {
             _context = context;
-            _httpContextAccesor = httpContextAccessor;
         }
 
         public async Task<bool> AddUserAsync(UserPOST user)
@@ -41,9 +39,9 @@ namespace Havoc_API.Services
                 throw new DataAccessException(e.Message);
             }
         }
-        public int GetUserId()
+        public int GetUserId(HttpRequest request)
         {
-            var token = _httpContextAccesor.HttpContext?.Items["JwtToken"]?.ToString();
+            var token = request.Headers.Authorization.ToString()["Bearer ".Length..].Trim();
             if (string.IsNullOrEmpty(token))
             {
                 throw new UnauthorizedAccessException("Cannot find token");
