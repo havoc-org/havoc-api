@@ -193,11 +193,10 @@ public class ProjectControllerTests
         //Arrange
         int userId = It.IsAny<int>();
         int projectId = It.IsAny<int>();
-        var mockCanDeleteRole = new Mock<Role>();
-        mockCanDeleteRole.Setup(r => r.CanDeleteProject()).Returns(true);
+        var canDeleteRole = new Role(RoleType.Owner);
         _userService.Setup(s => s.GetUserId()).Returns(userId);
         _participationService.Setup(s => s.GetUserRoleInProjectAsync(userId, projectId))
-            .ReturnsAsync(mockCanDeleteRole.Object);
+            .ReturnsAsync(canDeleteRole);
         _projectService.Setup(s => s.DeleteProjectByIdAsync(projectId))
             .ReturnsAsync(It.IsAny<int>());
         //Act
@@ -206,13 +205,15 @@ public class ProjectControllerTests
         response.Should().BeOfType<OkObjectResult>();
     }
 
-    [Fact]
-    public async void DeleteProjectByIdAsync_ReturnsUnAuthorizedWithMessage_WhenUserHasntDeletePermitionOfProject()
+    [Theory]
+    [InlineData(RoleType.Developer)]
+    [InlineData(RoleType.Manager)]
+    public async void DeleteProjectByIdAsync_ReturnsUnAuthorizedWithMessage_WhenUserHasntDeletePermitionOfProject(RoleType notOwnerRoleType)
     {
         //Arrange
         int userId = It.IsAny<int>();
         int projectId = It.IsAny<int>();
-        Role canDeleteRole = It.Is<Role>(r => r.CanDeleteProject() == false);
+        var canDeleteRole = new Role(notOwnerRoleType);
         _userService.Setup(s => s.GetUserId()).Returns(userId);
         _participationService.Setup(s => s.GetUserRoleInProjectAsync(userId, projectId))
             .ReturnsAsync(canDeleteRole);
@@ -230,7 +231,7 @@ public class ProjectControllerTests
         //Arrange
         int userId = It.IsAny<int>();
         int projectId = It.IsAny<int>();
-        Role canDeleteRole = It.Is<Role>(r => r.CanDeleteProject() == true);
+        var canDeleteRole = new Role(RoleType.Owner);
         _userService.Setup(s => s.GetUserId()).Returns(userId);
         _participationService.Setup(s => s.GetUserRoleInProjectAsync(userId, projectId))
             .ReturnsAsync(canDeleteRole);
@@ -282,7 +283,7 @@ public class ProjectControllerTests
         //Arrange
         int userId = It.IsAny<int>();
         int projectId = It.IsAny<int>();
-        Role canDeleteRole = It.Is<Role>(r => r.CanDeleteProject() == true);
+        var canDeleteRole = new Role(RoleType.Owner);
         _userService.Setup(s => s.GetUserId()).Returns(userId);
         _participationService.Setup(s => s.GetUserRoleInProjectAsync(userId, projectId))
             .ReturnsAsync(canDeleteRole);
