@@ -187,8 +187,12 @@ public class ProjectControllerTests
     }
 
 
-    [Fact]
-    public async void DeleteProjectByIdAsync_ReturnsOkResponseWithMessageOfAffectedRows_WhenProjectWasSuccessfullyDeleted()
+    [Theory]
+    [InlineData(1)]
+    [InlineData(2)]
+    [InlineData(123454)]
+    [InlineData(789556)]
+    public async void DeleteProjectByIdAsync_ReturnsOkResponseWithNumberOfAffectedRows_WhenProjectWasSuccessfullyDeleted(int linesAffected)
     {
         //Arrange
         int userId = It.IsAny<int>();
@@ -198,11 +202,11 @@ public class ProjectControllerTests
         _participationService.Setup(s => s.GetUserRoleInProjectAsync(userId, projectId))
             .ReturnsAsync(canDeleteRole);
         _projectService.Setup(s => s.DeleteProjectByIdAsync(projectId))
-            .ReturnsAsync(It.IsAny<int>());
+            .ReturnsAsync(linesAffected);
         //Act
         var response = await _projectController.DeleteProjectByIdAsync(projectId);
         //Assert
-        response.Should().BeOfType<OkObjectResult>();
+        response.Should().BeOfType<OkObjectResult>().Which.Value.Should().Be($"Affected rows: {linesAffected}");
     }
 
     [Theory]
