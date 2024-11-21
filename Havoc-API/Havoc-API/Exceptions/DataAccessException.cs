@@ -1,7 +1,7 @@
 
 namespace Havoc_API.Exceptions;
 
-public class DataAccessException : Exception
+public class DataAccessException : SupportedException
 {
     public DataAccessException()
     {

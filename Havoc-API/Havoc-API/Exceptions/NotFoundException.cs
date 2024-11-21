@@ -1,6 +1,6 @@
 ﻿namespace Havoc_API.Exceptions
 {
-    public class NotFoundException : Exception
+    public class NotFoundException : SupportedException
     {
         public NotFoundException()
         {

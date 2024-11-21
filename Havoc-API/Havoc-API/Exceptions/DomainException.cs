@@ -1,6 +1,6 @@
 namespace Havoc_API.Exceptions;
 
-public class DomainException : Exception
+public class DomainException : SupportedException
 {
     public DomainException()
     {
