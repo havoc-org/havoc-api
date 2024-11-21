@@ -28,6 +28,29 @@ public class TaskController : ControllerBase
         _participationService = participationService;
     }
 
+    [HttpGet()]
+    public async Task<ActionResult> GetTasksAsync()
+    {
+        try
+        {
+            var tasks = await _taskService.GetTasksAsync();
+            var statuses = await _taskService.GetAllTaskStatusesAsync();
+            return Ok(new { statuses, tasks });
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(new { ex.Message });
+        }
+        catch (DbUpdateException ex)
+        {
+            return StatusCode(500, new { ex.Message });
+        }
+        catch (SqlException ex)
+        {
+            return StatusCode(500, new { ex.Message });
+        }
+    }
+
     [HttpGet("{projectId}")]
     public async Task<ActionResult> GetTasksByProjectIdAsync(int projectId)
     {
@@ -36,8 +59,9 @@ public class TaskController : ControllerBase
             var userId = _userService.GetUserId(Request);
             await _participationService.GetUserRoleInProjectAsync(userId, projectId);
 
-            var result = await _taskService.GetTasksByProjectIdAsync(projectId);
-            return Ok(result);
+            var tasks = await _taskService.GetTasksByProjectIdAsync(projectId);
+            var statuses = await _taskService.GetAllTaskStatusesAsync();
+            return Ok(new { statuses, tasks });
         }
         catch (NotFoundException ex)
         {
@@ -132,19 +156,19 @@ public class TaskController : ControllerBase
         }
     }
 
-    [HttpPatch("{taskId}/updateStatus")]
-    public async Task<ActionResult> UpdateStatusByIdAsync(int taskId, TaskStatusPATCH taskStatus)
+    [HttpPatch("updateStatus")]
+    public async Task<ActionResult> UpdateStatusByIdAsync(TaskStatusPATCH taskStatus)
     {
         try
         {
             var userId = _userService.GetUserId(Request);
-            var task = await _taskService.GetTaskByIdAsync(taskId);
+            var task = await _taskService.GetTaskByIdAsync(taskStatus.TaskId);
 
             var role = await _participationService.GetUserRoleInProjectAsync(userId, task.ProjectId);
             if (!role.CanEditTask())
                 return Unauthorized(new { Message = "You have no permission to edit tasks" });
 
-            var result = await _taskService.UpdateStatusByIdAsync(taskId, taskStatus);
+            var result = await _taskService.UpdateTaskStatusAsync(taskStatus);
             return Ok(new { AffectedRows = result });
         }
         catch (NotFoundException ex)

@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using Havoc_API.DTOs.Assignment;
 using Havoc_API.DTOs.Attachment;
+using Havoc_API.DTOs.Tag;
 using Havoc_API.DTOs.TaskStatus;
 
 namespace Havoc_API.DTOs.Task;
@@ -30,5 +31,7 @@ public class TaskPOST
     public virtual ICollection<AssignmentPOST> Assignments { get; set; } = new List<AssignmentPOST>();
 
     public virtual ICollection<AttachmentPOST> Attachments { get; set; } = new List<AttachmentPOST>();
+
+    public virtual ICollection<TagPOST> Tags { get; set; } = new List<TagPOST>();
 
 }

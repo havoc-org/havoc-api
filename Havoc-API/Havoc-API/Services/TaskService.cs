@@ -22,6 +22,66 @@ public class TaskService : ITaskService
         _havocContext = havocContext;
     }
 
+    public async Task<List<TaskGET>> GetTasksAsync()
+    {
+        
+        var tasks = await _havocContext.Tasks
+        .Select(task => new TaskGET(
+            task.TaskId,
+            task.Name,
+            task.Description,
+            task.Start,
+            task.Deadline,
+            new UserGET(
+                task.Creator.UserId,
+                task.Creator.FirstName,
+                task.Creator.LastName,
+                task.Creator.Email
+            ),
+            new TaskStatusGET(
+                task.TaskStatus.TaskStatusId,
+                task.TaskStatus.Name
+            ),
+            task.Assignments.Select(assignment => new AssignmentGET(
+                new UserGET(
+                    assignment.UserId,
+                    assignment.User.FirstName,
+                    assignment.User.LastName,
+                    assignment.User.Email
+                ),
+                assignment.Description
+            )).ToList(),
+            task.Attachments.Select(attachment => new AttachmentGET(
+                attachment.AttachmentId,
+                attachment.FileLink,
+                new UserGET(
+                    attachment.UserId,
+                    attachment.User.FirstName,
+                    attachment.User.LastName,
+                    attachment.User.Email
+                )
+            )).ToList(),
+            task.Comments.Select(comment => new CommentGET(
+                comment.CommentId,
+                comment.Content,
+                comment.CommentDate,
+                new UserGET(
+                    comment.UserId,
+                    comment.User.FirstName,
+                    comment.User.LastName,
+                    comment.User.Email
+                )
+            )).ToList(),
+            task.Tags.Select(tag => new TagGET(
+                tag.TagId,
+                tag.Name,
+                tag.ColorHex
+            )).ToList()
+        )).ToListAsync();
+
+        return tasks;
+    }
+
     public async Task<List<TaskGET>> GetTasksByProjectIdAsync(int projectId)
     {
         bool isProjectExist = await _havocContext.Projects.AnyAsync(p => p.ProjectId == projectId);
@@ -98,14 +158,8 @@ public class TaskService : ITaskService
         .FindAsync(task.ProjectId) ?? throw new NotFoundException("Project not found");
 
         var status = await _havocContext.TaskStatuses
-        .FirstOrDefaultAsync(ts => ts.Name == task.TaskStatus.Name);
-
-        if (status == null)
-        {
-            status = new Models.TaskStatus(task.TaskStatus.Name);
-            await _havocContext.TaskStatuses.AddAsync(status);
-            await _havocContext.SaveChangesAsync();
-        }
+        .FirstOrDefaultAsync(ts => ts.Name == task.TaskStatus.Name)
+        ?? throw new NotFoundException("Task Status not found");
 
         var newTask = new Models.Task(
             task.Name,
@@ -139,6 +193,23 @@ public class TaskService : ITaskService
 
         await _havocContext.SaveChangesAsync();
 
+        foreach(var tag in task.Tags)
+        {
+            var newTag = await _havocContext.Tags
+            .FirstOrDefaultAsync(t => t.Name == tag.Name && t.ColorHex == tag.ColorHex);
+
+            if(newTag == null)
+            {
+                newTag = new Tag(tag.Name, tag.ColorHex);
+                await _havocContext.Tags.AddAsync(newTag);
+                await _havocContext.SaveChangesAsync();
+            }
+
+            newTask.Tags.Add(newTag);
+        }
+
+        await _havocContext.SaveChangesAsync();
+
         await transaction.CommitAsync();
 
         return newTask.TaskId;
@@ -163,20 +234,14 @@ public class TaskService : ITaskService
         return await _havocContext.SaveChangesAsync();
     }
 
-    public async Task<int> UpdateStatusByIdAsync(int taskId, TaskStatusPATCH taskStatus)
+    public async Task<int> UpdateTaskStatusAsync(TaskStatusPATCH taskStatus)
     {
         var task = await _havocContext.Tasks
-        .FindAsync(taskId) ?? throw new NotFoundException("Task not found");
+        .FindAsync(taskStatus.TaskId) ?? throw new NotFoundException("Task not found");
 
         var status = await _havocContext.TaskStatuses
-        .FirstOrDefaultAsync(ts => ts.Name == taskStatus.Name);
-
-        if (status == null)
-        {
-            status = new Models.TaskStatus(taskStatus.Name);
-            await _havocContext.TaskStatuses.AddAsync(status);
-            await _havocContext.SaveChangesAsync();
-        }
+        .FirstOrDefaultAsync(ts => EF.Functions.Like(ts.Name, taskStatus.Name))
+        ?? throw new NotFoundException("Task Status not found");
 
         task.UpdateStatus(status);
         _havocContext.Tasks.Update(task);
@@ -187,5 +252,17 @@ public class TaskService : ITaskService
     {
         return await _havocContext.Tasks
                 .FindAsync(taskId) ?? throw new NotFoundException("Task not found");
+    }
+
+    public async Task<List<TaskStatusGET>> GetAllTaskStatusesAsync()
+    {
+        var taskStatuses = await _havocContext.TaskStatuses
+        .OrderBy(ts => ts.TaskStatusId)
+        .Select(ts => new TaskStatusGET(
+            ts.TaskStatusId,
+            ts.Name
+        )).ToListAsync();
+
+        return taskStatuses;
     }
 }

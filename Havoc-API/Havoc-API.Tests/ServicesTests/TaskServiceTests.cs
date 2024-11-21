@@ -132,4 +132,63 @@ public class TaskServiceTests
         await Assert.ThrowsAsync<NotFoundException>(
             () => _taskService.UpdateTaskAsync(taskPatch));
     }
+
+    [Fact]
+    public async AsyncTask TaskService_UpdateTaskStatusAsync_ReturnsNumberOfAffectedRows_WhenTaskAndStatusExisted()
+    {
+        //Arrange
+        var user = HavocTestContextFactory.CreateTestUser();
+        var project = HavocTestContextFactory.CreateTestProject(user);
+
+        var task = HavocTestContextFactory.CreateTestTask(user, project);
+        await _context.Tasks.AddAsync(task);
+        await _context.SaveChangesAsync();
+
+        var taskStatusPatch = HavocTestContextFactory.CreateTestTaskStatusPatch();
+        taskStatusPatch.TaskId = task.TaskId;
+
+        _context.TaskStatuses.Add(new Models.TaskStatus(taskStatusPatch.Name));
+        await _context.SaveChangesAsync();
+
+        // Act
+        var numberOfAffectedRows = await _taskService.UpdateTaskStatusAsync(taskStatusPatch);
+
+        // Assert
+        numberOfAffectedRows.Should().BePositive();
+        var updatedTask = await _context.Tasks.FindAsync(task.TaskId);
+        updatedTask.Should().NotBeNull();
+        updatedTask!.TaskStatus.Name.Should().Be(taskStatusPatch.Name);
+    }
+
+    [Fact]
+    public async AsyncTask TaskService_UpdateTaskStatusAsync_ThrowsNotFoundException_WhenTaskDidntExist()
+    {
+        //Arrange
+        var taskStatusPatch = HavocTestContextFactory.CreateTestTaskStatusPatch();
+        _context.TaskStatuses.Add(new Models.TaskStatus(taskStatusPatch.Name));
+        await _context.SaveChangesAsync();
+
+        // Act & Assert
+        await Assert.ThrowsAsync<NotFoundException>(
+            () => _taskService.UpdateTaskStatusAsync(taskStatusPatch));
+    }
+
+    [Fact]
+    public async AsyncTask TaskService_UpdateTaskStatusAsync_ThrowsNotFoundException_WhenStatusDidntExist()
+    {
+        //Arrange
+        var user = HavocTestContextFactory.CreateTestUser();
+        var project = HavocTestContextFactory.CreateTestProject(user);
+
+        var task = HavocTestContextFactory.CreateTestTask(user, project);
+        await _context.Tasks.AddAsync(task);
+        await _context.SaveChangesAsync();
+
+        var taskStatusPatch = HavocTestContextFactory.CreateTestTaskStatusPatch();
+        taskStatusPatch.TaskId = task.TaskId;
+
+        // Act & Assert
+        await Assert.ThrowsAsync<NotFoundException>(
+            () => _taskService.UpdateTaskStatusAsync(taskStatusPatch));
+    }
 }
