@@ -4,16 +4,24 @@ namespace Havoc_API.Tests.TestData;
 
 public static class TaskStatusFactory
 {
-    public static TaskStatusPATCH CreatePatch()
+    public static TaskStatusPATCH CreatePatch(string name = "NewTaskStatus")
     {
         return new TaskStatusPATCH
         {
-            Name = "NewTaskStatus"
+            Name = name
         };
     }
 
-    public static Models.TaskStatus Create()
+    public static TaskStatusPOST CreatePost(string name = "NewTaskStatus")
     {
-        return new Models.TaskStatus("NewTaskStatus");
+        return new TaskStatusPOST
+        {
+            Name = name
+        };
+    }
+
+    public static Models.TaskStatus Create(string name = "NewTaskStatus")
+    {
+        return new Models.TaskStatus(name);
     }
 }

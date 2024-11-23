@@ -8,7 +8,6 @@ using Xunit;
 using Task = Havoc_API.Models.Task;
 using AsyncTask = System.Threading.Tasks.Task;
 using TaskFactory = Havoc_API.Tests.TestData.TaskFactory;
-using Havoc_API.DTOs.TaskStatus;
 
 namespace Havoc_API.Tests.ServicesTests;
 
@@ -64,6 +63,121 @@ public class TaskServiceTests
     }
 
     [Fact]
+    public async AsyncTask TaskService_AddTaskAsync_ReturnsIdOfCreatedTask_WhenValidDataProvided()
+    {
+        // Arrange
+        var user = UserFactory.Create();
+        var project = ProjectFactory.Create(user);
+        var status = TaskStatusFactory.Create();
+
+        await _context.Users.AddAsync(user);
+        await _context.Projects.AddAsync(project);
+        await _context.TaskStatuses.AddAsync(status);
+        await _context.SaveChangesAsync();
+
+        var statusPost = TaskStatusFactory.CreatePost(status.Name);
+        var taskPost = TaskFactory.CreatePost(user.UserId, project.ProjectId, statusPost, user.UserId);
+
+        // Act
+        var taskId = await _taskService.AddTaskAsync(taskPost);
+
+        // Assert
+        var addedTask = await _context.Tasks.FindAsync(taskId);
+        addedTask.Should().NotBeNull();
+        addedTask!.Name.Should().Be(taskPost.Name);
+        addedTask.Description.Should().Be(taskPost.Description);
+        addedTask.Start.Should().Be(taskPost.Start);
+        addedTask.Deadline.Should().Be(taskPost.Deadline);
+        addedTask.TaskStatus.Name.Should().Be(taskPost.TaskStatus.Name);
+        addedTask.Assignments.Should().HaveCount(taskPost.Assignments.Count);
+        addedTask.Attachments.Should().HaveCount(taskPost.Attachments.Count);
+        addedTask.Tags.Should().HaveCount(taskPost.Tags.Count);
+    }
+
+    [Fact]
+    public async AsyncTask TaskService_AddTaskAsync_ThrowsNotFoundException_WhenCreatorDidntExist()
+    {
+        // Arrange
+        var user = UserFactory.Create();
+        var project = ProjectFactory.Create(user);
+        var status = TaskStatusFactory.Create();
+
+        await _context.Users.AddAsync(user);
+        await _context.Projects.AddAsync(project);
+        await _context.TaskStatuses.AddAsync(status);
+        await _context.SaveChangesAsync();
+
+        var statusPost = TaskStatusFactory.CreatePost(status.Name);
+        var taskPost = TaskFactory.CreatePost(0, project.ProjectId, statusPost, user.UserId);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<NotFoundException>(
+            () => _taskService.AddTaskAsync(taskPost));
+    }
+
+    [Fact]
+    public async AsyncTask TaskService_AddTaskAsync_ThrowsNotFoundException_WhenProjectDidntExist()
+    {
+        // Arrange
+        var user = UserFactory.Create();
+        var status = TaskStatusFactory.Create();
+
+        await _context.Users.AddAsync(user);
+        await _context.TaskStatuses.AddAsync(status);
+        await _context.SaveChangesAsync();
+
+        var statusPost = TaskStatusFactory.CreatePost(status.Name);
+        var taskPost = TaskFactory.CreatePost(user.UserId, 0, statusPost, user.UserId);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<NotFoundException>(
+            () => _taskService.AddTaskAsync(taskPost));
+    }
+
+    [Fact]
+    public async AsyncTask TaskService_AddTaskAsync_ThrowsNotFoundException_WhenTaskStatusDidntExist()
+    {
+        // Arrange
+        var user = UserFactory.Create();
+        var project = ProjectFactory.Create(user);
+        var status = TaskStatusFactory.Create();
+
+        await _context.Users.AddAsync(user);
+        await _context.Projects.AddAsync(project);
+        await _context.TaskStatuses.AddAsync(status);
+        await _context.SaveChangesAsync();
+
+        var reversedName = new string(status.Name.Reverse().ToArray());
+        var statusPost = TaskStatusFactory.CreatePost(reversedName);
+        var taskPost = TaskFactory.CreatePost(0, project.ProjectId, statusPost, user.UserId);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<NotFoundException>(
+            () => _taskService.AddTaskAsync(taskPost));
+    }
+
+    [Fact]
+    public async AsyncTask TaskService_AddTaskAsync_ThrowsNotFoundException_WhenTaskUserForAssignmentDidntExist()
+    {
+        // Arrange
+        var user = UserFactory.Create();
+        var project = ProjectFactory.Create(user);
+        var status = TaskStatusFactory.Create();
+
+        await _context.Users.AddAsync(user);
+        await _context.Projects.AddAsync(project);
+        await _context.TaskStatuses.AddAsync(status);
+        await _context.SaveChangesAsync();
+
+        var statusPost = TaskStatusFactory.CreatePost(status.Name);
+        var taskPost = TaskFactory.CreatePost(0, project.ProjectId, statusPost, 0);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<NotFoundException>(
+            () => _taskService.AddTaskAsync(taskPost));
+    }
+
+    [Fact]
     public async AsyncTask TaskService_DeleteTaskByIdAsync_ReturnsNumberOfAffectedRows_WhenTaskExisted()
     {
         // Arrange
@@ -113,7 +227,6 @@ public class TaskServiceTests
 
         // Assert
         numberOfLines.Should().BePositive();
-
         var updatedTask = await _context.Tasks.FindAsync(task.TaskId);
         updatedTask.Should().NotBeNull();
         updatedTask!.Name.Should().Be(taskPatch.Name);
@@ -146,8 +259,9 @@ public class TaskServiceTests
 
         var taskStatusPatch = TaskStatusFactory.CreatePatch();
         taskStatusPatch.TaskId = task.TaskId;
+        var taskStatus = TaskStatusFactory.Create(taskStatusPatch.Name);
 
-        _context.TaskStatuses.Add(new Models.TaskStatus(taskStatusPatch.Name));
+        _context.TaskStatuses.Add(taskStatus);
         await _context.SaveChangesAsync();
 
         // Act
