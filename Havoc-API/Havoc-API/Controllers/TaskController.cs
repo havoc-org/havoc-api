@@ -28,6 +28,7 @@ public class TaskController : ControllerBase
         _participationService = participationService;
     }
 
+    //супер мега важный прикол для водки(потом удалит(надеюсь))
     [HttpGet()]
     public async Task<ActionResult> GetTasksAsync()
     {
@@ -67,11 +68,7 @@ public class TaskController : ControllerBase
         {
             return NotFound(new { ex.Message });
         }
-        catch (DbUpdateException ex)
-        {
-            return StatusCode(500, new { ex.Message });
-        }
-        catch (SqlException ex)
+        catch (DataAccessException ex)
         {
             return StatusCode(500, new { ex.Message });
         }
