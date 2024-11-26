@@ -28,24 +28,15 @@ public class ParticipationServiceTests
     public async void ParticipationService_GetUserRoleInProjectAsync_ShouldReturnUsersRole()
     {
         //Arange
-        var role1 = new Role(RoleType.Owner);
-        var role2 = new Role(RoleType.Developer);
+        var role1 = RoleFactory.OwnerRole();
+        var role2 = RoleFactory.DevRole();
         await _context.Roles.AddRangeAsync(role1, role2);
 
-        var user1 = HavocTestContextFactory.CreateTestUser("test@test.com");
-        var user2 = HavocTestContextFactory.CreateTestUser("test2@test.com");
+        var user1 = UserFactory.Create("test@test.com");
+        var user2 = UserFactory.Create("test2@test.com");
         await _context.Users.AddRangeAsync(user1, user2);
 
-        var project = new Project
-           (
-               "Test",
-               "test",
-               new byte[1234],
-               DateTime.Now,
-               DateTime.Now.AddDays(34),
-               user1,
-               new ProjectStatus("test")
-           );
+        var project = ProjectFactory.Create(user1);
 
         var participationOwner = new Participation
             (
@@ -74,16 +65,16 @@ public class ParticipationServiceTests
     public async void ParticipationService_GetUserRoleInProjectAsync_ShouldThrowNotFoundException_WhenParticipationDidntExist()
     {
         //Arange
-        var role1 = new Role(RoleType.Owner);
-        var role2 = new Role(RoleType.Developer);
+        var role1 = RoleFactory.OwnerRole();
+        var role2 = RoleFactory.DevRole();
         await _context.Roles.AddRangeAsync(role1, role2);
 
         _context.Users.RemoveRange(_context.Users.ToList());
-        var user1 = HavocTestContextFactory.CreateTestUser("test@test.com");
-        var user2 = HavocTestContextFactory.CreateTestUser("test2@test.com");
+        var user1 = UserFactory.Create("test@test.com");
+        var user2 = UserFactory.Create("test2@test.com");
         await _context.Users.AddRangeAsync(user1, user2);
 
-        var project = HavocTestContextFactory.CreateTestProject(user1);
+        var project = ProjectFactory.Create(user1);
 
         var participationOwner = new Participation
             (
@@ -109,21 +100,20 @@ public class ParticipationServiceTests
         await ownerRoleGetting.Should().ThrowAsync<NotFoundException>("Participation not found");
         await participantRoleGetting.Should().ThrowAsync<NotFoundException>("Participation not found");
     }
-
     [Fact]
     public async void ParticipationService_AddParticipationAsync_ShouldThrowNotFoundException_WhenRoleCannotBeFound()
     {
         //Arange
-        var role1 = new Role(RoleType.Owner);
-        var role2 = new Role(RoleType.Developer);
+        var role1 = RoleFactory.OwnerRole();
+        var role2 = RoleFactory.DevRole();
         await _context.Roles.AddRangeAsync(role1, role2);
 
         _context.Users.RemoveRange(_context.Users.ToList());
-        var user1 = HavocTestContextFactory.CreateTestUser("test@test.com");
-        var user2 = HavocTestContextFactory.CreateTestUser("test2@test.com");
+        var user1 = UserFactory.Create("test@test.com");
+        var user2 = UserFactory.Create("test2@test.com");
         await _context.Users.AddRangeAsync(user1, user2);
 
-        var project = HavocTestContextFactory.CreateTestProject(user1);
+        var project = ProjectFactory.Create(user1);
 
         var participationOwner = new Participation
             (
@@ -136,7 +126,7 @@ public class ParticipationServiceTests
         await _context.SaveChangesAsync();
 
         var participationsCount = _context.Participations.Count();
-        var roleNotInDb = new Role(RoleType.Manager);
+        var roleNotInDb = RoleFactory.ManagerRole();
         var participationPost = new ParticipationPOST(project.ProjectId, user2.Email, roleNotInDb.Name);
 
         //Act
@@ -152,16 +142,16 @@ public class ParticipationServiceTests
     public async void ParticipationService_AddParticipationAsync_ShouldThrowException_WhenUserNotFound()
     {
         //Arange
-        var role1 = new Role(RoleType.Owner);
-        var role2 = new Role(RoleType.Developer);
+        var role1 = RoleFactory.OwnerRole();
+        var role2 = RoleFactory.DevRole();
         await _context.Roles.AddRangeAsync(role1, role2);
 
         _context.Users.RemoveRange(_context.Users.ToList());
-        var user1 = HavocTestContextFactory.CreateTestUser("test@test.com");
-        var user2 = HavocTestContextFactory.CreateTestUser("test2@test.com");
+        var user1 = UserFactory.Create("test@test.com");
+        var user2 = UserFactory.Create("test2@test.com");
         await _context.Users.AddRangeAsync(user1, user2);
 
-        var project = HavocTestContextFactory.CreateTestProject(user1);
+        var project = ProjectFactory.Create(user1);
 
         var participationOwner = new Participation
             (
@@ -194,16 +184,16 @@ public class ParticipationServiceTests
     public async void ParticipationService_AddParticipationAsync_ShouldThrowException_WhenProjectNotFound()
     {
         //Arange
-        var role1 = new Role(RoleType.Owner);
-        var role2 = new Role(RoleType.Developer);
+        var role1 = RoleFactory.OwnerRole();
+        var role2 = RoleFactory.DevRole();
         await _context.Roles.AddRangeAsync(role1, role2);
 
         _context.Users.RemoveRange(_context.Users.ToList());
-        var user1 = HavocTestContextFactory.CreateTestUser("test@test.com");
-        var user2 = HavocTestContextFactory.CreateTestUser("test2@test.com");
+        var user1 = UserFactory.Create("test@test.com");
+        var user2 = UserFactory.Create("test2@test.com");
         await _context.Users.AddRangeAsync(user1, user2);
 
-        var project = HavocTestContextFactory.CreateTestProject(user1);
+        var project = ProjectFactory.Create(user1);
 
         var participationOwner = new Participation
             (
@@ -236,16 +226,16 @@ public class ParticipationServiceTests
     public async void ParticipationService_AddParticipationAsync_ShouldThrowException_WhenParticipationtAlreadyExists()
     {
         //Arange
-        var role1 = new Role(RoleType.Owner);
-        var role2 = new Role(RoleType.Developer);
+        var role1 = RoleFactory.OwnerRole();
+        var role2 = RoleFactory.DevRole();
         await _context.Roles.AddRangeAsync(role1, role2);
 
         _context.Users.RemoveRange(_context.Users.ToList());
-        var user1 = HavocTestContextFactory.CreateTestUser("test@test.com");
-        var user2 = HavocTestContextFactory.CreateTestUser("test2@test.com");
+        var user1 = UserFactory.Create("test@test.com");
+        var user2 = UserFactory.Create("test2@test.com");
         await _context.Users.AddRangeAsync(user1, user2);
 
-        var project = HavocTestContextFactory.CreateTestProject(user1);
+        var project = ProjectFactory.Create(user1);
 
         var participationOwner = new Participation
             (
@@ -284,16 +274,16 @@ public class ParticipationServiceTests
     public async void ParticipationService_AddParticipationAsync_ShouldThrowException_WhenParticipationtSuccessfullyCreated()
     {
         //Arange
-        var role1 = new Role(RoleType.Owner);
-        var role2 = new Role(RoleType.Developer);
+        var role1 = RoleFactory.OwnerRole();
+        var role2 = RoleFactory.DevRole();
         await _context.Roles.AddRangeAsync(role1, role2);
 
         _context.Users.RemoveRange(_context.Users.ToList());
-        var user1 = HavocTestContextFactory.CreateTestUser("test@test.com");
-        var user2 = HavocTestContextFactory.CreateTestUser("test2@test.com");
+        var user1 = UserFactory.Create("test@test.com");
+        var user2 = UserFactory.Create("test2@test.com");
         await _context.Users.AddRangeAsync(user1, user2);
 
-        var project = HavocTestContextFactory.CreateTestProject(user1);
+        var project = ProjectFactory.Create(user1);
 
         await _context.Projects.AddAsync(project);
         await _context.SaveChangesAsync();
@@ -329,16 +319,16 @@ public class ParticipationServiceTests
     public async void ParticipationService_GetParticipationsByProjectIDAsync_ShouldReturnUsersParticipations()
     {
         //Arange
-        var role1 = new Role(RoleType.Owner);
-        var role2 = new Role(RoleType.Developer);
+        var role1 = RoleFactory.OwnerRole();
+        var role2 = RoleFactory.DevRole();
         await _context.Roles.AddRangeAsync(role1, role2);
 
         _context.Users.RemoveRange(_context.Users.ToList());
-        var user1 = HavocTestContextFactory.CreateTestUser("test@test.com");
-        var user2 = HavocTestContextFactory.CreateTestUser("test2@test.com");
+        var user1 = UserFactory.Create("test@test.com");
+        var user2 = UserFactory.Create("test2@test.com");
         await _context.Users.AddRangeAsync(user1, user2);
 
-        var project = HavocTestContextFactory.CreateTestProject(user1);
+        var project = ProjectFactory.Create(user1);
 
         await _context.Projects.AddAsync(project);
         await _context.SaveChangesAsync();

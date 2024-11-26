@@ -122,7 +122,7 @@ namespace Havoc_API.Services
             }
             catch (SqlException e)
             {
-                throw new DataAccessException(e.Message);
+                throw new DataAccessException();
             }
         }
     }

@@ -1,7 +1,4 @@
-﻿using Azure.Core;
-using Havoc_API.DTOs.Tokens;
-using Havoc_API.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Havoc_API.DTOs.Tokens;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
