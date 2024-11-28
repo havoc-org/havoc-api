@@ -274,6 +274,14 @@ public partial class HavocContext : DbContext, IHavocContext
             entity.HasAlternateKey(e => e.Email);
         });
 
+        modelBuilder.Entity<Project>().ToTable(tb => tb.HasTrigger("trgUpdateLastModifiedWhenProjectUpdated"));
+        modelBuilder.Entity<Models.Task>().ToTable(tb => tb.HasTrigger("trgUpdateLastModifiedWhenTaskInsertedUpdatedOrDeleted"));
+        modelBuilder.Entity<Participation>().ToTable(tb => tb.HasTrigger("trgUpdateLastModifiedWhenParticipationInsertedOrDeleted"));
+        modelBuilder.Entity<Attachment>().ToTable(tb => tb.HasTrigger("trgUpdateLastModifiedWhenAttachmentInsertedOrDeleted"));
+        modelBuilder.Entity<Comment>().ToTable(tb => tb.HasTrigger("trgUpdateLastModifiedWhenCommentInsertedUpdatedOrDeleted"));
+        modelBuilder.Entity<Assignment>().ToTable(tb => tb.HasTrigger("trgUpdateLastModifiedWhenAssignmentInsertedOrDeleted"));
+        modelBuilder.Entity<Tag>().ToTable(tb => tb.HasTrigger("trgUpdateLastModifiedWhenTaskTagInsertedOrDeleted"));   
+
         OnModelCreatingPartial(modelBuilder);
     }
     public async Task<int> SaveChangesAsync()
