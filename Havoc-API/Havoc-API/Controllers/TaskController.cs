@@ -72,6 +72,10 @@ public class TaskController : ControllerBase
         {
             return StatusCode(500, new { ex.Message });
         }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Unauthorized(new { ex.Message });
+        }
     }
 
     [HttpPost]
