@@ -1,9 +1,12 @@
+using System.Data;
+using System.Reflection;
 using FluentAssertions;
 using Havoc_API.Exceptions;
 using Havoc_API.Middlewares;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
@@ -28,6 +31,24 @@ public class SupportedExceptionTestData : TheoryData<SupportedException, int>
         Add(new DataAccessException("Database BOOM"), internalErrorCode);
         Add(new DataAccessException("SQl doesnt work"), internalErrorCode);
         Add(new DataAccessException("AAAAAAAAAAAAAAA"), internalErrorCode);
+    }
+}
+
+public class NonSupportedExceptionTestData : TheoryData<Exception>
+{
+    public NonSupportedExceptionTestData()
+    {
+        Add(new ArgumentNullException("This is not correct"));
+        Add(new ConstraintException("sdlkjgf;lskdjf;skjdgflsdkjgskdjg"));
+        Add(new NotImplementedException("Logic is correct, you -- are not"));
+
+        Add(new OutOfMemoryException("No data"));
+        Add(new DbUpdateException("U sure u loookin' fo' it, boah?"));
+        Add(new DbUpdateConcurrencyException("Nuh uuuuuuuuuuuuh"));
+
+        Add(new Exception("Database BOOM"));
+        Add(new ReadOnlyException("SQl doesnt work"));
+        Add(new CustomAttributeFormatException("AAAAAAAAAAAAAAA"));
     }
 }
 
@@ -68,18 +89,17 @@ public class CustomExceptionHandlerTests
         );
     }
 
-    [Fact]
-    public async void TryHandleAsync_NeitherChangeResponseNorLogsItAndReturnsFalse_WhenSupportedExceptionIsThrown()
+    [Theory]
+    [ClassData(typeof(NonSupportedExceptionTestData))]
+    public async void TryHandleAsync_ChangeResponseToInternalErrorAndLogsItAndReturnsTrue_WhenNotSupportedExceptionIsThrown(Exception nonSupportedException)
     {
         //Arrange
         var httpContext = new DefaultHttpContext();
-        var statusCode = httpContext.Response.StatusCode;
         var cancellationToken = It.IsAny<CancellationToken>();
-        var nonSupportedException = It.Is<Exception>(e => !(e is SupportedException));
         //Act
         var handling = await _exceptionHandler.TryHandleAsync(httpContext, nonSupportedException, cancellationToken);
-        handling.Should().BeFalse();
-        httpContext.Response.StatusCode.Should().Be(statusCode);
+        handling.Should().BeTrue();
+        httpContext.Response.StatusCode.Should().Be(500);
         _logger.Verify
         (
             x => x.Log
@@ -90,7 +110,7 @@ public class CustomExceptionHandlerTests
                     It.IsAny<Exception>(),
                     It.Is<Func<It.IsAnyType, Exception?, string>>((v, t) => true)
                 ),
-            Times.Never()
+            Times.Once()
         );
     }
 }
