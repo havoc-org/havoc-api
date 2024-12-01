@@ -44,6 +44,7 @@ Console.WriteLine(builder.Configuration["JWT:Audience"]);
 // Add services to the container.
 builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<IParticipationService, ParticipationService>();
+builder.Services.AddScoped<IAttachmentService, AttachmentService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<IUserService, UserService>();

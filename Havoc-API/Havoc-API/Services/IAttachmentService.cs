@@ -10,5 +10,4 @@ public interface IAttachmentService
     public Task<AttachmentGET> GetAttachmentAsync(int attachmentId);
     public Task<IEnumerable<AttachmentGET>> GetTasksAttachmentsAsync(int taskId);
     public Task<int> DeleteAttachmentAsync(int attachmentId);
-    public Task<int> UpdateAttachmentAsync(AttachmentPUT attachment);
 }

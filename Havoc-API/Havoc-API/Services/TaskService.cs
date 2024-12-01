@@ -24,7 +24,7 @@ public class TaskService : ITaskService
 
     public async Task<List<TaskGET>> GetTasksAsync()
     {
-        
+
         var tasks = await _havocContext.Tasks
         .Select(task => new TaskGET(
             task.TaskId,
@@ -85,10 +85,10 @@ public class TaskService : ITaskService
     public async Task<List<TaskGET>> GetTasksByProjectIdAsync(int projectId)
     {
         bool isProjectExist = await _havocContext.Projects.AnyAsync(p => p.ProjectId == projectId);
-        
-        if(!isProjectExist)
+
+        if (!isProjectExist)
             throw new NotFoundException("Project Not Found");
-        
+
         var tasks = await _havocContext.Tasks
         .Where(task => task.ProjectId == projectId)
         .Select(task => new TaskGET(
@@ -143,14 +143,14 @@ public class TaskService : ITaskService
                 tag.ColorHex
             )).ToList()
         )).ToListAsync();
-        
+
         return tasks;
     }
 
     public async Task<int> AddTaskAsync(TaskPOST task)
     {
         using var transaction = _havocContext.Database.BeginTransaction();
-        
+
         var creator = await _havocContext.Users
         .FindAsync(task.CreatorId) ?? throw new NotFoundException("Creator not found");
 
@@ -174,18 +174,18 @@ public class TaskService : ITaskService
         await _havocContext.Tasks.AddAsync(newTask);
         await _havocContext.SaveChangesAsync();
 
-        foreach(var assignment in task.Assignments)
+        foreach (var assignment in task.Assignments)
         {
             var userForAssignment = await _havocContext
             .Users.FindAsync(assignment.UserId) ?? throw new NotFoundException("User for Assignment not found");
-            
+
             var newAssignment = new Assignment(assignment.Description, newTask, userForAssignment);
             await _havocContext.Assignments.AddAsync(newAssignment);
         }
 
         await _havocContext.SaveChangesAsync();
 
-        foreach(var attachment in task.Attachments)
+        foreach (var attachment in task.Attachments)
         {
             var newAttachment = new Attachment(attachment.FileLink, newTask, creator);
             await _havocContext.Attachments.AddAsync(newAttachment);
@@ -193,12 +193,12 @@ public class TaskService : ITaskService
 
         await _havocContext.SaveChangesAsync();
 
-        foreach(var tag in task.Tags)
+        foreach (var tag in task.Tags)
         {
             var newTag = await _havocContext.Tags
             .FirstOrDefaultAsync(t => t.Name == tag.Name && t.ColorHex == tag.ColorHex);
 
-            if(newTag == null)
+            if (newTag == null)
             {
                 newTag = new Tag(tag.Name, tag.ColorHex);
                 await _havocContext.Tags.AddAsync(newTag);
@@ -219,7 +219,7 @@ public class TaskService : ITaskService
     {
         var task = await _havocContext.Tasks
         .FindAsync(taskId) ?? throw new NotFoundException("Task not found");
-        
+
         _havocContext.Tasks.Remove(task);
         return await _havocContext.SaveChangesAsync();
     }

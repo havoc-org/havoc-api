@@ -55,6 +55,15 @@ public class CustomExceptionHandler : IExceptionHandler
             return true;
         }
 
-        return false;
+        var exceptionMsg = exception.Message;
+        _logger.LogError(
+            "Internal exception: {exceptionMessage}, Time of occurrence {time}",
+            exceptionMsg, DateTime.UtcNow);
+        httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        await httpContext.Response.WriteAsJsonAsync(new
+        {
+            Message = $"Internal exception: {exceptionMsg}, Time of occurrence {DateTime.UtcNow}"
+        }, cancellationToken: cancellationToken);
+        return true;
     }
 }

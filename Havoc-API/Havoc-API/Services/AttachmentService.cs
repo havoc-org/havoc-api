@@ -3,6 +3,7 @@ using Havoc_API.DTOs.Attachment;
 using Havoc_API.DTOs.User;
 using Havoc_API.Exceptions;
 using Havoc_API.Models;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace Havoc_API.Services;
@@ -41,43 +42,50 @@ public class AttachmentService : IAttachmentService
 
     public async Task<AttachmentGET> GetAttachmentAsync(int attachmentId)
     {
-        var attachment = await _havocContext.Attachments.FirstOrDefaultAsync(a => a.AttachmentId == attachmentId) ?? throw new NotFoundException("Attachment doesn't exist");
-        return new AttachmentGET(
-            attachment.AttachmentId,
-            attachment.FileLink,
-            new UserGET(
-                attachment.UserId,
-                attachment.User.FirstName,
-                attachment.User.LastName,
-                attachment.User.Email
-            )
-        );
+        try
+        {
+            var attachment = await _havocContext.Attachments.FirstOrDefaultAsync(a => a.AttachmentId == attachmentId) ?? throw new NotFoundException("Attachment doesn't exist");
+            return new AttachmentGET(
+                attachment.AttachmentId,
+                attachment.FileLink,
+                new UserGET(
+                    attachment.UserId,
+                    attachment.User.FirstName,
+                    attachment.User.LastName,
+                    attachment.User.Email
+                )
+            );
+        }
+        catch (SqlException e)
+        {
+            throw new DataAccessException(e.Message);
+        }
     }
 
     public async Task<IEnumerable<AttachmentGET>> GetTasksAttachmentsAsync(int taskId)
     {
-        var task = await _havocContext.Tasks
-            .FirstOrDefaultAsync(t => t.TaskId == taskId)
-                ?? throw new NotFoundException("Task doesn't exist");
+        try
+        {
+            var task = await _havocContext.Tasks
+                .FirstOrDefaultAsync(t => t.TaskId == taskId)
+                    ?? throw new NotFoundException("Task doesn't exist");
 
-        return task.Attachments
-            .Select(attachment => new
-                AttachmentGET(
-                    attachment.AttachmentId,
-                    attachment.FileLink,
-                    new UserGET(
-                        attachment.UserId,
-                        attachment.User.FirstName,
-                        attachment.User.LastName,
-                        attachment.User.Email
-                    )
-             )).ToList()
-    }
-
-    public Task<int> UpdateAttachmentAsync(AttachmentPUT attachment)
-    {
-        var oldAttachment = new Attachment(attachment.FileLink, newTask, creator);
-        await _havocContext.Attachments.AddAsync(newAttachment);
-        return newAttachment.AttachmentId;
+            return task.Attachments
+                .Select(attachment => new
+                    AttachmentGET(
+                        attachment.AttachmentId,
+                        attachment.FileLink,
+                        new UserGET(
+                            attachment.UserId,
+                            attachment.User.FirstName,
+                            attachment.User.LastName,
+                            attachment.User.Email
+                        )
+                 )).ToList();
+        }
+        catch (SqlException e)
+        {
+            throw new DataAccessException(e.Message);
+        }
     }
 }
