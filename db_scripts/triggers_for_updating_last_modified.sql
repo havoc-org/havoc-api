@@ -4,7 +4,7 @@ AFTER UPDATE
 AS
 BEGIN
     UPDATE Project
-    SET LastModified = GETDATE()
+    SET LastModified = SYSDATETIMEOFFSET() AT TIME ZONE 'Central European Standard Time'
     WHERE ProjectId IN (SELECT DISTINCT ProjectId FROM Inserted);
 END;
 GO
@@ -15,7 +15,7 @@ AFTER INSERT, DELETE
 AS
 BEGIN
     UPDATE Project
-    SET LastModified = GETDATE()
+    SET LastModified = SYSDATETIMEOFFSET() AT TIME ZONE 'Central European Standard Time'
     WHERE ProjectId IN (SELECT DISTINCT ProjectId FROM Inserted)
         OR ProjectId IN (SELECT DISTINCT ProjectId FROM Deleted);
 END;
@@ -27,7 +27,7 @@ AFTER INSERT, UPDATE, DELETE
 AS
 BEGIN
     UPDATE Project
-    SET LastModified = GETDATE()
+    SET LastModified = SYSDATETIMEOFFSET() AT TIME ZONE 'Central European Standard Time'
     WHERE ProjectId IN (SELECT DISTINCT ProjectId FROM Inserted)
         OR ProjectId IN (SELECT DISTINCT ProjectId FROM Deleted);
 END;
@@ -39,7 +39,7 @@ AFTER INSERT, DELETE
 AS
 BEGIN
     UPDATE Project
-    SET LastModified = GETDATE()
+    SET LastModified = SYSDATETIMEOFFSET() AT TIME ZONE 'Central European Standard Time'
     WHERE ProjectId IN (
         SELECT DISTINCT Task.ProjectId
         FROM Task
@@ -58,7 +58,7 @@ AFTER INSERT, DELETE
 AS
 BEGIN
     UPDATE Project
-    SET LastModified = GETDATE()
+    SET LastModified = SYSDATETIMEOFFSET() AT TIME ZONE 'Central European Standard Time'
     WHERE ProjectId IN (
         SELECT DISTINCT Task.ProjectId
         FROM Task
@@ -77,7 +77,7 @@ AFTER INSERT, UPDATE, DELETE
 AS
 BEGIN
     UPDATE Project
-    SET LastModified = GETDATE()
+    SET LastModified = SYSDATETIMEOFFSET() AT TIME ZONE 'Central European Standard Time'
     WHERE ProjectId IN (
         SELECT DISTINCT Task.ProjectId
         FROM Task
@@ -96,7 +96,7 @@ AFTER INSERT, DELETE
 AS
 BEGIN
     UPDATE Project
-    SET LastModified = GETDATE()
+    SET LastModified = SYSDATETIMEOFFSET() AT TIME ZONE 'Central European Standard Time'
     WHERE ProjectId IN (
         SELECT DISTINCT Task.ProjectId
         FROM Task
