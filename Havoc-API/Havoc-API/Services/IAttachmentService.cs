@@ -5,9 +5,9 @@ namespace Havoc_API.Services;
 
 public interface IAttachmentService
 {
-    public Task<AttachmentGET> AddAttachmentAsync(AttachmentPOST attachment, int taskId, int creatorId);
-    public Task<IEnumerable<AttachmentGET>> AddManyAttachmentsAsync(IEnumerable<AttachmentPOST> attachment, int taskId, int creatorId);
-    public Task<AttachmentGET> GetAttachmentAsync(int attachmentId);
-    public Task<IEnumerable<AttachmentGET>> GetTasksAttachmentsAsync(int taskId);
-    public Task<int> DeleteAttachmentAsync(int attachmentId);
+    public Task<AttachmentGET> AddAttachmentAsync(AttachmentPOST attachment, int taskId, int creatorId, int projectId);
+    public Task<IEnumerable<AttachmentGET>> AddManyAttachmentsAsync(IEnumerable<AttachmentPOST> attachment, int taskId, int creatorId, int projectId);
+    public Task<AttachmentGET> GetAttachmentAsync(int attachmentId, int taskId, int projectId);
+    public Task<IEnumerable<AttachmentGET>> GetTasksAttachmentsAsync(int taskId, int projectId);
+    public Task<int> DeleteAttachmentAsync(int attachmentId, int taskId, int projectId);
 }

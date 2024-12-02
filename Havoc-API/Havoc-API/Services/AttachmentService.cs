@@ -15,10 +15,12 @@ public class AttachmentService : IAttachmentService
         _havocContext = havocContext;
     }
 
-    public async Task<AttachmentGET> AddAttachmentAsync(AttachmentPOST attachment, int taskId, int creatorId)
+    public async Task<AttachmentGET> AddAttachmentAsync(AttachmentPOST attachment, int taskId, int creatorId, int projectId)
     {
         try
         {
+            if (await _havocContext.Tasks.FirstOrDefaultAsync(t => t.TaskId == taskId && t.ProjectId == projectId) is null)
+                throw new NotFoundException("Task or Project doesnt exist");
             var creator = await _havocContext.Users.FirstOrDefaultAsync(u => u.UserId == creatorId)
                 ?? throw new NotFoundException("User doesn't exist");
             var task = await _havocContext.Tasks.FirstOrDefaultAsync(u => u.TaskId == taskId)
@@ -66,10 +68,12 @@ public class AttachmentService : IAttachmentService
         }
     }
 
-    public async Task<IEnumerable<AttachmentGET>> AddManyAttachmentsAsync(IEnumerable<AttachmentPOST> attachments, int taskId, int creatorId)
+    public async Task<IEnumerable<AttachmentGET>> AddManyAttachmentsAsync(IEnumerable<AttachmentPOST> attachments, int taskId, int creatorId, int projectId)
     {
         try
         {
+            if (await _havocContext.Tasks.FirstOrDefaultAsync(t => t.TaskId == taskId && t.ProjectId == projectId) is null)
+                throw new NotFoundException("Task or Project doesnt exist");
             var creator = await _havocContext.Users.FirstOrDefaultAsync(u => u.UserId == creatorId)
                 ?? throw new NotFoundException("User doesn't exist");
             var task = await _havocContext.Tasks.FirstOrDefaultAsync(u => u.TaskId == taskId)
@@ -99,12 +103,16 @@ public class AttachmentService : IAttachmentService
         }
     }
 
-    public async Task<int> DeleteAttachmentAsync(int attachmentId)
+    public async Task<int> DeleteAttachmentAsync(int attachmentId, int taskId, int projectId)
     {
         try
         {
             var attachment = await _havocContext.Attachments
-                .FirstOrDefaultAsync(a => a.AttachmentId == attachmentId)
+                .Include(a => a.Task)
+                .FirstOrDefaultAsync(a =>
+                                        a.AttachmentId == attachmentId &&
+                                        a.Task.ProjectId == projectId &&
+                                        a.TaskId == taskId)
                     ?? throw new NotFoundException("Attachment doesn't exist");
             _havocContext.Attachments.Remove(attachment);
             return await _havocContext.SaveChangesAsync();
@@ -119,13 +127,17 @@ public class AttachmentService : IAttachmentService
         }
     }
 
-    public async Task<AttachmentGET> GetAttachmentAsync(int attachmentId)
+    public async Task<AttachmentGET> GetAttachmentAsync(int attachmentId, int taskId, int projectId)
     {
         try
         {
             var attachment = await _havocContext.Attachments
                 .Include(a => a.User)
-                .FirstOrDefaultAsync(a => a.AttachmentId == attachmentId)
+                .Include(a => a.Task)
+                .FirstOrDefaultAsync(a =>
+                                        a.AttachmentId == attachmentId &&
+                                        a.Task.ProjectId == projectId &&
+                                        a.TaskId == taskId)
                     ?? throw new NotFoundException("Attachment doesn't exist");
             return new AttachmentGET(
                 attachment.AttachmentId,
@@ -144,10 +156,12 @@ public class AttachmentService : IAttachmentService
         }
     }
 
-    public async Task<IEnumerable<AttachmentGET>> GetTasksAttachmentsAsync(int taskId)
+    public async Task<IEnumerable<AttachmentGET>> GetTasksAttachmentsAsync(int taskId, int projectId)
     {
         try
         {
+            if (await _havocContext.Tasks.FirstOrDefaultAsync(t => t.TaskId == taskId && t.ProjectId == projectId) is null)
+                throw new NotFoundException("Task or Project doesnt exist");
             var attachments = await _havocContext.Attachments
                 .Include(a => a.User)
                 .Where(a => a.TaskId == taskId)
