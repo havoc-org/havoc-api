@@ -147,10 +147,10 @@ namespace Havoc_API.Services
                             par.User.LastName,
                             par.User.Email,
                             new RoleGET(
-                            par.Role.RoleId,
-                            par.Role.Name
+                                par.Role.RoleId,
+                                par.Role.Name
                             )
-                            )
+                        )
                     )).ToList()
 
                 )).ToListAsync();
