@@ -1,0 +1,61 @@
+# Comments are provided throughout this file to help you get started.
+# If you need more help, visit the Docker Compose reference guide at
+# https://docs.docker.com/go/compose-spec-reference/
+
+# Here the instructions define your application as a service called "server".
+# This service is built from the Dockerfile in the current directory.
+# You can add other services your application may depend on here, such as a
+# database or a cache. For examples, see the Awesome Compose repository:
+# https://github.com/docker/awesome-compose
+services:
+  backend:
+    build:
+      context: ./Havoc-API
+      target: final
+    container_name: havoc-api
+    ports:
+      - 443:443
+# <Papich ore.mp3>
+# depends_on:
+#     db:
+#       condition: service_healthy
+#   db:
+#     build:
+#       context: ./db_scripts
+#     container_name: sql_server_container
+#     environment:
+#       ACCEPT_EULA: Y # Accept the EULA
+#       SA_PASSWORD: YourPasswordHere1234 # Set the 'sa' password (must be strong)
+#       MSSQL_PID: Developer # Set the edition (Developer, Express, etc.)
+#       SQLSERVER_SSL_CERT: /var/opt/mssql/certs/server.crt
+#       SQLSERVER_SSL_KEY: /var/opt/mssql/certs/server.key
+#     ports:
+#       - "1433:1433" # Expose port 1433 for SQL Server
+#     volumes:
+#       - sqlserver_data:/var/opt/mssql # Persist data in a named volume
+#       - ../Havoc-API/Havoc-API/ssl:/var/opt/mssql/certs/
+#     healthcheck:
+#       test:
+#         [
+#           "CMD",
+#           "/opt/mssql-tools18/bin/sqlcmd",
+#           "-S",
+#           "localhost",
+#           "-U",
+#           "sa",
+#           "-P",
+#           "YourPasswordHere1234",
+#           "-N",
+#           "-C",
+#           "-Q",
+#           "SELECT 1",
+#         ]
+#       interval: 10s
+#       timeout: 5s
+#       retries: 5
+#     restart: "no" # Restart the container unless it is manually stopped
+
+# # Volumes declaration to persist SQL Server data
+# volumes:
+#   sqlserver_data:
+#     driver: local

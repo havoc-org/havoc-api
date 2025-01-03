@@ -3,6 +3,9 @@
 
 -- tables
 -- Table: Assignment
+CREATE DATABASE havoc;
+use havoc;
+
 CREATE TABLE Assignment (
     UserId int  NOT NULL,
     TaskId int  NOT NULL,

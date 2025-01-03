@@ -11,6 +11,9 @@ using Havoc_API.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
+if (builder.Environment.IsProduction())
+    builder.WebHost.UseKestrel();
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
    {
@@ -64,10 +67,10 @@ builder.Services.AddDbContext<HavocContext>(options =>
      options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(builder =>
+    options.AddDefaultPolicy(build =>
     {
-        builder
-               .WithOrigins("https://localhost:5173")
+        build
+               .WithOrigins(builder.Configuration["FrontendUrl"] ?? throw new ArgumentNullException("Cors must have something"))
                .AllowAnyMethod()
                .AllowAnyHeader()
                .AllowCredentials();
@@ -78,11 +81,11 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// if (app.Environment.IsDevelopment())
+// {
+app.UseSwagger();
+app.UseSwaggerUI();
+// }
 
 app.UseExceptionHandler(new ExceptionHandlerOptions()
 {
@@ -91,7 +94,8 @@ app.UseExceptionHandler(new ExceptionHandlerOptions()
 });
 
 app.UseCors();
-app.UseHttpsRedirection();
+if (app.Environment.IsProduction())
+    app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();

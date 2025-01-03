@@ -1,0 +1,16 @@
+# FROM mcr.microsoft.com/mssql/server:2022-latest
+
+# # Set environment variables
+# ENV ACCEPT_EULA=Y
+# ENV SA_PASSWORD=YourPasswordHere1234
+
+# # Copy initialization SQL script
+# COPY ./havoc_create.sql /var/opt/mssql/scripts/
+# COPY ./triggers_for_updating_last_modified.sql /var/opt/mssql/scripts/
+
+# # Command to start SQL Server
+# CMD /bin/bash -c "/opt/mssql/bin/sqlservr & sleep 20 && \
+#     /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P $SA_PASSWORD -i /var/opt/mssql/scripts/havoc_create.sql -C -N -t 30 -b -k1 -TrustServerCertificate=yes && \
+#     /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P $SA_PASSWORD -i /var/opt/mssql/scripts/triggers_for_updating_last_modified.sql -C -N -t 30 -b -k1 -TrustServerCertificate=yes && \
+#     wait"
+# Dockerise database -- maybe
