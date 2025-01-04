@@ -31,7 +31,7 @@ jobs:
       with:
         push: true
         tags: havocimages.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_086dabfadc0143fd90a768bdd51ddfdf }}/api/havoc-api:${{ github.sha }}
-        file: ./Havoc-API/Havoc-API/Dockerfile
+        file: ./Havoc-API/Dockerfile
 
   deploy:
     runs-on: ubuntu-latest
