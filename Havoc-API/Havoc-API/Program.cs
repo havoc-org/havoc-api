@@ -40,10 +40,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
            }
        };
    });
-Console.WriteLine(builder.Configuration["JWT:Issuer"]);
-Console.WriteLine(builder.Configuration["JWT:Audience"]);
-Console.WriteLine(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]!)));
-Console.WriteLine(builder.Configuration["JWT:Audience"]);
+if (builder.Environment.IsDevelopment())
+{
+    Console.WriteLine(builder.Configuration["JWT:Issuer"]);
+    Console.WriteLine(builder.Configuration["JWT:Audience"]);
+    Console.WriteLine(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]!)));
+    Console.WriteLine(builder.Configuration["JWT:Audience"]);
+}
+
 // Add services to the container.
 builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<IParticipationService, ParticipationService>();
@@ -81,11 +85,11 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-// if (app.Environment.IsDevelopment())
-// {
-app.UseSwagger();
-app.UseSwaggerUI();
-// }
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 app.UseExceptionHandler(new ExceptionHandlerOptions()
 {
