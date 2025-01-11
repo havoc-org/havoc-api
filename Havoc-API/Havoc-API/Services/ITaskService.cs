@@ -10,7 +10,7 @@ public interface ITaskService
     public Task<int> DeleteTaskByIdAsync(int taskId);
     public Task<int> UpdateTaskAsync(TaskPATCH taskUpdate);
     public Task<int> UpdateTaskStatusAsync(TaskStatusPATCH taskStatus);
-    public Task<Models.Task> GetTaskByIdAsync(int taskId);
+    public Task<TaskGET> GetTaskByIdAsync(int taskId);
     public Task<List<TaskStatusGET>> GetAllTaskStatusesAsync();
     public Task<List<TaskGET>> GetTasksAsync();
 }

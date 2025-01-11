@@ -51,7 +51,27 @@ public class TaskController : ControllerBase
             return StatusCode(500, new { ex.Message });
         }
     }
-
+    [HttpGet("byId/{taskId}")]
+    public async Task<ActionResult> GetTaskAsync(int taskId)
+    {
+        try
+        {
+            var task = await _taskService.GetTaskByIdAsync(taskId);
+            return Ok(new { task });
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(new { ex.Message });
+        }
+        catch (DbUpdateException ex)
+        {
+            return StatusCode(500, new { ex.Message });
+        }
+        catch (SqlException ex)
+        {
+            return StatusCode(500, new { ex.Message });
+        }
+    }
     [HttpGet("{projectId}")]
     public async Task<ActionResult> GetTasksByProjectIdAsync(int projectId)
     {
