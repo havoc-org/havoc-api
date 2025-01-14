@@ -17,16 +17,16 @@ public class CommentService : ICommentService
     }
 
 
-    public async Task<IEnumerable<CommentGET>> GetTasksCommentsAsync(int taskId, int projectId)
+    public async Task<IEnumerable<CommentGET>> GetTasksCommentsAsync(int taskId)
     {
         try
         {
-            if (await _havocContext.Tasks.FirstOrDefaultAsync(t => t.TaskId == taskId && t.ProjectId == projectId) is null)
-                throw new NotFoundException("Task or Project doesnt exist");
+            if (await _havocContext.Tasks.FirstOrDefaultAsync(t => t.TaskId == taskId) is null)
+                throw new NotFoundException("Task doesnt exist");
             return await _havocContext.Comments
                 .Include(c => c.User)
                 .Include(c => c.Task)
-                .Where(c => c.TaskId == taskId && c.Task.ProjectId == projectId)
+                .Where(c => c.TaskId == taskId)
                 .Select
                 (
                     c => new CommentGET
@@ -73,7 +73,7 @@ public class CommentService : ICommentService
         }
     }
 
-    public async Task<CommentGET> AddCommentAsync(CommentPOST comment, int userId, int taskId, int projectId)
+    public async Task<CommentGET> AddCommentAsync(CommentPOST comment, int userId, int taskId)
     {
         try
         {
@@ -83,7 +83,7 @@ public class CommentService : ICommentService
             var task =
                 await _havocContext.Tasks
                     .Include(t => t.Project)
-                    .FirstOrDefaultAsync(t => t.TaskId == taskId && t.ProjectId == projectId)
+                    .FirstOrDefaultAsync(t => t.TaskId == taskId)
                         ?? throw new NotFoundException("Task doesn't exist");
             var newComment = new Comment(comment.Content, task, user);
             await _havocContext.Comments.AddAsync(newComment);

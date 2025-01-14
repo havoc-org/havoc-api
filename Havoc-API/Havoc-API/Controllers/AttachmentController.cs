@@ -9,6 +9,7 @@ namespace Havoc_API.Controllers;
 
 [Authorize]
 [Route("api/projects/{projectId}/tasks/{taskId}/attachments")]
+[Route("api/tasks/{taskId}/attachments")]
 [ApiController]
 public class AttachmentController : ControllerBase
 {
@@ -26,9 +27,9 @@ public class AttachmentController : ControllerBase
 
     }
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<AttachmentGET>>> GetAllAttachments(int taskId, int projectId)
+    public async Task<ActionResult<IEnumerable<AttachmentGET>>> GetAllAttachments(int taskId)
     {
-        var attachments = await _attachmentService.GetTasksAttachmentsAsync(taskId, projectId);
+        var attachments = await _attachmentService.GetTasksAttachmentsAsync(taskId);
         return Ok(attachments);
     }
 

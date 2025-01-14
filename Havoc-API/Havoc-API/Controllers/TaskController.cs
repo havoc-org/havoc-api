@@ -29,7 +29,7 @@ public class TaskController : ControllerBase
     }
 
     //супер мега важный прикол для водки(потом удалит(надеюсь))
-    [HttpGet()]
+    [HttpGet]
     public async Task<ActionResult> GetTasksAsync()
     {
         try

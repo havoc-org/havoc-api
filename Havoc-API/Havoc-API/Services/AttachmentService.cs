@@ -156,12 +156,12 @@ public class AttachmentService : IAttachmentService
         }
     }
 
-    public async Task<IEnumerable<AttachmentGET>> GetTasksAttachmentsAsync(int taskId, int projectId)
+    public async Task<IEnumerable<AttachmentGET>> GetTasksAttachmentsAsync(int taskId)
     {
         try
         {
-            if (await _havocContext.Tasks.FirstOrDefaultAsync(t => t.TaskId == taskId && t.ProjectId == projectId) is null)
-                throw new NotFoundException("Task or Project doesnt exist");
+            if (await _havocContext.Tasks.FirstOrDefaultAsync(t => t.TaskId == taskId) is null)
+                throw new NotFoundException("Task doesnt exist");
             var attachments = await _havocContext.Attachments
                 .Include(a => a.User)
                 .Where(a => a.TaskId == taskId)

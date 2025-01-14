@@ -6,6 +6,7 @@ namespace Havoc_API.Controllers;
 
 [Authorize]
 [Route("api/projects/{projectId}/tasks/{taskId}/comments")]
+[Route("api/tasks/{taskId}/comments")]
 [ApiController]
 public class CommentController : ControllerBase
 {
@@ -23,26 +24,23 @@ public class CommentController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetTasksComments(int taskId, int projectId)
+    public async Task<IActionResult> GetTasksComments(int taskId)
     {
-        var userId = _userService.GetUserId(Request);
-        var role =
-            await _participationService
-                .GetUserRoleInProjectAsync(userId, projectId);
-        return Ok(await _commentService.GetTasksCommentsAsync(taskId, projectId));
+        return Ok(await _commentService.GetTasksCommentsAsync(taskId));
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddCommentToTask(CommentPOST comment, int taskId, int projectId)
+    public async Task<IActionResult> AddCommentToTask(CommentPOST comment)
     {
+
         var userId = _userService.GetUserId(Request);
         var role =
             await _participationService
-                .GetUserRoleInProjectAsync(userId, projectId);
+                .GetUserRoleInProjectAsync(userId, comment.projectId);
         if (!role.CanEditTask())
             return Unauthorized("You have no permission to edit task");
-        var newComment = await _commentService.AddCommentAsync(comment, userId, taskId, projectId);
-        return Created($"api/tasks/{taskId}/comments/{newComment.CommentId}", newComment);
+        var newComment = await _commentService.AddCommentAsync(comment, userId, comment.taskId);
+        return Created($"api/tasks/{comment.taskId}/comments/{newComment.CommentId}", newComment);
     }
 
     [HttpDelete("commentId")]

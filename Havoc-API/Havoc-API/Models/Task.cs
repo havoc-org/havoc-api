@@ -38,7 +38,7 @@ public partial class Task
             {
                 string trimmedValue = value.Trim();
 
-                if (trimmedValue.Length > 200 || trimmedValue.Length == 0)
+                if (trimmedValue.Length > 400 || trimmedValue.Length == 0)
                     throw new StringLengthException(nameof(Description));
 
                 _description = trimmedValue;

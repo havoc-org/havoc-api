@@ -40,13 +40,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
            }
        };
    });
-if (builder.Environment.IsDevelopment())
-{
-    Console.WriteLine(builder.Configuration["JWT:Issuer"]);
-    Console.WriteLine(builder.Configuration["JWT:Audience"]);
-    Console.WriteLine(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]!)));
-    Console.WriteLine(builder.Configuration["JWT:Audience"]);
-}
+
 
 // Add services to the container.
 builder.Services.AddScoped<IProjectService, ProjectService>();
