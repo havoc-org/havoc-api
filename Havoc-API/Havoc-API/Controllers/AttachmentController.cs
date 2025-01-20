@@ -40,16 +40,16 @@ public class AttachmentController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult> AddAttachment(AttachmentPOST attachment, int taskId, int projectId)
+    public async Task<ActionResult> AddAttachments(IEnumerable<AttachmentPOST> attachments, int taskId, int projectId)
     {
         var role =
             await _participationService
                 .GetUserRoleInProjectAsync(_userService.GetUserId(Request), projectId);
         if (!role.CanEditTask())
             return Unauthorized("You have no permission to edit task");
-        var newAttachment =
-            await _attachmentService.AddAttachmentAsync(attachment, taskId, _userService.GetUserId(Request), projectId);
-        return Ok(newAttachment);
+        var newAttachments =
+            await _attachmentService.AddManyAttachmentsAsync(attachments, taskId, _userService.GetUserId(Request), projectId);
+        return Ok(newAttachments);
     }
 
     [HttpDelete("{attachmentId}")]
