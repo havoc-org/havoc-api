@@ -17,6 +17,33 @@ public class AssignmentService : IAssignmentService
 
     }
 
+    public async Task<bool> AddAssignmentAsync(AssignmentPOST assignment, int taskId)
+    {
+
+        var user = await _havocContext.Users.FirstOrDefaultAsync(us => us.UserId == assignment.UserId);
+        if (user == null)
+        {
+            return false;
+            throw new Exception("User not found");
+        }
+        var existingAssignment = await _havocContext.Assignments.FindAsync(taskId, user.UserId);
+        if (existingAssignment != null)
+        {
+            throw new Exception("This assignment already exists userID: " + existingAssignment.UserId + " projectID: " + existingAssignment.TaskId);
+        }
+
+        var task = await _havocContext.Tasks.FindAsync(taskId);
+        if (task == null) { throw new Exception("Task not found");};
+
+        var result = await _havocContext.Assignments.AddAsync(new Assignment(
+            assignment.Description,
+            task,
+            user
+        ));
+         await _havocContext.SaveChangesAsync(); 
+        return true;
+    }
+
     public async Task<IEnumerable<AssignmentGET>> AddManyAssignmentsAsync(
     IEnumerable<AssignmentPOST> assignments,
     int taskId,
@@ -75,15 +102,15 @@ public class AssignmentService : IAssignmentService
         }
     }
 
-     public async Task<int> DeleteAssignmentAsync(int taskId, int userId, int projectId)
+    public async Task<int> DeleteAssignmentAsync(int taskId, int userId, int projectId)
     {
         try
         {
-            
+
             var assignment = await _havocContext.Assignments
                 .Include(a => a.Task)
                 .FirstOrDefaultAsync(a => a.UserId == userId && a.TaskId == taskId && a.Task.ProjectId == projectId);
-                    
+
             if (assignment == null)
             {
                 Console.WriteLine($"[Error] Assignment not found. UserId={userId}, TaskId={taskId}, ProjectId={projectId}");

@@ -28,7 +28,22 @@ public class AssignmentController : ControllerBase
         _participationService = participationService;
     }
 
-    [HttpPost]
+    [HttpPost("addSingle")]
+    public async Task<IActionResult> AddAssignment(AssignmentPOST assignment, int taskId, int projectId)
+    {
+        var role =
+            await _participationService
+                .GetUserRoleInProjectAsync(_userService.GetUserId(Request), projectId);
+
+        if (!role.CanEditTask())
+            return Unauthorized("You have no permission to edit task");
+
+        var result = await _assignmentService.AddAssignmentAsync(assignment, taskId);
+        return Ok(result);
+
+    }
+
+    [HttpPost("addMultiple")]
     public async Task<IActionResult> AddAssignments(
     IEnumerable<AssignmentPOST> assignments,
     int taskId,
