@@ -111,5 +111,15 @@ namespace Havoc_API.Services
                 throw new DataAccessException(e.Message);
             }
         }
+
+        public async Task<int> UpdateUserAsync(UserPATCH userUpdate)
+        {
+            var user = await _context.Users
+            .FindAsync(userUpdate.UserId) ?? throw new NotFoundException("User not found");
+
+            user.UpdateUser(userUpdate);
+            _context.Users.Update(user);
+            return await _context.SaveChangesAsync();
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Havoc_API.Exceptions;
+﻿using Havoc_API.DTOs.User;
+using Havoc_API.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -96,6 +97,12 @@ public partial class User
         LastName = lastName;
         Email = email;
         Password = password;
+    }
+
+    public void UpdateUser(UserPATCH user)
+    {
+        _firstName = user.Name;
+        _lastName = user.SurName;
     }
 
 }

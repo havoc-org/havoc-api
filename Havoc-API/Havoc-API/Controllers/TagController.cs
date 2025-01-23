@@ -3,7 +3,6 @@ using Havoc_API.Exceptions;
 using Havoc_API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Havoc_API.Exceptions;
 using Havoc_API.Models;
 
 namespace Havoc_API.Controllers;

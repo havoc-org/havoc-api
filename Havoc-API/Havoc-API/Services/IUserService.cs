@@ -1,4 +1,5 @@
-﻿using Havoc_API.DTOs.Tokens;
+﻿using Havoc_API.DTOs.Task;
+using Havoc_API.DTOs.Tokens;
 using Havoc_API.DTOs.User;
 using Havoc_API.Models;
 
@@ -11,6 +12,7 @@ namespace Havoc_API.Services
         Task<UserGET> GetUserAsync(string email, string password);
         Task<User> GetUserByIdAsync(int userId);
         Task<bool> VerifyEmailAsync(string email);
+        Task<int> UpdateUserAsync(UserPATCH userPATCH);
         int GetUserId(HttpRequest request);
 
     }
