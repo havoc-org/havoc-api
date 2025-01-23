@@ -16,13 +16,13 @@ public partial class Participation
     public virtual Role Role { get; private set; } = null!;
 
     public virtual User User { get; private set; } = null!;
-    
+
     private Participation() { }
 
     public Participation(Project project, Role role, User user)
     {
-        ProjectId=project.ProjectId; 
-        UserId=user.UserId;
+        ProjectId = project.ProjectId;
+        UserId = user.UserId;
         RoleId = role.RoleId;
         Project = project;
         Role = role;

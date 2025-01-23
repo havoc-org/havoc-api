@@ -77,6 +77,32 @@ namespace Havoc_API.Services
             }
         }
 
+        public async Task<int> DeleteParticipation(int userId, int projectId)
+        {
+            try
+            {
+                var participation = await _havocContext.Participations
+                        .Include(a => a.User)
+                        .FirstOrDefaultAsync(a => a.UserId == userId && a.ProjectId == projectId);
+
+                if (participation == null)
+                {
+                    throw new NotFoundException($"Participation for UserId={userId}, ProjectId={projectId} doesn't exist.");
+                }
+                _havocContext.Participations.Remove(participation);
+                return await _havocContext.SaveChangesAsync();
+            }
+            catch (SqlException e)
+            {
+                Console.WriteLine($"[Error] Database error occurred: {e.Message}");
+                throw new DataAccessException($"Database error: {e.Message}");
+            }
+            catch (DbUpdateException e)
+            {
+                Console.WriteLine($"[Error] Database update error occurred: {e.Message}");
+                throw new DataAccessException($"Database update error: {e.Message}");
+            }
+        }
 
         public async Task<ICollection<ParticipationGET>> GetParticipationsByProjectIDAsync(int projectId)
         {

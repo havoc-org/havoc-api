@@ -280,7 +280,12 @@ public partial class HavocContext : DbContext, IHavocContext
         modelBuilder.Entity<Attachment>().ToTable(tb => tb.HasTrigger("trgUpdateLastModifiedWhenAttachmentInsertedOrDeleted"));
         modelBuilder.Entity<Comment>().ToTable(tb => tb.HasTrigger("trgUpdateLastModifiedWhenCommentInsertedUpdatedOrDeleted"));
         modelBuilder.Entity<Assignment>().ToTable(tb => tb.HasTrigger("trgUpdateLastModifiedWhenAssignmentInsertedOrDeleted"));
-        modelBuilder.Entity<Tag>().ToTable(tb => tb.HasTrigger("trgUpdateLastModifiedWhenTaskTagInsertedOrDeleted"));   
+        modelBuilder.Entity<Models.Task>()
+                    .HasMany(t => t.Tags)
+                    .WithMany(tag => tag.Tasks)
+                    .UsingEntity<Dictionary<string, object>>(
+                        "TaskTag",
+                        join => join.ToTable(tb => tb.HasTrigger("trgUpdateLastModifiedWhenTaskTagInsertedOrDeleted")));
 
         OnModelCreatingPartial(modelBuilder);
     }

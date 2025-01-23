@@ -10,6 +10,6 @@ namespace Havoc_API.Services
         public Task<bool> AddParticipationAsync(ParticipationPOST participation);
         public Task<bool> AddParticipationListAsync(List<ParticipationPOST> participationList);
         public Task<Role> GetUserRoleInProjectAsync(int userId, int projectId);
-
+        public Task<int> DeleteParticipation(int userId, int projectId);
     }
 }

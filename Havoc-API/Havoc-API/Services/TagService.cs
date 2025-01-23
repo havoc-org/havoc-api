@@ -11,6 +11,7 @@ public class TagService : ITagService
 {
     private readonly IHavocContext _havocContext;
 
+
     public TagService(IHavocContext havocContext)
     {
         _havocContext = havocContext;
@@ -36,23 +37,41 @@ public class TagService : ITagService
         }
     }
 
-    // Добавить новый тег к таску
-    public async Task<int> AddTagToTaskAsync(TagPOST tag, int taskId)
+    public async Task<IEnumerable<TagGET>> AddTagsToTaskAsync(IEnumerable<TagPOST> tags, int taskId, int projectId)
     {
         try
         {
-            var task = await _havocContext.Tasks.Include(t => t.Tags)
-                .FirstOrDefaultAsync(t => t.TaskId == taskId)
-                ?? throw new NotFoundException("Task not found");
+            var task = await _havocContext.Tasks.FirstOrDefaultAsync(t => t.TaskId == taskId)
+                               ?? throw new NotFoundException("Task doesn't exist");
 
-            if (task.Tags.Any(t => t.Name == tag.Name && t.ColorHex == tag.ColorHex))
-                throw new DomainException("Tag with the same name and color already exists in this task");
+            if (await _havocContext.Tasks.FirstOrDefaultAsync(t => t.TaskId == taskId && t.ProjectId == projectId) is null)
+                throw new NotFoundException("Task or Project doesn't exist");
 
-            var newTag = new Tag(tag.Name, tag.ColorHex);
-            task.Tags.Add(newTag);
+            var newTags = new List<Tag>();
 
-            await _havocContext.SaveChangesAsync();
-            return newTag.TagId;
+            foreach (var tag in tags)
+            {
+
+
+                var existingTag = await _havocContext.Tags
+                    .FirstOrDefaultAsync(t => t.Name == tag.Name && t.ColorHex == tag.ColorHex && task.TaskId == t.TagId);
+
+                if (existingTag == null)
+                {
+                    var newTag = new Tag(tag.Name, tag.ColorHex);
+                    newTags.Add(newTag);
+                    task.Tags.Add(newTag);
+                }
+
+            }
+
+            if (newTags.Any())
+            {
+                await _havocContext.Tags.AddRangeAsync(newTags);
+                await _havocContext.SaveChangesAsync();
+            }
+
+            return newTags.Select(a => new TagGET(a.TagId, a.Name, a.ColorHex)).ToList();
         }
         catch (SqlException e)
         {
@@ -64,12 +83,15 @@ public class TagService : ITagService
         }
     }
 
-    // Удалить тег из таски
+
+
+
     public async Task<int> DeleteTagFromTaskAsync(int tagId, int taskId)
     {
         try
         {
-            var task = await _havocContext.Tasks.Include(t => t.Tags)
+            var task = await _havocContext.Tasks
+                .Include(t => t.Tags)
                 .FirstOrDefaultAsync(t => t.TaskId == taskId)
                 ?? throw new NotFoundException("Task not found");
 
@@ -77,6 +99,7 @@ public class TagService : ITagService
                 ?? throw new NotFoundException("Tag not found in the task");
 
             task.Tags.Remove(tag);
+
             return await _havocContext.SaveChangesAsync();
         }
         catch (SqlException e)
@@ -88,4 +111,5 @@ public class TagService : ITagService
             throw new DataAccessException(e.Message);
         }
     }
+
 }

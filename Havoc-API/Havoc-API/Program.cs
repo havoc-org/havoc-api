@@ -52,6 +52,7 @@ builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IHavocContext, HavocContext>();
 builder.Services.AddScoped<ITagService, TagService>();
+builder.Services.AddScoped<IAssignmentService, AssignmentService>();
 builder.Logging.AddConsole();   
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 

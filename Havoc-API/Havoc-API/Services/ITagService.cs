@@ -4,15 +4,12 @@ namespace Havoc_API.Services;
 
 public interface ITagService
 {
-    // Получить теги, связанные с задачей
+
     Task<List<TagGET>> GetTagsByTaskIdAsync(int taskId);
 
 
-
-    // Добавить новый тег к задаче
-   Task<int> AddTagToTaskAsync(TagPOST tag, int taskId);
+    Task<IEnumerable<TagGET>> AddTagsToTaskAsync(IEnumerable<TagPOST> tags, int taskId, int projectId);
 
 
-    // Удалить тег из задачи
     Task<int> DeleteTagFromTaskAsync(int tagId, int taskId);
 }
