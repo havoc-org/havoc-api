@@ -134,4 +134,39 @@ public class AssignmentService : IAssignmentService
             throw new DataAccessException($"Database update error: {e.Message}");
         }
     }
+    public async Task<int> DeleteManyAssignmentsAsync(IEnumerable<AssignmentDELETE> assignments, int taskId, int projectId)
+    {
+        try
+        {
+
+            foreach (var assignment in assignments)
+            {
+                var existingAssignment = await _havocContext.Assignments
+                    .FirstOrDefaultAsync(a => a.UserId == assignment.UserId && a.TaskId == taskId);
+
+                if (existingAssignment == null)
+                {
+                    Console.WriteLine($"[Error] Assignment not found. UserId={assignment.UserId}, TaskId={taskId}, ProjectId={projectId}");
+                    throw new NotFoundException($"Assignment for UserId={assignment.UserId}, TaskId={taskId}, ProjectId={projectId} doesn't exist.");
+                }
+
+                _havocContext.Assignments.Remove(existingAssignment);
+            }
+
+            var result = await _havocContext.SaveChangesAsync();
+
+            Console.WriteLine($"[Info] Assignment deleted successfully. UsersIds={assignments.Select(o=>o.UserId)}, TaskId={taskId}, ProjectId={projectId}");
+            return result;
+        }
+        catch (SqlException e)
+        {
+            Console.WriteLine($"[Error] Database error occurred: {e.Message}");
+            throw new DataAccessException($"Database error: {e.Message}");
+        }
+        catch (DbUpdateException e)
+        {
+            Console.WriteLine($"[Error] Database update error occurred: {e.Message}");
+            throw new DataAccessException($"Database update error: {e.Message}");
+        }
+    }
 }

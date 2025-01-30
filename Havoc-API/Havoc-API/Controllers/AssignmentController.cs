@@ -76,5 +76,16 @@ public class AssignmentController : ControllerBase
         await _assignmentService.DeleteAssignmentAsync(taskId, userId, projectId);
         return NoContent();
     }
+    [HttpPost("removeMultiple")]
+    public async Task<ActionResult> RemoveAssignmentsAsync(IEnumerable<AssignmentDELETE> assignments, int taskId, int projectId)
+    {
+        var role =
+            await _participationService
+                .GetUserRoleInProjectAsync(_userService.GetUserId(Request), projectId);
+        if (!role.CanEditTask())
+            return Unauthorized("You have no permission to edit task");
+        var result = await _assignmentService.DeleteManyAssignmentsAsync(assignments, taskId, projectId);
+        return Ok(result);
+    }
 
 }
