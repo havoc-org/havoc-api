@@ -28,12 +28,14 @@ public static class TaskFactory
 
     public static TaskGET CreateGet(Task task)
     {
-        return new TaskGET(
+        return new TaskGET
+        (
             task.TaskId,
             task.Name,
             task.Description,
             task.Start,
             task.Deadline,
+            task.ProjectId,
             new UserGET(
                 task.Creator.UserId,
                 task.Creator.FirstName,

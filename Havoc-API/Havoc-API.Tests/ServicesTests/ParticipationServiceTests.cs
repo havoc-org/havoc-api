@@ -175,6 +175,7 @@ public class ParticipationServiceTests
         var action = async () => await _participationService.AddParticipationAsync(participationPost);
 
         //Asert
+
         await action.Should().ThrowAsync<Exception>("User not found");
         _context.Participations.Should().HaveCount(participationsCount);
         _context.Participations.Should().ContainEquivalentOf(participationOwner);

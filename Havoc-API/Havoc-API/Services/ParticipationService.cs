@@ -29,7 +29,8 @@ namespace Havoc_API.Services
                 var user = await _havocContext.Users.FirstOrDefaultAsync(us => us.Email.Equals(participation.Email));
                 if (user == null)
                 {
-                    return false;   // change when need to implement if there is no participant in database
+                    // i'm going to cut somebody balls 
+                    // return false;   // change when need to implement if there is no participant in database
 
                     throw new Exception("User not found");
                 }
