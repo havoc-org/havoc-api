@@ -10,7 +10,7 @@ namespace Havoc_API.Services;
 public class AttachmentService : IAttachmentService
 {
     private readonly IHavocContext _havocContext;
-    public AttachmentService(HavocContext havocContext)
+    public AttachmentService(IHavocContext havocContext)
     {
         _havocContext = havocContext;
     }
@@ -78,7 +78,9 @@ public class AttachmentService : IAttachmentService
                 ?? throw new NotFoundException("User doesn't exist");
             var task = await _havocContext.Tasks.FirstOrDefaultAsync(u => u.TaskId == taskId)
                 ?? throw new NotFoundException("Task doesn't exist");
-            var newAttachments = attachments.Select(attachment => new Attachment(attachment.FileLink, task, creator));
+
+            var newAttachments = attachments.Where(a => !_havocContext.Attachments.Select(e => e.FileLink).Contains(a.FileLink))
+                .Select(attachment => new Attachment(attachment.FileLink, task, creator));
             await _havocContext.Attachments.AddRangeAsync(newAttachments);
             await _havocContext.SaveChangesAsync();
             return newAttachments.Select(attachment => new
