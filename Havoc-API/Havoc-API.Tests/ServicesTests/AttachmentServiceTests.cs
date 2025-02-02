@@ -4,7 +4,6 @@ using Havoc_API.Tests.TestData;
 using Havoc_API.DTOs.Attachment;
 using FluentAssertions;
 using Xunit;
-using Havoc_API.Models;
 
 namespace Havoc_API.Tests.ServicesTests;
 
@@ -126,7 +125,6 @@ public class AttachmentServiceTests
         );
 
         //Assert
-        Console.WriteLine(result.GetType());
         result.Should().BeAssignableTo<IEnumerable<AttachmentGET>>();
         var resultSet = result.Zip(newAttachments, Tuple.Create);
         foreach (var GetAndPost in resultSet)
@@ -192,7 +190,7 @@ public class AttachmentServiceTests
     }
 
     [Fact]
-    public async System.Threading.Tasks.Task DeleteAttachmentAsync_ShouldDeleteAttachment_WhenAttachmentExists()
+    public async System.Threading.Tasks.Task DeleteAttachmentAsync_ShouldDeleteAttachmentAndReturnNumberOfAffectedRows_WhenAttachmentExists()
     {
         //Arrange
         var user = UserFactory.Create();

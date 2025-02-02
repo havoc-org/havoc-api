@@ -21,18 +21,4 @@ public static class AttachmentFactory
             FileLink = fileLink
         };
     }
-
-    public static AttachmentGET CreateGet(Attachment attachment)
-    {
-        return new AttachmentGET(
-            attachment.AttachmentId,
-            attachment.FileLink,
-            new UserGET(
-                attachment.UserId,
-                attachment.User.FirstName,
-                attachment.User.LastName,
-                attachment.User.Email
-            )
-        );
-    }
 }

@@ -20,7 +20,7 @@ public class TaskGET
 
     public DateTime? Deadline { get; set; }
 
-    public int ProjectId {  get; set; }
+    public int ProjectId { get; set; }
 
     public virtual ICollection<AssignmentGET> Assignments { get; set; } = new List<AssignmentGET>();
 
@@ -33,17 +33,18 @@ public class TaskGET
     public virtual UserGET Creator { get; set; } = null!;
 
     public virtual TaskStatusGET TaskStatus { get; set; } = null!;
-    
 
-    private TaskGET(){}
 
-    public TaskGET(int taskId, string name, string? description, DateTime? start, DateTime? deadline,int projectId, UserGET creator, TaskStatusGET taskStatus, ICollection<AssignmentGET> assignments, ICollection<AttachmentGET> attachments, ICollection<CommentGET> comments, ICollection<TagGET> tags){
+    private TaskGET() { }
+
+    public TaskGET(int taskId, string name, string? description, DateTime? start, DateTime? deadline, int projectId, UserGET creator, TaskStatusGET taskStatus, ICollection<AssignmentGET> assignments, ICollection<AttachmentGET> attachments, ICollection<CommentGET> comments, ICollection<TagGET> tags)
+    {
         TaskId = taskId;
         Name = name;
         Description = description;
         Start = start;
         Deadline = deadline;
-        ProjectId=projectId;
+        ProjectId = projectId;
         Creator = creator;
         TaskStatus = taskStatus;
         Assignments = assignments;
