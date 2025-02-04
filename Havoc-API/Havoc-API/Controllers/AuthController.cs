@@ -3,12 +3,7 @@ using Havoc_API.DTOs.Tokens;
 using Havoc_API.DTOs.User;
 using Havoc_API.Exceptions;
 using Havoc_API.Services;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 
 namespace Havoc_API.Controllers
 {
