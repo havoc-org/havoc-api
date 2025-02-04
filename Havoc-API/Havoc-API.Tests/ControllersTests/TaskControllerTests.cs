@@ -78,10 +78,11 @@ public class TaskControllerTests
 
         //Assert
         response.Should().BeOfType<OkObjectResult>().Which.Value.Should()
-        .BeEquivalentTo(new {
+        .BeEquivalentTo(new
+        {
             statuses = taskStatuses,
             tasks = taskGetList
-            });
+        });
     }
 
     [Fact]
@@ -195,5 +196,103 @@ public class TaskControllerTests
 
         //Assert
         response.Should().BeOfType<ObjectResult>().Which.StatusCode.Should().Be(500);
+    }
+
+    [Fact]
+    public async void AddTaskAsync_ReturnsOkWithTaskIdResult_WhenTaskWasAddedSuccessfully()
+    {
+        //Arrrange
+        var userId = It.IsAny<int>();
+        var taskId = It.IsAny<int>();
+        var taskPost = TaskFactory.CreatePost(userId, It.IsAny<int>(), It.IsAny<TaskStatusPOST>(), It.IsAny<int>());
+        _userService.Setup(us => us.GetUserId(It.IsAny<HttpRequest>())).Returns(userId);
+        _participationService.Setup(ps => ps.GetUserRoleInProjectAsync(userId, It.IsAny<int>())).ReturnsAsync(RoleFactory.OwnerRole());
+        _taskService.Setup(ts => ts.AddTaskAsync(It.IsAny<TaskPOST>())).ReturnsAsync(taskId);
+
+        //Act
+        var response = await _taskController.AddTaskAsync(taskPost);
+
+        //Assert
+        response
+            .Should().BeOfType<OkObjectResult>()
+            .Which.Value
+            .Should().BeEquivalentTo(new { TaskId = taskId });
+    }
+
+    [Fact]
+    public async void DeleteTaskByIdAsync_ShouldReturnOkWithNumberOfAffectedRows_WhenTaskWasDeletedSuccessfully()
+    {
+        //Arrange
+        var rows = It.Is<int>(i => i >= 0);
+        var user = UserFactory.Create();
+        var userId = user.UserId;
+        var project = ProjectFactory.Create(user);
+        var task = TaskFactory.Create(user, project);
+        var taskId = task.TaskId;
+        var taskGet = TaskFactory.CreateGet(task);
+        _userService.Setup(us => us.GetUserId(It.IsAny<HttpRequest>())).Returns(userId);
+        _participationService.Setup(ps => ps.GetUserRoleInProjectAsync(userId, project.ProjectId)).ReturnsAsync(RoleFactory.OwnerRole());
+        _taskService.Setup(ts => ts.GetTaskByIdAsync(taskId)).ReturnsAsync(taskGet);
+        _taskService.Setup(ts => ts.DeleteTaskByIdAsync(taskId)).ReturnsAsync(rows);
+        //Act
+        var response = await _taskController.DeleteTaskByIdAsync(taskId);
+
+        //Assert
+        response.Should().BeOfType<OkObjectResult>()
+            .Which.Value
+            .Should().BeEquivalentTo(new { AffectedRows = rows });
+    }
+
+    [Fact]
+    public async void UpdateTaskAsync_ShouldReturnOkWithNumberOfAffectedRows_WhenTaskWasUpdatedSuccessfully()
+    {
+        //Arrange
+        var rows = It.Is<int>(i => i >= 0);
+        var user = UserFactory.Create();
+        var userId = user.UserId;
+        var project = ProjectFactory.Create(user);
+        var taskPatch = Mock.Of<TaskPATCH>();
+        var task = TaskFactory.Create(user, project);
+        var taskGet = TaskFactory.CreateGet(task);
+        _userService.Setup(us => us.GetUserId(It.IsAny<HttpRequest>())).Returns(userId);
+        _taskService.Setup(ts => ts.GetTaskByIdAsync(taskPatch.TaskId)).ReturnsAsync(taskGet);
+        _participationService.Setup(ps => ps.GetUserRoleInProjectAsync(userId, It.IsAny<int>())).ReturnsAsync(RoleFactory.OwnerRole());
+        _taskService.Setup(ts => ts.UpdateTaskAsync(It.IsAny<TaskPATCH>())).ReturnsAsync(rows);
+
+        //Act
+        var response = await _taskController.UpdateTaskAsync(taskPatch);
+
+        //Assert
+        response.Should().BeOfType<OkObjectResult>()
+            .Which.Value
+            .Should().BeEquivalentTo(new { AffectedRows = rows });
+    }
+
+    [Fact]
+    public async void UpdateStatusByIdAsync_ShouldReturnNumberOfRowsAffected_WhenTaskStatusWasSuccessfullyUpdated()
+    {
+        //Arrange
+        var rows = It.Is<int>(i => i >= 0);
+        var user = UserFactory.Create();
+        var project = ProjectFactory.Create(user);
+        var task = TaskFactory.Create(user, project);
+        var taskGet = TaskFactory.CreateGet(task);
+        var taskId = task.TaskId;
+        var taskStatusPatch = TaskStatusFactory.CreatePatch();
+        var userId = user.UserId;
+        _userService.Setup(us => us.GetUserId(It.IsAny<HttpRequest>())).Returns(userId);
+        _participationService.Setup(ps => ps.GetUserRoleInProjectAsync(userId, It.IsAny<int>())).ReturnsAsync(RoleFactory.OwnerRole());
+
+        _taskService.Setup(ts => ts.GetTaskByIdAsync(taskStatusPatch.TaskId))
+            .ReturnsAsync(taskGet);
+        _taskService.Setup(ts => ts.UpdateTaskStatusAsync(taskStatusPatch)).ReturnsAsync(rows);
+
+        //Act
+        var response = await _taskController.UpdateStatusByIdAsync(taskStatusPatch);
+
+        //Assert
+        response.Should().BeOfType<OkObjectResult>()
+            .Which.Value
+            .Should().BeEquivalentTo(new { AffectedRows = rows });
     }
 }
