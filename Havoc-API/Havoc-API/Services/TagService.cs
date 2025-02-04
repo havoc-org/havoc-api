@@ -51,10 +51,8 @@ public class TagService : ITagService
 
             foreach (var tag in tags)
             {
-
-
                 var existingTag = await _havocContext.Tags
-                    .FirstOrDefaultAsync(t => t.Name == tag.Name && t.ColorHex == tag.ColorHex && task.TaskId == t.TagId);
+                    .FirstOrDefaultAsync(t => t.Name == tag.Name && t.ColorHex == tag.ColorHex);
 
                 if (existingTag == null)
                 {
@@ -62,7 +60,6 @@ public class TagService : ITagService
                     newTags.Add(newTag);
                     task.Tags.Add(newTag);
                 }
-
             }
 
             if (newTags.Any())
@@ -82,9 +79,6 @@ public class TagService : ITagService
             throw new DataAccessException(e.Message);
         }
     }
-
-
-
 
     public async Task<int> DeleteTagFromTaskAsync(int tagId, int taskId)
     {
