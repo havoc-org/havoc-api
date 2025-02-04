@@ -15,4 +15,19 @@ public static class CommentFactory
     {
         return new CommentPOST(content);
     }
+
+    public static CommentGET CreateGet(Comment comment)
+    {
+        return new CommentGET(
+            comment.CommentId,
+            comment.Content,
+            comment.CommentDate,
+            new Havoc_API.DTOs.User.UserGET(
+                comment.UserId,
+                comment.User.FirstName,
+                comment.User.LastName,
+                comment.User.Email
+            )
+        );
+    }
 }
