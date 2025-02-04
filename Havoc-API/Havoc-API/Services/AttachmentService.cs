@@ -80,7 +80,7 @@ public class AttachmentService : IAttachmentService
                 ?? throw new NotFoundException("Task doesn't exist");
 
             var newAttachments = attachments.Where(a => !_havocContext.Attachments.Select(e => e.FileLink).Contains(a.FileLink))
-                .Select(attachment => new Attachment(attachment.FileLink, task, creator));
+                .Select(attachment => new Attachment(attachment.FileLink, task, creator)).ToList();
             await _havocContext.Attachments.AddRangeAsync(newAttachments);
             await _havocContext.SaveChangesAsync();
             return newAttachments.Select(attachment => new

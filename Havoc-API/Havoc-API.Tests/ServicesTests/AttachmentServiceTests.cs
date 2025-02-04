@@ -87,7 +87,7 @@ public class AttachmentServiceTests
     }
 
     [Fact]
-    public async System.Threading.Tasks.Task AddManyAttachmentAsync_ShouldAddAllAttachments_WhenAttachmentsDontExist()
+    public async Task AddManyAttachmentAsync_ShouldAddAllAttachments_WhenAttachmentsDontExist()
     {
         //Arrange
         var user = UserFactory.Create();

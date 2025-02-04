@@ -28,17 +28,4 @@ public static class AssignmentFactory
             Description = description
         };
     }
-
-    public static AssignmentGET CreateGet(Assignment assignment)
-    {
-        return new AssignmentGET(
-            new Havoc_API.DTOs.User.UserGET(
-                assignment.UserId,
-                assignment.User.FirstName,
-                assignment.User.LastName,
-                assignment.User.Email
-            ),
-            assignment.Description
-        );
-    }
 }
