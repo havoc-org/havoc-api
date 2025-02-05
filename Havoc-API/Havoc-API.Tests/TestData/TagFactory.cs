@@ -16,4 +16,9 @@ public static class TagFactory
             ColorHex = colorHex
         };
     }
+
+    public static TagGET CreateGet(Tag tag)
+    {
+        return new TagGET(tag.TagId, tag.Name, tag.ColorHex);
+    }
 }
