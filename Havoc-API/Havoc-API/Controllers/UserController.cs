@@ -27,7 +27,7 @@ public class UserController : ControllerBase
         try
         {
             var user = await _userService.GetUserGETByIdAsync(userId);
-            return Ok(new { user });
+            return Ok(user);
 
         }
         catch (NotFoundException ex)
@@ -55,6 +55,29 @@ public class UserController : ControllerBase
         catch (NotFoundException ex)
         {
             return NotFound(new { ex.Message });
+        }
+        catch (DataAccessException ex)
+        {
+            return StatusCode(500, new { ex.Message });
+        }
+    }
+
+    [HttpPatch("updatePassword")]
+    public async Task<ActionResult> UpdateUserPasswordAsync(string oldPass, string newPass)
+    {
+        try
+        {
+            var userId = _userService.GetUserId(Request);
+            var result = await _userService.UpdateUserPasswordAsync(userId, oldPass, newPass);
+            return Ok(new { AffectedRows = result });
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(new { ex.Message });
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Unauthorized(new { ex.Message });
         }
         catch (DataAccessException ex)
         {

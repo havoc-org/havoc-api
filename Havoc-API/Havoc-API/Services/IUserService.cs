@@ -14,6 +14,7 @@ namespace Havoc_API.Services
         Task<UserGET> GetUserGETByIdAsync(int userId);
         Task<bool> VerifyEmailAsync(string email);
         Task<int> UpdateUserAsync(UserPATCH userPATCH);
+        Task<int> UpdateUserPasswordAsync(int userId, string oldPass, string newPass);
         int GetUserId(HttpRequest request);
 
     }
