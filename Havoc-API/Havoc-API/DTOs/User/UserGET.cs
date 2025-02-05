@@ -12,6 +12,8 @@ namespace Havoc_API.DTOs.User
         public string LastName { get; private set; } = null!;
 
         public string Email { get; private set; } = null!;
+        public int AssignmentCount { get; set; }
+        public int ParticipationCount { get; set; }
 
         public UserGET(int userId, string firstName, string lastName, string email)
         {

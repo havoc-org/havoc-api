@@ -26,7 +26,7 @@ public class UserController : ControllerBase
     {
         try
         {
-            var user = await _userService.GetUserByIdAsync(userId);
+            var user = await _userService.GetUserGETByIdAsync(userId);
             return Ok(new { user });
 
         }

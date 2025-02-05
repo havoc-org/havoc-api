@@ -78,6 +78,35 @@ namespace Havoc_API.Services
             }
         }
 
+        public async Task<UserGET> GetUserGETByIdAsync(int userId)
+        {
+            try
+            {
+                var user = await _context.Users
+                    .Where(u => u.UserId == userId)
+                    .Select(u => new UserGET(
+                        u.UserId,
+                        u.FirstName,
+                        u.LastName,
+                        u.Email
+                    )
+                    {
+                        AssignmentCount = u.Assignments.Count(),
+                        ParticipationCount = u.Participations.Count()
+                    })
+                    .FirstOrDefaultAsync();
+
+                if (user == null)
+                    throw new NotFoundException("Cannot find user by Id " + userId);
+
+                return user;
+            }
+            catch (SqlException e)
+            {
+                throw new DataAccessException(e.Message);
+            }
+        }
+
         public async Task<bool> VerifyEmailAsync(string email)
         {
             try
