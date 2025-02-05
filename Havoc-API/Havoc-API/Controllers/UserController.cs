@@ -63,12 +63,12 @@ public class UserController : ControllerBase
     }
 
     [HttpPatch("updatePassword")]
-    public async Task<ActionResult> UpdateUserPasswordAsync(string oldPass, string newPass)
+    public async Task<ActionResult> UpdateUserPasswordAsync(PasswordUpdateDTO passwordUpdate)
     {
         try
         {
             var userId = _userService.GetUserId(Request);
-            var result = await _userService.UpdateUserPasswordAsync(userId, oldPass, newPass);
+            var result = await _userService.UpdateUserPasswordAsync(userId, passwordUpdate.OldPass, passwordUpdate.NewPass);
             return Ok(new { AffectedRows = result });
         }
         catch (NotFoundException ex)
