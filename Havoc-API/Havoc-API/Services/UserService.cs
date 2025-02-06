@@ -150,5 +150,29 @@ namespace Havoc_API.Services
             _context.Users.Update(user);
             return await _context.SaveChangesAsync();
         }
+
+        public async Task<int> UpdateUserPasswordAsync(int userId, string oldPass, string newPass)
+        {
+            try
+            {
+                var user = await _context.Users.FindAsync(userId);
+                if (user == null)
+                    throw new NotFoundException($"User with ID {userId} not found");
+
+                if (!BCrypt.Net.BCrypt.Verify(oldPass, user.Password))
+                    throw new UnauthorizedAccessException("Incorrect old password");
+
+                string hashedNewPassword = BCrypt.Net.BCrypt.HashPassword(newPass);
+
+                user.UpdateUserPassword(hashedNewPassword);
+                _context.Users.Update(user);
+
+                return await _context.SaveChangesAsync();
+            }
+            catch (SqlException e)
+            {
+                throw new DataAccessException(e.Message);
+            }
+        }
     }
 }
