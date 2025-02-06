@@ -13,6 +13,10 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: ./Havoc-API
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
