@@ -22,4 +22,9 @@ public static class UserFactory
             Email = email,
             Password = password
         };
+
+    public static UserGET CreateGet(User user)
+    {
+        return new UserGET(user.UserId, user.FirstName, user.LastName, user.Email);
+    }
 }

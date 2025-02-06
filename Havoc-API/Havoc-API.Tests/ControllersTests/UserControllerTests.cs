@@ -27,15 +27,15 @@ public class UserControllerTests
     {
         //Arrange
         var userId = 1;
-        var user = UserFactory.Create();
-        _mockUserService.Setup(x => x.GetUserByIdAsync(userId)).ReturnsAsync(user);
+        var user = UserFactory.CreateGet(UserFactory.Create());
+        _mockUserService.Setup(x => x.GetUserGETByIdAsync(userId)).ReturnsAsync(user);
 
         //Act
         var result = await _userController.GetUserAsync(userId);
 
         //Assert
         result.Should().BeOfType<OkObjectResult>();
-        result.As<OkObjectResult>().Value.Should().BeEquivalentTo(new { user });
+        result.As<OkObjectResult>().Value.Should().BeEquivalentTo(user);
     }
 
     [Fact]

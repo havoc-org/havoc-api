@@ -132,7 +132,7 @@ public class AttachmentControllerTests
     }
 
     [Fact]
-    public async void RemoveAttachment_ReturnsNoContentResult_WhenAttachmentWasUnattchedFromTask()
+    public async void RemoveAttachment_ReturnsOkWithSuccessMessage_WhenAttachmentWasUnattchedFromTask()
     {
         // Arrange
         var user = UserFactory.Create();
@@ -152,6 +152,6 @@ public class AttachmentControllerTests
         var result = await _attachmentController.RemoveAttachment(attachmentId, taskId, projectId);
 
         // Assert
-        result.Should().BeOfType<NoContentResult>();
+        result.Should().BeOfType<OkObjectResult>().Which.Value.Should().BeEquivalentTo(new { result = "Success" });
     }
 }
