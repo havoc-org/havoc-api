@@ -61,7 +61,7 @@ public class AttachmentController : ControllerBase
         if (!role.CanEditTask())
             return Unauthorized("You have no permission to edit task");
         await _attachmentService.DeleteAttachmentAsync(attachmentId, taskId, projectId);
-        return NoContent();
+        return Ok(new { result = "Success" });
     }
 
 }

@@ -78,6 +78,35 @@ namespace Havoc_API.Services
             }
         }
 
+        public async Task<UserGET> GetUserGETByIdAsync(int userId)
+        {
+            try
+            {
+                var user = await _context.Users
+                    .Where(u => u.UserId == userId)
+                    .Select(u => new UserGET(
+                        u.UserId,
+                        u.FirstName,
+                        u.LastName,
+                        u.Email
+                    )
+                    {
+                        AssignmentCount = u.Assignments.Count(),
+                        ParticipationCount = u.Participations.Count()
+                    })
+                    .FirstOrDefaultAsync();
+
+                if (user == null)
+                    throw new NotFoundException("Cannot find user by Id " + userId);
+
+                return user;
+            }
+            catch (SqlException e)
+            {
+                throw new DataAccessException(e.Message);
+            }
+        }
+
         public async Task<bool> VerifyEmailAsync(string email)
         {
             try
@@ -120,6 +149,30 @@ namespace Havoc_API.Services
             user.UpdateUser(userUpdate);
             _context.Users.Update(user);
             return await _context.SaveChangesAsync();
+        }
+
+        public async Task<int> UpdateUserPasswordAsync(int userId, string oldPass, string newPass)
+        {
+            try
+            {
+                var user = await _context.Users.FindAsync(userId);
+                if (user == null)
+                    throw new NotFoundException($"User with ID {userId} not found");
+
+                if (!BCrypt.Net.BCrypt.Verify(oldPass, user.Password))
+                    throw new UnauthorizedAccessException("Incorrect old password");
+
+                string hashedNewPassword = BCrypt.Net.BCrypt.HashPassword(newPass);
+
+                user.UpdateUserPassword(hashedNewPassword);
+                _context.Users.Update(user);
+
+                return await _context.SaveChangesAsync();
+            }
+            catch (SqlException e)
+            {
+                throw new DataAccessException(e.Message);
+            }
         }
     }
 }

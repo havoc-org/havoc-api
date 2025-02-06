@@ -105,4 +105,9 @@ public partial class User
         _lastName = user.SurName;
     }
 
+    public void UpdateUserPassword(string newPass)
+    {
+        _password = newPass;
+    }
+
 }
