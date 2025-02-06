@@ -70,7 +70,7 @@ builder.Services.AddCors(options =>
     options.AddDefaultPolicy(build =>
     {
         build
-               .WithOrigins(builder.Configuration["FrontendUrl"] ?? throw new ArgumentNullException("Cors must have something"))
+               .WithOrigins(builder.Configuration["JWT:Audience"] ?? throw new ArgumentNullException("Cors must have something"))
                .AllowAnyMethod()
                .AllowAnyHeader()
                .AllowCredentials();
@@ -83,6 +83,7 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    Console.WriteLine("Swagger is On");
     app.UseSwagger();
     app.UseSwaggerUI();
 }

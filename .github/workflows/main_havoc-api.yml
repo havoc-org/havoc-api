@@ -33,7 +33,6 @@ jobs:
 
   build:
     runs-on: "ubuntu-latest"
-
     steps:
       - uses: actions/checkout@v2
 
@@ -53,7 +52,11 @@ jobs:
           push: true
           tags: havocimages.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_086dabfadc0143fd90a768bdd51ddfdf }}/api/havoc-api:${{ github.sha }}
           file: ./Havoc-API/Dockerfile
-
+          build-args: |
+            ConnectionStrings__DefaultConnection=${{ secrets.CONNECTIONSTRING }}
+            JWT_Audience=${{ secrets.SPAURL }}
+            JWT_Issuer=${{ secrets.APIURL }}
+            JWT_Key=${{ secrets.JWTKEY }}
   deploy:
     runs-on: ubuntu-latest
     needs: build

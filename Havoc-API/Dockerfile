@@ -49,7 +49,23 @@ WORKDIR /app
 COPY --from=build /app .
 
 # Install libicu-dev
-RUN apk update && apk add icu-libs
+ENV \
+    DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
+    LC_ALL=en_US.UTF-8 \
+    LANG=en_US.UTF-8
+
+ARG JWT_Key
+ARG JWT_Audience
+ARG JWT_Issuer
+ARG DB_CONNECTION_STRING
+ENV JWT_Key=$JWT_Key
+ENV JWT_Audience=$JWT_Audience
+ENV JWT_Issuer=$JWT_Issuer
+ENV ConnectionStrings__Default=$DB_CONNECTION_STRING
+
+RUN apk add --no-cache \
+    icu-data-full \
+    icu-libs
 
 # Switch to a non-privileged user (defined in the base image) that the app will run under.
 # See https://docs.docker.com/go/dockerfile-user-best-practices/
