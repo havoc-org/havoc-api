@@ -1,4 +1,5 @@
 ﻿using Havoc_API.Exceptions;
+using Havoc_API.DTOs.Project;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -57,7 +58,7 @@ namespace Havoc_API.Models
             {
                 if (value.HasValue && Deadline.HasValue && value >= Deadline)
                     throw new WrongDateException("Start is after or equal to deadline");
-            
+
                 _start = value;
             }
         }
@@ -102,6 +103,31 @@ namespace Havoc_API.Models
             ProjectStatusId = projectStatus.ProjectStatusId;
             ProjectStatus = projectStatus;
             Creator = creator;
+        }
+
+        public void UpdateProject(ProjectPATCH project)
+        {
+            if (!string.IsNullOrEmpty(project.Name))
+            {
+                Name = project.Name;
+            }
+
+            if (project.Description != null)
+            {
+                Description = project.Description;
+            }
+
+            if (project.StartDate.HasValue)
+            {
+                this.Start = project.StartDate;
+            }
+
+            if (project.Deadline.HasValue)
+            {
+                Deadline = project.Deadline;
+            }
+
+            LastModified = DateTime.Now;
         }
     }
 }
