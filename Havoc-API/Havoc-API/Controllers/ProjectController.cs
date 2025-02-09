@@ -2,7 +2,6 @@
 using Havoc_API.Exceptions;
 using Havoc_API.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -28,6 +27,34 @@ namespace Havoc_API.Controllers
             _participationService = participationService;
         }
 
+        [HttpPatch("{projectId}")]
+        public async Task<ActionResult> UpdateProjectAsync(int projectId, [FromBody] ProjectPATCH projectUpdate)
+        {
+            try
+            {
+                var userId = _userService.GetUserId(Request);
+
+                var role = await _participationService.GetUserRoleInProjectAsync(userId, projectId);
+                if (!role.CanEditProject())
+                    return Unauthorized("You have no permission to edit this project");
+
+                var result = await _projectService.UpdateProjectAsync(projectId, projectUpdate);
+
+                return Ok(new { AffectedRows = result });
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { ex.Message });
+            }
+            catch (DataAccessException ex)
+            {
+                return StatusCode(500, new { ex.Message });
+            }
+            catch (SqlException ex)
+            {
+                return StatusCode(500, new { ex.Message });
+            }
+        }
 
         [HttpGet("all")]
         public async Task<ActionResult> GetProjectsAsync()
@@ -45,7 +72,6 @@ namespace Havoc_API.Controllers
                 return StatusCode(500, new { ex.Message });
             }
         }
-
 
         [HttpGet("{id}")]
         public async Task<ActionResult> GetProjectByIdAsync(int id)
@@ -92,7 +118,6 @@ namespace Havoc_API.Controllers
                 var userId = _userService.GetUserId(Request);
                 var creator = await _userService.GetUserByIdAsync(userId);
                 return Ok(await _projectService.AddProjectAsync(newProject, creator));
-
             }
             catch (NotFoundException ex)
             {
@@ -126,6 +151,5 @@ namespace Havoc_API.Controllers
                 return StatusCode(500, new { ex.Message });
             }
         }
-
     }
 }

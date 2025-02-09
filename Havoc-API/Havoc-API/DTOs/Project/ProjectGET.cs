@@ -24,6 +24,7 @@ namespace Havoc_API.DTOs.Project
 
         public virtual ProjectStatusGET ProjectStatus { get; private set; } = null!;
         public virtual ICollection<ParticipationGET> Participations { get; private set; } = new List<ParticipationGET>();
+        public string InviteCode { get; set; } = null!;
         
         public ProjectGET(int projectId, string name, string? description, byte[]? background, DateTime? start, DateTime? deadline, DateTime lastModified, UserGET creator, ProjectStatusGET projectStatus, ICollection<ParticipationGET> participations)
         {

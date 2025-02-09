@@ -30,15 +30,19 @@ public class ParticipationController : ControllerBase
     }
 
     [HttpDelete]
-    public async Task<ActionResult> RemoveParticipation(int userId, int projectId){
-        var role =
-            await _participationService
-                .GetUserRoleInProjectAsync(_userService.GetUserId(Request), projectId);
+    public async Task<ActionResult> RemoveParticipation(int userId, int projectId)
+    {
+        var role = await _participationService
+            .GetUserRoleInProjectAsync(_userService.GetUserId(Request), projectId);
         if (!role.CanEditProject())
             return Unauthorized("You have no permission to edit project");
+
         await _participationService.DeleteParticipation(userId, projectId);
-        return NoContent();
+
+        // Возвращаем JSON с сообщением об успешном удалении
+        return Ok(new { message = "" });
     }
+
 
 
     [HttpPost]
@@ -58,6 +62,26 @@ public class ParticipationController : ControllerBase
         var result = await _participationService.AddParticipationListAsync(participations);
         return Ok(result);
 
+    }
+
+    [HttpGet]
+    public async Task<ActionResult<ICollection<ParticipationGET>>> GetParticipationsByProjectIdAsync(int projectId)
+    {
+        try
+        {
+
+
+            var participations = await _participationService.GetParticipationsByProjectIDAsync(projectId);
+            return Ok(participations);
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(new { ex.Message });
+        }
+        catch (DataAccessException ex)
+        {
+            return StatusCode(500, new { ex.Message });
+        }
     }
 
 }
