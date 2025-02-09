@@ -37,7 +37,7 @@ public class ParticipationControllerTests
         var result = await _participationController.RemoveParticipation(It.IsAny<int>(), It.IsAny<int>());
 
         //Assert
-        result.Should().BeOfType<NoContentResult>();
+        result.Should().BeOfType<OkObjectResult>();
     }
 
     [Fact]
