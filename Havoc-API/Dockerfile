@@ -24,12 +24,16 @@ RUN --mount=type=secret,id=jwt_key \
     --mount=type=secret,id=db_connection \
     --mount=type=secret,id=api_url \
     --mount=type=secret,id=spa_url 
+    # JWT__Key=$(cat /run/secrets/jwt_key) \
+    # ConnectionStrings__Default=$(cat /run/secrets/db_connection) \
+    # JWT__Issuer=$(cat /run/secrets/api_url) \
+    # JWT__Audience=$(cat /run/secrets/spa_url)
 
-RUN apk add --no-cache bash \
-    && sed -i "s|#{ConnectionStrings__Default}#|$(cat run/secrets/db_connection)|g" /source/Havoc-API/appsettings.Production.json \
-    && sed -i "s|#{JWT__Key}#|$(cat run/secrets/jwt_key)|g" /source/Havoc-API/appsettings.Production.json \
-    && sed -i "s|#{JWT__Audience}#|$(cat run/secrets/spa_url)|g" /source/Havoc-API/appsettings.Production.json \
-    && sed -i "s|#{JWT__Issuer}#|$(cat run/secrets/api_url)|g" /source/Havoc-API/appsettings.Production.json
+# RUN apk add --no-cache bash \
+#     && sed -i "s|#{ConnectionStrings__Default}#|$(cat run/secrets/db_connection)|g" /source/Havoc-API/appsettings.Production.json \
+#     && sed -i "s|#{JWT__Key}#|$(RUN --mount=type=secret,id=jwt_key, cat run/secrets/jwt_key)|g" /source/Havoc-API/appsettings.Production.json \
+#     && sed -i "s|#{JWT__Audience}#|$(cat run/secrets/spa_url)|g" /source/Havoc-API/appsettings.Production.json \
+#     && sed -i "s|#{JWT__Issuer}#|$(cat run/secrets/api_url)|g" /source/Havoc-API/appsettings.Production.json
 
 # Build the application.
 # Leverage a cache mount to /root/.nuget/packages so that subsequent builds don't have to re-download packages.
@@ -57,6 +61,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine AS final
 WORKDIR /app
 
 # Copy everything needed to run the app from the "build" stage.
+COPY ./appsettings.Production.json /app/appsettings.Production.json
 COPY --from=build /app .
 
 # Install libicu-dev
