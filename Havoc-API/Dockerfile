@@ -61,7 +61,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine AS final
 WORKDIR /app
 
 # Copy everything needed to run the app from the "build" stage.
-COPY ./appsettings.Production.json /app/appsettings.Production.json
+COPY ./Havoc-API/Havoc-API/appsettings.Production.json /app/appsettings.Production.json
 COPY --from=build /app .
 
 # Install libicu-dev
