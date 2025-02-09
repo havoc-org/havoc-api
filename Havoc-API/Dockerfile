@@ -55,7 +55,7 @@ WORKDIR /app
 
 # Copy everything needed to run the app from the "build" stage.
 COPY --from=build /app .
-COPY /source/Havoc-API/appsettings.Production.json appsettings.Production.json
+COPY --from=build /source/Havoc-API/appsettings.Production.json appsettings.Production.json
 
 # Install libicu-dev
 ENV \
