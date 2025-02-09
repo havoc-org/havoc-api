@@ -57,11 +57,11 @@ jobs:
           push: true
           tags: havocimages.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_086dabfadc0143fd90a768bdd51ddfdf }}/api/havoc-api:${{ github.sha }}
           file: ./Havoc-API/Dockerfile
-          build-args: |
-            ConnectionStrings__Default=${{ secrets.CONNECTIONSTRING }}
-            JWT__Audience=${{ secrets.SPAURL }}
-            JWT__Issuer=${{ secrets.APIURL }}
-            JWT__Key=${{ secrets.JWTKEY }}
+          secrets: |
+            jwt_key=${{ secrets.JWTKEY }}
+            db_connection=${{ secrets.CONNECTIONSTRING }}
+            api_url=${{ secrets.APIURL }}
+            spa_url=${{ secrets.SPAURL }}
   deploy:
     runs-on: ubuntu-latest
     needs: build

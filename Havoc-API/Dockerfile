@@ -22,13 +22,21 @@ WORKDIR /source/Havoc-API
 # Placing it here allows the previous steps to be cached across architectures.
 ARG TARGETARCH
 
+RUN --mount=type=secret,id=jwt_key \
+    --mount=type=secret,id=db_connection \
+    --mount=type=secret,id=api_url \
+    --mount=type=secret,id=spa_url \
+    JWT__Key=$(cat /run/secrets/jwt_key) \
+    ConnectionStrings__Default=$(cat /run/secrets/db_connection) \
+    JWT__Issuer=$(cat /run/secrets/api_url) \
+    JWT__Audience=$(cat /run/secrets/spa_url)
+
 # Build the application.
 # Leverage a cache mount to /root/.nuget/packages so that subsequent builds don't have to re-download packages.
 # If TARGETARCH is "amd64", replace it with "x64" - "x64" is .NET's canonical name for this and "amd64" doesn't
 #   work in .NET 6.0.
 RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages \
     dotnet publish -a ${TARGETARCH/amd64/x64} --use-current-runtime --self-contained false -o /app
-
 # If you need to enable globalization and time zones:
 # https://github.com/dotnet/dotnet-docker/blob/main/samples/enable-globalization.md
 ################################################################################
@@ -54,15 +62,14 @@ ENV \
     LC_ALL=en_US.UTF-8 \
     LANG=en_US.UTF-8
 
-ARG JWT__Key
-ARG JWT__Audience
-ARG JWT__Issuer
-ARG ConnectionStrings__Default
-
-ENV JWT__Key=$JWT__Key
-ENV JWT__Audience=$JWT__Audience
-ENV JWT__Issuer=$JWT__Issuer
-ENV ConnectionStrings__Default=$ConnectionStrings__Default
+RUN --mount=type=secret,id=jwt_key \
+    --mount=type=secret,id=db_connection \
+    --mount=type=secret,id=api_url \
+    --mount=type=secret,id=spa_url \
+    JWT__Key=$(cat /run/secrets/jwt_key) \
+    ConnectionStrings__Default=$(cat /run/secrets/db_connection) \
+    JWT__Issuer=$(cat /run/secrets/api_url) \
+    JWT__Audience=$(cat /run/secrets/spa_url)
 
 RUN apk add --no-cache \
     icu-data-full \
