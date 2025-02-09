@@ -71,10 +71,10 @@ RUN --mount=type=secret,id=jwt_key \
     JWT__Issuer=$(cat /run/secrets/api_url) \
     JWT__Audience=$(cat /run/secrets/spa_url) \
     apk add --no-cache bash \
-    sed -i 's|#{ConnectionStrings__Default}#|${{ secrets.CONNECTIONSTRING }}|g' appsettings.Production.json \
-    sed -i 's|#{JWT__Key}#|${{ secrets.JWTKEY }}|g' appsettings.Production.json \
-    sed -i 's|#{JWT__Audience}#|${{ secrets.SPAURL }}|g' appsettings.Production.json \
-    sed -i 's|#{JWT__Issuer}#|${{ secrets.APIURL }}|g' appsettings.Production.json
+    && sed -i 's|#{ConnectionStrings__Default}#|${{ secrets.CONNECTIONSTRING }}|g' appsettings.Production.json \
+    && sed -i 's|#{JWT__Key}#|${{ secrets.JWTKEY }}|g' appsettings.Production.json \
+    && sed -i 's|#{JWT__Audience}#|${{ secrets.SPAURL }}|g' appsettings.Production.json \
+    && sed -i 's|#{JWT__Issuer}#|${{ secrets.APIURL }}|g' appsettings.Production.json
 
 RUN apk add --no-cache \
     icu-data-full \
