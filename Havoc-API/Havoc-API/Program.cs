@@ -12,7 +12,10 @@ using Havoc_API.Middlewares;
 var builder = WebApplication.CreateBuilder(args);
 
 if (builder.Environment.IsProduction())
+{
     builder.WebHost.UseKestrel();
+    // builder.Configuration.AddEnvironmentVariables();
+}
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -53,7 +56,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IHavocContext, HavocContext>();
 builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<IAssignmentService, AssignmentService>();
-builder.Logging.AddConsole();   
+builder.Logging.AddConsole();
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 
 builder.Services.AddHttpContextAccessor();
@@ -95,8 +98,6 @@ app.UseExceptionHandler(new ExceptionHandlerOptions()
 });
 
 app.UseCors();
-if (app.Environment.IsProduction())
-    app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
