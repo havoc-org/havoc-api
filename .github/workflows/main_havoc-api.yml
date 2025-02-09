@@ -44,16 +44,10 @@ jobs:
 
       - name: Create Production Settings
         run: |
-          echo '{
-            "ConnectionStrings": {
-              "Default": "${{ secrets.CONNECTIONSTRING }}"
-            },
-            "JWT": {
-              "Key": "${{ secrets.JWTKEY }}",
-              "Audience": "${{ secrets.SPAURL }}",
-              "Issuer": "${{ secrets.APIURL }}"
-            } 
-          }' > Havoc-API/appsettings.Production.json
+          sed -i 's|\${ConnectionStrings__Default}|${{ secrets.CONNECTIONSTRING}}|g' Havoc-API/appSettings.Production.json
+          sed -i 's|\${JWT__Key}|${{ secrets.JWTKEY }}|g' Havoc-API/appSettings.Production.json
+          sed -i 's|\${JWT__Audience}|${{ secrets.SPAURL }}|g' Havoc-API/appSettings.Production.json
+          sed -i 's|\${JWT__Issuer}|${{ secrets.APIURL }}|g' Havoc-API/appSettings.Production.json
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
