@@ -53,7 +53,7 @@ jobs:
               "Audience": "${{ secrets.SPAURL }}",
               "Issuer": "${{ secrets.APIURL }}"
             } 
-          }' > appSettings.Production.json
+          }' > Havoc-API/appsettings.Production.json
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
