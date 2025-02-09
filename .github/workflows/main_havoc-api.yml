@@ -44,21 +44,7 @@ jobs:
 
       - name: Create Production Settings
         run: |
-          echo '{
-            "ConnectionStrings": {
-              "DefaultConnection": "${{ secrets.DB_CONNECTION }}"
-            },
-            "ApiSettings": {
-              "ApiKey": "${{ secrets.API_KEY }}",
-              "ApiUrl": "${{ secrets.API_URL }}"
-            },
-            "SmtpSettings": {
-              "Host": "${{ secrets.SMTP_HOST }}",
-              "Port": "${{ secrets.SMTP_PORT }}",
-              "Username": "${{ secrets.SMTP_USERNAME }}",
-              "Password": "${{ secrets.SMTP_PASSWORD }}"
-            }
-          }' > ./Havoc-API/Havoc-API/appsettings.Production.json
+          echo 'test' > ./Havoc-API/Havoc-API/appsettings.Production.json
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
