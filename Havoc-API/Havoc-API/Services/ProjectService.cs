@@ -59,8 +59,11 @@ namespace Havoc_API.Services
                                 )
                             )
                         )).ToList()
-                ))
-                .FirstOrDefaultAsync(); // Получаем первый подходящий результат
+                )
+                {
+                    InviteCode = project.GenerateInviteCode()
+                }
+                ).FirstOrDefaultAsync();
             if (project is null)
                 throw new NotFoundException("Project not found");
             return project;
