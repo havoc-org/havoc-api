@@ -12,5 +12,6 @@ namespace Havoc_API.Services
         public Task<Role> GetUserRoleInProjectAsync(int userId, int projectId);
         public Task<int> DeleteParticipation(int userId, int projectId);
         public Task<ParticipationGET> PatchParticipantRoleAsync(int userId, int projectId, ParticipationPATCH patch);
+        public Task<int> AddUserToProjectThroughInviteCodeAsync(int userId, string inviteCode);
     }
 }

@@ -151,5 +151,37 @@ namespace Havoc_API.Controllers
                 return StatusCode(500, new { ex.Message });
             }
         }
+
+        [HttpPost("{inviteCode}")]
+        public async Task<ActionResult> AddUserToProjectThroughInviteCodeAsync(string inviteCode)
+        {
+            try
+            {
+                var userId = _userService.GetUserId(Request);
+                var result = await _participationService.AddUserToProjectThroughInviteCodeAsync(userId, inviteCode);
+
+                return Ok(result);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { ex.Message });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { ex.Message });
+            }
+            catch (DataAccessException ex)
+            {
+                return StatusCode(500, new { ex.Message });
+            }
+            catch (SqlException ex)
+            {
+                return StatusCode(500, new { ex.Message });
+            }
+        }
     }
 }

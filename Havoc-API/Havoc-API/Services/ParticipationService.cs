@@ -202,6 +202,30 @@ namespace Havoc_API.Services
             }
         }
 
+        public async Task<int> AddUserToProjectThroughInviteCodeAsync(int userId, string inviteCode)
+        {
+            var decryptedInviteCode = Project.DecryptInviteCode(inviteCode);
 
+            var project = await _havocContext.Projects
+                .FirstOrDefaultAsync(p => p.ProjectId == int.Parse(decryptedInviteCode["ProjectId"])
+                && p.Name == decryptedInviteCode["ProjectName"]) ?? throw new NotFoundException("Project Not Found");
+
+            var user = await _havocContext.Users.FindAsync(userId) ?? throw new NotFoundException("User Not Found");
+
+            bool isUserAlreadyInProject = await _havocContext.Participations
+            .AnyAsync(p => p.ProjectId == project.ProjectId && p.User.UserId == userId);
+
+            if (isUserAlreadyInProject)
+            {
+                throw new InvalidOperationException("User is already a participant in this project.");
+            }
+
+            var newParticipation = new Participation(project, new Role(RoleType.Developer), user);
+
+            await _havocContext.Participations.AddAsync(newParticipation);
+            await _havocContext.SaveChangesAsync();
+
+            return newParticipation.ProjectId;
+        }
     }
 }
