@@ -41,6 +41,20 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+
+      - name: Create Production Settings
+      run: |
+        echo '{
+          "ConnectionStrings": {
+            "Default": "${{ secrets.CONNECTIONSTRING }}"
+          },
+          "JWT": {
+            "Key": "${{ secrets.JWTKEY }}",
+            "Audience": "${{ secrets.SPAURL }}",
+            "Issuer": "${{ secrets.APIURL }}"
+          } 
+        }' > appSettings.Production.json
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
