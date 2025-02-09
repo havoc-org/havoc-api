@@ -16,8 +16,6 @@ FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS build
 
 COPY . /source
 
-WORKDIR /source/Havoc-API
-
 # This is the architecture you’re building for, which is passed in by the builder.
 # Placing it here allows the previous steps to be cached across architectures.
 ARG TARGETARCH
@@ -25,21 +23,21 @@ ARG TARGETARCH
 RUN --mount=type=secret,id=jwt_key \
     --mount=type=secret,id=db_connection \
     --mount=type=secret,id=api_url \
-    --mount=type=secret,id=spa_url \
-    JWT__Key=$(cat /run/secrets/jwt_key) \
-    ConnectionStrings__Default=$(cat /run/secrets/db_connection) \
-    JWT__Issuer=$(cat /run/secrets/api_url) \
-    JWT__Audience=$(cat /run/secrets/spa_url) \
-    apk add --no-cache bash \
-    && sed -i "s|#{ConnectionStrings__Default}#|${ConnectionStrings__Default}|g" appsettings.Production.json \
-    && sed -i "s|#{JWT__Key}#|${JWT__Key}|g" appsettings.Production.json \
-    && sed -i "s|#{JWT__Audience}#|${JWT__Audience}|g" appsettings.Production.json \
-    && sed -i "s|#{JWT__Issuer}#|${JWT__Issuer}|g" appsettings.Production.json
+    --mount=type=secret,id=spa_url 
+
+RUN apk add --no-cache bash \
+    && sed -i "s|#{ConnectionStrings__Default}#|$(cat run/secrets/db_connection)|g" /source/Havoc-API/appsettings.Production.json \
+    && sed -i "s|#{JWT__Key}#|$(cat run/secrets/jwt_key)|g" /source/Havoc-API/appsettings.Production.json \
+    && sed -i "s|#{JWT__Audience}#|$(cat run/secrets/spa_url)|g" /source/Havoc-API/appsettings.Production.json \
+    && sed -i "s|#{JWT__Issuer}#|$(cat run/secrets/api_url)|g" /source/Havoc-API/appsettings.Production.json
 
 # Build the application.
 # Leverage a cache mount to /root/.nuget/packages so that subsequent builds don't have to re-download packages.
 # If TARGETARCH is "amd64", replace it with "x64" - "x64" is .NET's canonical name for this and "amd64" doesn't
 #   work in .NET 6.0.
+
+WORKDIR /source/Havoc-API
+
 RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages \
     dotnet publish -a ${TARGETARCH/amd64/x64} --use-current-runtime --self-contained false -o /app
 # If you need to enable globalization and time zones:
