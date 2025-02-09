@@ -78,6 +78,55 @@ namespace Havoc_API.Services
             }
         }
 
+        public async Task<ParticipationGET> PatchParticipantRoleAsync(int userId, int projectId, ParticipationPATCH patch)
+        {
+            try
+            {
+                if (!Enum.TryParse<RoleType>(patch.Role, true, out var parsedRole))
+                {
+                    throw new NotFoundException("Invalid role: " + patch.Role);
+                }
+
+                var participation = await _havocContext.Participations
+                    .Include(p => p.Role)
+                    .Include(p => p.User)
+                    .FirstOrDefaultAsync(p => p.UserId == userId && p.ProjectId == projectId);
+
+                if (participation == null)
+                    throw new NotFoundException("Participation not found");
+
+                var role = await _havocContext.Roles.FirstOrDefaultAsync(r => r.Name == parsedRole);
+                if (role == null)
+                    throw new NotFoundException("Role not found");
+
+                participation.updateParticipationRole(role);
+                await _havocContext.SaveChangesAsync();
+
+                return new ParticipationGET(
+                    participation.ProjectId,
+                    new UserParticipationGET(
+                        participation.User.UserId,
+                        participation.User.FirstName,
+                        participation.User.LastName,
+                        participation.User.Email,
+                        new RoleGET(role.RoleId, role.Name)
+                    )
+                );
+            }
+            catch (SqlException e)
+            {
+                throw new DataAccessException(e.Message);
+            }
+            catch (DbUpdateException e)
+            {
+                throw new DataAccessException(e.Message);
+            }
+            catch (Exception ex)
+            {
+                throw new DataAccessException(ex.Message);
+            }
+        }
+
         public async Task<int> DeleteParticipation(int userId, int projectId)
         {
             try
@@ -152,5 +201,7 @@ namespace Havoc_API.Services
                 throw new DataAccessException(e.Message);
             }
         }
+
+
     }
 }

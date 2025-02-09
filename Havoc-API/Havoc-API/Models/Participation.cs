@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore.Update.Internal;
 
 namespace Havoc_API.Models;
 
@@ -27,5 +28,9 @@ public partial class Participation
         Project = project;
         Role = role;
         User = user;
+    }
+
+    public void updateParticipationRole(Role role){
+        RoleId = role.RoleId;
     }
 }
