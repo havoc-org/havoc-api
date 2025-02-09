@@ -14,7 +14,7 @@ services:
       target: final
     container_name: havoc-api
     ports:
-      - 443:443
+      - 443:8080
 # <Papich ore.mp3>
 # depends_on:
 #     db:

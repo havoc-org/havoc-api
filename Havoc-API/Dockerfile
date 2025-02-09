@@ -54,14 +54,15 @@ ENV \
     LC_ALL=en_US.UTF-8 \
     LANG=en_US.UTF-8
 
-ARG JWT_Key
-ARG JWT_Audience
-ARG JWT_Issuer
-ARG DB_CONNECTION_STRING
-ENV JWT_Key=$JWT_Key
-ENV JWT_Audience=$JWT_Audience
-ENV JWT_Issuer=$JWT_Issuer
-ENV ConnectionStrings__Default=$DB_CONNECTION_STRING
+ARG JWT__Key
+ARG JWT__Audience
+ARG JWT__Issuer
+ARG ConnectionStrings__Default
+
+ENV JWT__Key=$JWT__Key
+ENV JWT__Audience=$JWT__Audience
+ENV JWT__Issuer=$JWT__Issuer
+ENV ConnectionStrings__Default=$ConnectionStrings__Default
 
 RUN apk add --no-cache \
     icu-data-full \
@@ -72,4 +73,5 @@ RUN apk add --no-cache \
 # and https://github.com/dotnet/dotnet-docker/discussions/4764
 USER $APP_UID
 
+EXPOSE 8080
 ENTRYPOINT ["dotnet", "Havoc-API.dll"]
