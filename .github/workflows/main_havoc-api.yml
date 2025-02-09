@@ -62,6 +62,7 @@ jobs:
       - name: Build and push container image to registry
         uses: docker/build-push-action@v3
         with:
+          context: .
           push: true
           tags: havocimages.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_086dabfadc0143fd90a768bdd51ddfdf }}/api/havoc-api:${{ github.sha }}
           file: ./Havoc-API/Dockerfile
