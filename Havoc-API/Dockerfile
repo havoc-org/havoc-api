@@ -29,7 +29,12 @@ RUN --mount=type=secret,id=jwt_key \
     JWT__Key=$(cat /run/secrets/jwt_key) \
     ConnectionStrings__Default=$(cat /run/secrets/db_connection) \
     JWT__Issuer=$(cat /run/secrets/api_url) \
-    JWT__Audience=$(cat /run/secrets/spa_url)
+    JWT__Audience=$(cat /run/secrets/spa_url) \
+    apk add --no-cache bash \
+    && sed -i "s|#{ConnectionStrings__Default}#|${ConnectionStrings__Default}|g" appsettings.Production.json \
+    && sed -i "s|#{JWT__Key}#|${JWT__Key}|g" appsettings.Production.json \
+    && sed -i "s|#{JWT__Audience}#|${JWT__Audience}|g" appsettings.Production.json \
+    && sed -i "s|#{JWT__Issuer}#|${JWT__Issuer}|g" appsettings.Production.json
 
 # Build the application.
 # Leverage a cache mount to /root/.nuget/packages so that subsequent builds don't have to re-download packages.
@@ -71,10 +76,10 @@ RUN --mount=type=secret,id=jwt_key \
     JWT__Issuer=$(cat /run/secrets/api_url) \
     JWT__Audience=$(cat /run/secrets/spa_url) \
     apk add --no-cache bash \
-    && sed -i 's|#{ConnectionStrings__Default}#|${{ secrets.CONNECTIONSTRING }}|g' appsettings.Production.json \
-    && sed -i 's|#{JWT__Key}#|${{ secrets.JWTKEY }}|g' appsettings.Production.json \
-    && sed -i 's|#{JWT__Audience}#|${{ secrets.SPAURL }}|g' appsettings.Production.json \
-    && sed -i 's|#{JWT__Issuer}#|${{ secrets.APIURL }}|g' appsettings.Production.json
+    && sed -i "s|#{ConnectionStrings__Default}#|${ConnectionStrings__Default}|g" appsettings.Production.json \
+    && sed -i "s|#{JWT__Key}#|${JWT__Key}|g" appsettings.Production.json \
+    && sed -i "s|#{JWT__Audience}#|${JWT__Audience}|g" appsettings.Production.json \
+    && sed -i "s|#{JWT__Issuer}#|${JWT__Issuer}|g" appsettings.Production.json
 
 RUN apk add --no-cache \
     icu-data-full \
