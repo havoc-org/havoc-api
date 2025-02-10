@@ -5,6 +5,6 @@ namespace Havoc_API.DTOs.Participation
 {
     public class ParticipationPATCH
     {
-        public string Role { get; set; }
+        public string Role { get; set; } = null!;
     }
 }

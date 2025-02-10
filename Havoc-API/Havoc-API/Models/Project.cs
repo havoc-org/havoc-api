@@ -27,7 +27,6 @@ namespace Havoc_API.Models
             private set
             {
                 string trimmedValue = value.Trim();
-
                 if (trimmedValue.Length > 25 || trimmedValue.Length == 0)
                     throw new StringLengthException(nameof(Name));
 
@@ -43,7 +42,6 @@ namespace Havoc_API.Models
                 if (value != null)
                 {
                     string trimmedValue = value.Trim();
-
                     if (trimmedValue.Length > 200 || trimmedValue.Length == 0)
                         throw new StringLengthException(nameof(Description));
 
@@ -54,7 +52,6 @@ namespace Havoc_API.Models
         }
 
         public byte[]? Background { get; private set; }
-
         public int CreatorId { get; private set; }
 
         public DateTime? Start
@@ -81,15 +78,11 @@ namespace Havoc_API.Models
         }
 
         public DateTime LastModified { get; private set; }
-
         public int ProjectStatusId { get; private set; }
 
         public virtual User Creator { get; private set; } = null!;
-
         public virtual ICollection<Participation> Participations { get; private set; } = new List<Participation>();
-
         public virtual ProjectStatus ProjectStatus { get; private set; } = null!;
-
         public virtual ICollection<Task> Tasks { get; private set; } = new List<Task>();
 
         private Project() { }
@@ -150,18 +143,24 @@ namespace Havoc_API.Models
                 using StreamWriter sw = new StreamWriter(cs);
                 sw.Write(rawString);
             }
-            return Convert.ToBase64String(ms.ToArray());
+
+            string base64 = Convert.ToBase64String(ms.ToArray());
+
+            return base64.Replace('+', '-').Replace('/', '_').Replace("=", "");
         }
 
         public static Dictionary<string, string> DecryptInviteCode(string inviteCode)
         {
             try
             {
+                string fixedBase64 = inviteCode.Replace('-', '+').Replace('_', '/');
+                while (fixedBase64.Length % 4 != 0) fixedBase64 += "=";
+
                 using Aes aes = Aes.Create();
                 aes.Key = Key;
                 aes.IV = IV;
 
-                using MemoryStream ms = new(Convert.FromBase64String(inviteCode));
+                using MemoryStream ms = new(Convert.FromBase64String(fixedBase64));
                 using CryptoStream cs = new(ms, aes.CreateDecryptor(), CryptoStreamMode.Read);
                 using StreamReader sr = new(cs);
                 string decrypted = sr.ReadToEnd();
