@@ -10,34 +10,34 @@ on:
   workflow_dispatch:
 
 jobs:
-  # test:
-  #   runs-on: ubuntu-latest
+  test:
+    runs-on: ubuntu-latest
 
-  #   defaults:
-  #     run:
-  #       working-directory: ./Havoc-API
+    defaults:
+      run:
+        working-directory: ./Havoc-API
 
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v2
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-  #     - name: Setup .NET
-  #       uses: actions/setup-dotnet@v3
-  #       with:
-  #         dotnet-version: "8.0.x"
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: "8.0.x"
 
-  #     - name: Restore dependencies
-  #       run: dotnet restore
+      - name: Restore dependencies
+        run: dotnet restore
 
-  #     - name: Build solution
-  #       run: dotnet build --configuration Release --no-restore
+      - name: Build solution
+        run: dotnet build --configuration Release --no-restore
 
-  #     - name: Run Unit Tests
-  #       run: dotnet test --no-restore --verbosity normal
+      - name: Run Unit Tests
+        run: dotnet test --no-restore --verbosity normal
 
   build:
     runs-on: "ubuntu-latest"
-    # needs: test
+    needs: test
     steps:
       - uses: actions/checkout@v2
 
