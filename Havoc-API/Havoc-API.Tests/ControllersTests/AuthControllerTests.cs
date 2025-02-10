@@ -49,8 +49,7 @@ public class AuthControllerTests
         _authController = new AuthController
             (
                 tokenService: _tokenService.Object,
-                userService: _userService.Object,
-                configuration: _config
+                userService: _userService.Object
             )
         {
             ControllerContext = new ControllerContext

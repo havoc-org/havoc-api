@@ -30,10 +30,6 @@ public class UserController : ControllerBase
             return Ok(user);
 
         }
-        catch (NotFoundException ex)
-        {
-            return NotFound(new { ex.Message });
-        }
         catch (DbUpdateException ex)
         {
             return StatusCode(500, new { ex.Message });
@@ -47,19 +43,8 @@ public class UserController : ControllerBase
     [HttpPatch]
     public async Task<ActionResult> UpdateUserAsync(UserPATCH userUpdate)
     {
-        try
-        {
-            var result = await _userService.UpdateUserAsync(userUpdate);
-            return Ok(new { AffectedRows = result });
-        }
-        catch (NotFoundException ex)
-        {
-            return NotFound(new { ex.Message });
-        }
-        catch (DataAccessException ex)
-        {
-            return StatusCode(500, new { ex.Message });
-        }
+        var result = await _userService.UpdateUserAsync(userUpdate);
+        return Ok(new { AffectedRows = result });
     }
 
     [HttpPatch("updatePassword")]
@@ -71,17 +56,9 @@ public class UserController : ControllerBase
             var result = await _userService.UpdateUserPasswordAsync(userId, passwordUpdate.OldPass, passwordUpdate.NewPass);
             return Ok(new { AffectedRows = result });
         }
-        catch (NotFoundException ex)
-        {
-            return NotFound(new { ex.Message });
-        }
         catch (UnauthorizedAccessException ex)
         {
             return Unauthorized(new { ex.Message });
-        }
-        catch (DataAccessException ex)
-        {
-            return StatusCode(500, new { ex.Message });
         }
     }
 }

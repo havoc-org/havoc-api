@@ -56,23 +56,6 @@ namespace Havoc_API.Controllers
             }
         }
 
-        [HttpGet("all")]
-        public async Task<ActionResult> GetProjectsAsync()
-        {
-            try
-            {
-                return Ok(await _projectService.GetProjectsAsync());
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (DataAccessException ex)
-            {
-                return StatusCode(500, new { ex.Message });
-            }
-        }
-
         [HttpGet("{id}")]
         public async Task<ActionResult> GetProjectByIdAsync(int id)
         {
@@ -162,10 +145,6 @@ namespace Havoc_API.Controllers
 
                 return Ok(result);
             }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { ex.Message });
-            }
             catch (InvalidOperationException ex)
             {
                 return BadRequest(new { ex.Message });
@@ -173,10 +152,6 @@ namespace Havoc_API.Controllers
             catch (ArgumentException ex)
             {
                 return BadRequest(new { ex.Message });
-            }
-            catch (DataAccessException ex)
-            {
-                return StatusCode(500, new { ex.Message });
             }
             catch (SqlException ex)
             {

@@ -28,29 +28,6 @@ public class TaskController : ControllerBase
         _participationService = participationService;
     }
 
-    //супер мега важный прикол для водки(потом удалит(надеюсь))
-    [HttpGet]
-    public async Task<ActionResult> GetTasksAsync()
-    {
-        try
-        {
-            var tasks = await _taskService.GetTasksAsync();
-            var statuses = await _taskService.GetAllTaskStatusesAsync();
-            return Ok(new { statuses, tasks });
-        }
-        catch (NotFoundException ex)
-        {
-            return NotFound(new { ex.Message });
-        }
-        catch (DbUpdateException ex)
-        {
-            return StatusCode(500, new { ex.Message });
-        }
-        catch (SqlException ex)
-        {
-            return StatusCode(500, new { ex.Message });
-        }
-    }
     [HttpGet("byId/{taskId}")]
     public async Task<ActionResult> GetTaskAsync(int taskId)
     {
@@ -130,75 +107,42 @@ public class TaskController : ControllerBase
     [HttpDelete("{taskId}")]
     public async Task<ActionResult> DeleteTaskByIdAsync(int taskId)
     {
-        try
-        {
-            var userId = _userService.GetUserId(Request);
-            var task = await _taskService.GetTaskByIdAsync(taskId);
+        var userId = _userService.GetUserId(Request);
+        var task = await _taskService.GetTaskByIdAsync(taskId);
 
-            var role = await _participationService.GetUserRoleInProjectAsync(userId, task.ProjectId);
-            if (!role.CanDeleteTask())
-                return Unauthorized(new { Message = "You have no permission to delete tasks" });
+        var role = await _participationService.GetUserRoleInProjectAsync(userId, task.ProjectId);
+        if (!role.CanDeleteTask())
+            return Unauthorized(new { Message = "You have no permission to delete tasks" });
 
-            var result = await _taskService.DeleteTaskByIdAsync(taskId);
-            return Ok(new { AffectedRows = result });
-        }
-        catch (NotFoundException ex)
-        {
-            return NotFound(new { ex.Message });
-        }
-        catch (DataAccessException ex)
-        {
-            return StatusCode(500, new { ex.Message });
-        }
+        var result = await _taskService.DeleteTaskByIdAsync(taskId);
+        return Ok(new { AffectedRows = result });
     }
 
     [HttpPatch]
     public async Task<ActionResult> UpdateTaskAsync(TaskPATCH taskUpdate)
     {
-        try
-        {
-            var userId = _userService.GetUserId(Request);
-            var task = await _taskService.GetTaskByIdAsync(taskUpdate.TaskId);
+        var userId = _userService.GetUserId(Request);
+        var task = await _taskService.GetTaskByIdAsync(taskUpdate.TaskId);
 
-            var role = await _participationService.GetUserRoleInProjectAsync(userId, task.ProjectId);
-            if (!role.CanEditTask())
-                return Unauthorized(new { Message = "You have no permission to edit tasks" });
+        var role = await _participationService.GetUserRoleInProjectAsync(userId, task.ProjectId);
+        if (!role.CanEditTask())
+            return Unauthorized(new { Message = "You have no permission to edit tasks" });
 
-            var result = await _taskService.UpdateTaskAsync(taskUpdate);
-            return Ok(new { AffectedRows = result });
-        }
-        catch (NotFoundException ex)
-        {
-            return NotFound(new { ex.Message });
-        }
-        catch (DataAccessException ex)
-        {
-            return StatusCode(500, new { ex.Message });
-        }
+        var result = await _taskService.UpdateTaskAsync(taskUpdate);
+        return Ok(new { AffectedRows = result });
     }
 
     [HttpPatch("updateStatus")]
     public async Task<ActionResult> UpdateStatusByIdAsync(TaskStatusPATCH taskStatus)
     {
-        try
-        {
-            var userId = _userService.GetUserId(Request);
-            var task = await _taskService.GetTaskByIdAsync(taskStatus.TaskId);
+        var userId = _userService.GetUserId(Request);
+        var task = await _taskService.GetTaskByIdAsync(taskStatus.TaskId);
 
-            var role = await _participationService.GetUserRoleInProjectAsync(userId, task.ProjectId);
-            if (!role.CanEditTask())
-                return Unauthorized(new { Message = "You have no permission to edit tasks" });
+        var role = await _participationService.GetUserRoleInProjectAsync(userId, task.ProjectId);
+        if (!role.CanEditTask())
+            return Unauthorized(new { Message = "You have no permission to edit tasks" });
 
-            var result = await _taskService.UpdateTaskStatusAsync(taskStatus);
-            return Ok(new { AffectedRows = result });
-        }
-        catch (NotFoundException ex)
-        {
-            return NotFound(new { ex.Message });
-        }
-        catch (DataAccessException ex)
-        {
-            return StatusCode(500, new { ex.Message });
-        }
+        var result = await _taskService.UpdateTaskStatusAsync(taskStatus);
+        return Ok(new { AffectedRows = result });
     }
 }

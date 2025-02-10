@@ -55,7 +55,7 @@ namespace Havoc_API.Controllers
         }
 
         [HttpPatch]
-        public async Task<IActionResult> PatchParticipantRole( int userId, int projectId, ParticipationPATCH patch)
+        public async Task<IActionResult> PatchParticipantRole(int userId, int projectId, ParticipationPATCH patch)
         {
             var currentUserId = _userService.GetUserId(Request);
             var currentRole = await _participationService.GetUserRoleInProjectAsync(currentUserId, projectId);
@@ -64,37 +64,16 @@ namespace Havoc_API.Controllers
                 return Unauthorized("You have no permission to edit project");
             }
 
-            try
-            {
-                var updatedParticipation = await _participationService.PatchParticipantRoleAsync(userId, projectId, patch);
-                return Ok(updatedParticipation);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (DataAccessException ex)
-            {
-                return StatusCode(500, new { message = ex.Message });
-            }
+            var updatedParticipation = await _participationService.PatchParticipantRoleAsync(userId, projectId, patch);
+            return Ok(updatedParticipation);
+
         }
 
         [HttpGet]
         public async Task<ActionResult<ICollection<ParticipationGET>>> GetParticipationsByProjectIdAsync(int projectId)
         {
-            try
-            {
-                var participations = await _participationService.GetParticipationsByProjectIDAsync(projectId);
-                return Ok(participations);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { ex.Message });
-            }
-            catch (DataAccessException ex)
-            {
-                return StatusCode(500, new { ex.Message });
-            }
+            var participations = await _participationService.GetParticipationsByProjectIDAsync(projectId);
+            return Ok(participations);
         }
     }
 }
