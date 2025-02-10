@@ -54,7 +54,7 @@ namespace Havoc_API.Controllers
                 {
                     HttpOnly = true, //Если true - Ограничивает доступ к кукам только через HTTP, предотвращает доступ к кукам из JavaScript
                     Secure = true, // Устанавливает куку только по HTTPS (рекомендуется в продакшене)
-                    SameSite = SameSiteMode.Lax, // Политика SameSite для предотвращения CSRF-атак
+                    SameSite = SameSiteMode.None, // Политика SameSite для предотвращения CSRF-атак
                     Expires = DateTime.UtcNow.AddDays(3) // Время жизни куки
                 };
 
@@ -102,7 +102,7 @@ namespace Havoc_API.Controllers
                 {
                     HttpOnly = true, //Если true - Ограничивает доступ к кукам только через HTTP, предотвращает доступ к кукам из JavaScript
                     Secure = true, // Устанавливает куку только по HTTPS (рекомендуется в продакшене)
-                    SameSite = SameSiteMode.Lax, // Политика SameSite для предотвращения CSRF-атак
+                    SameSite = SameSiteMode.None, // Политика SameSite для предотвращения CSRF-атак // We need to be able to make cross site request with cookies
                     Expires = DateTime.UtcNow.AddDays(3) // Время жизни куки
                 };
 
