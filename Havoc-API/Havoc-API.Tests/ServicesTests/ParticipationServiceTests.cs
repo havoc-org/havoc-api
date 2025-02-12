@@ -378,4 +378,147 @@ public class ParticipationServiceTests
             .And.ContainEquivalentOf(participationGet1)
             .And.ContainEquivalentOf(participationGet2);
     }
+
+    [Fact]
+    public async void PatchParticipantRoleAsync_ShouldReturnUpdatedParticipationGet_WhenParticipationWasSuccessfullyPatched()
+    {
+        //Arange
+        var role1 = RoleFactory.OwnerRole();
+        var role2 = RoleFactory.DevRole();
+        var role3 = RoleFactory.ManagerRole();
+        await _context.Roles.AddRangeAsync(role1, role2, role3);
+
+        _context.Users.RemoveRange(_context.Users.ToList());
+        var user1 = UserFactory.Create("test@test.com");
+        var user2 = UserFactory.Create("test2@test.com");
+        await _context.Users.AddRangeAsync(user1, user2);
+
+        var project = ProjectFactory.Create(user1);
+
+        await _context.Projects.AddAsync(project);
+        await _context.SaveChangesAsync();
+
+        var participationOwner = new Participation
+            (
+                project,
+                role1,
+                user1
+            );
+        var nonOwnerParticipation = new Participation
+            (
+                project,
+                role2,
+                user2
+            );
+
+        await _context.Participations.AddRangeAsync(participationOwner, nonOwnerParticipation);
+        await _context.SaveChangesAsync();
+
+        var participationGet = new ParticipationGET(
+           project.ProjectId,
+           new DTOs.User.UserParticipationGET(
+               user1.UserId,
+               user1.FirstName,
+               user1.LastName,
+               user1.Email,
+               new DTOs.Role.RoleGET(role1.RoleId, role1.Name)
+           )
+        );
+
+        var newRole = "Manager";
+        Enum.TryParse<RoleType>(newRole, true, out var parsedNewRole);
+        var participationPatch = new ParticipationPATCH() { Role = newRole };
+        //Act
+        var result = await _participationService.PatchParticipantRoleAsync(user2.UserId, project.ProjectId, participationPatch);
+        //Arrange
+        result.User.Role.Name.Should().Be(parsedNewRole);
+        result.User.UserId.Should().Be(user2.UserId);
+        result.ProjectId.Should().Be(project.ProjectId);
+    }
+
+    [Fact]
+    public async void AddUserToProjectThroughInviteCodeAsync_ShouldAddUserToProject_WhenExistingUserIsntParticipatingInProject()
+    {
+        //Arange
+        var role1 = RoleFactory.OwnerRole();
+        var role2 = RoleFactory.DevRole();
+        var role3 = RoleFactory.ManagerRole();
+        await _context.Roles.AddRangeAsync(role1, role2, role3);
+
+        _context.Users.RemoveRange(_context.Users.ToList());
+        var user1 = UserFactory.Create("test@test.com");
+        var user2 = UserFactory.Create("test2@test.com");
+        var user3 = UserFactory.Create("test3@test.com");
+        await _context.Users.AddRangeAsync(user1, user2, user3);
+
+        var project = ProjectFactory.Create(user1);
+
+        await _context.Projects.AddAsync(project);
+        await _context.SaveChangesAsync();
+
+        var participationOwner = new Participation
+            (
+                project,
+                role1,
+                user1
+            );
+        var nonOwnerParticipation = new Participation
+            (
+                project,
+                role2,
+                user2
+            );
+
+        await _context.Participations.AddRangeAsync(participationOwner, nonOwnerParticipation);
+        await _context.SaveChangesAsync();
+        var inviteCode = project.GenerateInviteCode();
+
+        //Act
+        var result = await _participationService.AddUserToProjectThroughInviteCodeAsync(user3.UserId, inviteCode);
+
+        //Arrange
+        result.Should().Be(project.ProjectId);
+    }
+
+    [Fact]
+    public async void DeleteParticipation_ShouldReturnNumberOfAffectedRows_WhenParticipationWasSuccessfullyRemoved()
+    {
+        var role1 = RoleFactory.OwnerRole();
+        var role2 = RoleFactory.DevRole();
+        var role3 = RoleFactory.ManagerRole();
+        await _context.Roles.AddRangeAsync(role1, role2, role3);
+
+        _context.Users.RemoveRange(_context.Users.ToList());
+        var user1 = UserFactory.Create("test@test.com");
+        var user2 = UserFactory.Create("test2@test.com");
+        await _context.Users.AddRangeAsync(user1, user2);
+
+        var project = ProjectFactory.Create(user1);
+
+        await _context.Projects.AddAsync(project);
+        await _context.SaveChangesAsync();
+
+        var participationOwner = new Participation
+            (
+                project,
+                role1,
+                user1
+            );
+        var nonOwnerParticipation = new Participation
+            (
+                project,
+                role2,
+                user2
+            );
+
+        await _context.Participations.AddRangeAsync(participationOwner, nonOwnerParticipation);
+        await _context.SaveChangesAsync();
+
+        // Act
+        var result = await _participationService.DeleteParticipation(user2.UserId, project.ProjectId);
+
+        // Arrange
+        result.Should().BePositive();
+        _context.Participations.FirstOrDefault(p => p.UserId == user2.UserId && project.ProjectId == p.ProjectId).Should().BeNull();
+    }
 }

@@ -305,4 +305,21 @@ public class TaskServiceTests
         await Assert.ThrowsAsync<NotFoundException>(
             () => _taskService.UpdateTaskStatusAsync(taskStatusPatch));
     }
+
+    [Fact]
+    public async void GetTaskByIdAsync_ShouldReturnTaskGet_WhenTaskExists()
+    {
+        // Arrange
+        var user = UserFactory.Create();
+        var project = ProjectFactory.Create(user);
+
+        var task = TaskFactory.Create(user, project);
+        await _context.Tasks.AddAsync(task);
+        await _context.SaveChangesAsync();
+        var taskGet = TaskFactory.CreateGet(task);
+        //Act
+        var result = await _taskService.GetTaskByIdAsync(task.TaskId);
+        //Arrrange
+        result.Should().BeEquivalentTo(taskGet);
+    }
 }
