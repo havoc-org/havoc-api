@@ -123,7 +123,7 @@ namespace Havoc_API.Controllers
                     return Unauthorized("You have no permission to delete this project");
 
                 var result = await _projectService.DeleteProjectByIdAsync(projectId);
-                return Ok("Affected rows: " + result);
+                return Ok(new { AffectedRows = result, Message = "Project deleted successfully" });
             }
             catch (NotFoundException ex)
             {
