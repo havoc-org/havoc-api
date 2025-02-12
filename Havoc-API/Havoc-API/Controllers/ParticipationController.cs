@@ -47,7 +47,7 @@ namespace Havoc_API.Controllers
 
             if (!role.CanEditProject())
             {
-                return Unauthorized("You have no permission to edit project");
+                return Unauthorized(new { message = "You have no permission to edit project" });
             }
 
             var result = await _participationService.AddParticipationListAsync(participations);
@@ -61,7 +61,7 @@ namespace Havoc_API.Controllers
             var currentRole = await _participationService.GetUserRoleInProjectAsync(currentUserId, projectId);
             if (!currentRole.CanEditProject())
             {
-                return Unauthorized("You have no permission to edit project");
+                return Unauthorized(new { message = "You have no permission to edit project" });
             }
 
             var updatedParticipation = await _participationService.PatchParticipantRoleAsync(userId, projectId, patch);

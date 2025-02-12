@@ -46,7 +46,7 @@ public class AttachmentController : ControllerBase
             await _participationService
                 .GetUserRoleInProjectAsync(_userService.GetUserId(Request), projectId);
         if (!role.CanEditTask())
-            return Unauthorized("You have no permission to edit task");
+            return Unauthorized(new { message = "You have no permission to edit task" });
         var newAttachments =
             await _attachmentService.AddManyAttachmentsAsync(attachments, taskId, _userService.GetUserId(Request), projectId);
         return Ok(newAttachments);
@@ -59,7 +59,7 @@ public class AttachmentController : ControllerBase
             await _participationService
                 .GetUserRoleInProjectAsync(_userService.GetUserId(Request), projectId);
         if (!role.CanEditTask())
-            return Unauthorized("You have no permission to edit task");
+            return Unauthorized(new { message = "You have no permission to edit task" });
         await _attachmentService.DeleteAttachmentAsync(attachmentId, taskId, projectId);
         return Ok(new { result = "Success" });
     }

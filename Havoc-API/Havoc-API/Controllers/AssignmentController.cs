@@ -36,7 +36,7 @@ public class AssignmentController : ControllerBase
                 .GetUserRoleInProjectAsync(_userService.GetUserId(Request), projectId);
 
         if (!role.CanEditTask())
-            return Unauthorized("You have no permission to edit task");
+            return Unauthorized(new { message = "You have no permission to edit task" });
 
         var result = await _assignmentService.AddAssignmentAsync(assignment, taskId);
         return Ok(result);
@@ -54,7 +54,7 @@ public class AssignmentController : ControllerBase
                 .GetUserRoleInProjectAsync(_userService.GetUserId(Request), projectId);
 
         if (!role.CanEditTask())
-            return Unauthorized("You have no permission to edit task");
+            return Unauthorized(new { message = "You have no permission to edit task" });
 
         var result = await _assignmentService.AddManyAssignmentsAsync(
             assignments,
@@ -72,7 +72,7 @@ public class AssignmentController : ControllerBase
             await _participationService
                 .GetUserRoleInProjectAsync(_userService.GetUserId(Request), projectId);
         if (!role.CanEditTask())
-            return Unauthorized("You have no permission to edit task");
+            return Unauthorized(new { message = "You have no permission to edit task" });
         await _assignmentService.DeleteAssignmentAsync(taskId, userId, projectId);
         return NoContent();
     }
@@ -83,7 +83,7 @@ public class AssignmentController : ControllerBase
             await _participationService
                 .GetUserRoleInProjectAsync(_userService.GetUserId(Request), projectId);
         if (!role.CanEditTask())
-            return Unauthorized("You have no permission to edit task");
+            return Unauthorized(new { message = "You have no permission to edit task" });
         var result = await _assignmentService.DeleteManyAssignmentsAsync(assignments, taskId, projectId);
         return Ok(result);
     }
