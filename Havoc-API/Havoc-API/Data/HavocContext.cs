@@ -114,7 +114,7 @@ public partial class HavocContext : DbContext, IHavocContext
 
             entity.HasOne(d => d.Project).WithMany(p => p.Participations)
                 .HasForeignKey(d => d.ProjectId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("Participation_Project");
 
             entity.HasOne(d => d.Role).WithMany(p => p.Participations)
