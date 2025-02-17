@@ -38,7 +38,7 @@ public class CommentController : ControllerBase
             await _participationService
                 .GetUserRoleInProjectAsync(userId, comment.projectId);
         if (!role.CanEditTask())
-            return Unauthorized("You have no permission to edit task");
+            return Unauthorized(new { message = "You have no permission to edit task" });
         var newComment = await _commentService.AddCommentAsync(comment, userId, comment.taskId);
         return Created($"api/tasks/{comment.taskId}/comments/{newComment.CommentId}", newComment);
     }
@@ -51,7 +51,7 @@ public class CommentController : ControllerBase
             await _participationService
                 .GetUserRoleInProjectAsync(userId, projectId);
         if (!role.CanEditTask())
-            return Unauthorized("You have no permission to edit task");
+            return Unauthorized(new { message = "You have no permission to edit task" });
         await _commentService.DeleteCommentAsync(commentId, projectId);
         return NoContent();
     }

@@ -172,4 +172,37 @@ public class UserServiceTests
         );
     }
 
+    [Fact]
+    public async void UpdateUserPasswordAsync_ShouldReturnNumbrOfAffectedLines_WhenUpdateWasSuccessful()
+    {
+        // Arrange
+        var pwd = "testPass";
+        var newPwd = "newPassword";
+        var user = UserFactory.Create("test@gmail.com", BCrypt.Net.BCrypt.HashPassword(pwd));
+        await _context.Users.AddAsync(user);
+        await _context.SaveChangesAsync();
+
+        //Act
+        var result = await _userService.UpdateUserPasswordAsync(user.UserId, pwd, newPwd);
+
+        //Arrange
+        result.Should().BePositive();
+        BCrypt.Net.BCrypt.Verify(newPwd, user.Password).Should().BeTrue();
+    }
+
+    [Fact]
+    public async void GetUserGETByIdAsync_ShouldReturnUserGET_WhenUserWithSuchIdExists()
+    {
+        // Arrange
+        var user = UserFactory.Create();
+        await _context.Users.AddAsync(user);
+        await _context.SaveChangesAsync();
+        var userGet = UserFactory.CreateGet(user);
+        // Act
+        var result = await _userService.GetUserGETByIdAsync(user.UserId);
+
+        // Assert
+        result.Should().BeEquivalentTo(userGet);
+    }
+
 }

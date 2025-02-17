@@ -207,7 +207,7 @@ public class ProjectControllerTests
         //Act
         var response = await _projectController.DeleteProjectByIdAsync(projectId);
         //Assert
-        response.Should().BeOfType<OkObjectResult>().Which.Value.Should().Be($"Affected rows: {linesAffected}");
+        response.Should().BeOfType<OkObjectResult>().Which.Value.Should().BeEquivalentTo(new { Message = "Project deleted successfully", AffectedRows = linesAffected });
     }
 
     [Theory]

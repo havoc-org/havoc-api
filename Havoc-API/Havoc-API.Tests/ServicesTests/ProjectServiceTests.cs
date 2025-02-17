@@ -432,4 +432,25 @@ public class ProjectServiceTests
         await creation.Should().ThrowAsync<NotFoundException>("Creator not found");
         _context.ProjectStatuses.Should().BeEmpty();
     }
+
+    [Fact]
+    public async void GetProjectByIdAsync_ShouldRetunrProjectGet_WhenProjectWithIdExists()
+    {
+        //Arrange 
+        var user1 = UserFactory.Create("test@test.com");
+        await _context.Users.AddRangeAsync(user1);
+
+        var project = ProjectFactory.Create(user1);
+        await _context.Projects.AddAsync(project);
+
+        await _context.SaveChangesAsync();
+
+        var projectGet = ProjectFactory.CreateGet(project);
+        projectGet.InviteCode = project.GenerateInviteCode();
+        //Act
+        var result = await _projectService.GetProjectByIdAsync(project.ProjectId);
+
+        //Arrange
+        result.Should().BeEquivalentTo(projectGet);
+    }
 }
