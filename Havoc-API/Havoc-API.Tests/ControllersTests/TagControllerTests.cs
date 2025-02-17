@@ -108,6 +108,6 @@ public class TagControllerTests
         // Act
         var result = await _tagController.DeleteTagFromTaskAsync(taskId, tagId, projectId);
         // Assert
-        result.Should().BeOfType<NoContentResult>();
+        result.Should().BeOfType<OkObjectResult>();
     }
 }
