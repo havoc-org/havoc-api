@@ -48,7 +48,7 @@ public class TagController : ControllerBase
 
     }
 
-    [HttpDelete]
+    [HttpDelete("{tagId}")]
     public async Task<IActionResult> DeleteTagFromTaskAsync( int taskId, int tagId, int projectId)
     {
             var role =
@@ -57,7 +57,7 @@ public class TagController : ControllerBase
 
         if (!role.CanEditTask())
             return Unauthorized("You have no permission to edit task");
-        await _tagService.DeleteTagFromTaskAsync(tagId, taskId);
-        return NoContent();
+        var result = await _tagService.DeleteTagFromTaskAsync(tagId, taskId);
+        return Ok(new { result });
     }
 }
