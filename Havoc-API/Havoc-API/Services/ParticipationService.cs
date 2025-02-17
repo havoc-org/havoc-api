@@ -22,25 +22,18 @@ namespace Havoc_API.Services
         {
             try
             {
-                var role = await _havocContext.Roles.Where(r => r.Name.Equals(participation.Role)).FirstOrDefaultAsync();
-                if (role == null)
-                    throw new NotFoundException("Cannot find Role: " + participation.Role);
+                var role = await _havocContext.Roles.Where(r => r.Name.Equals(participation.Role)).FirstOrDefaultAsync() 
+                ?? throw new NotFoundException("Cannot find Role: " + participation.Role);
 
-                var user = await _havocContext.Users.FirstOrDefaultAsync(us => us.Email.Equals(participation.Email));
-                if (user == null)
-                {
-                    // i'm going to cut somebody balls 
-                    // return false;   // change when need to implement if there is no participant in database
+                var user = await _havocContext.Users.FirstOrDefaultAsync(us => us.Email.Equals(participation.Email)) 
+                ?? throw new NotFoundException("User not found");
 
-                    throw new Exception("User not found");
-                }
                 var existingParticipation = await _havocContext.Participations.FindAsync(participation.ProjectId, user.UserId);
                 if (existingParticipation != null)
-                    throw new Exception("This participation already exists userID: " + existingParticipation.UserId + " projectID: " + existingParticipation.ProjectId);
-                var project = await _havocContext.Projects.FindAsync(participation.ProjectId);
-                if (project == null)
-                    throw new Exception("Project not found");
+                    throw new InvalidOperationException("This participation already exists userID: " + existingParticipation.UserId + " projectID: " + existingParticipation.ProjectId);
 
+                var project = await _havocContext.Projects.FindAsync(participation.ProjectId) 
+                ?? throw new NotFoundException("Project not found");
                 await _havocContext.Participations.AddAsync(new Participation(
                     project,
                     role,
@@ -95,10 +88,8 @@ namespace Havoc_API.Services
                 if (participation == null)
                     throw new NotFoundException("Participation not found");
 
-                var role = await _havocContext.Roles.FirstOrDefaultAsync(r => r.Name == parsedRole);
-                if (role == null)
-                    throw new NotFoundException("Role not found");
-
+                var role = await _havocContext.Roles.FirstOrDefaultAsync(r => r.Name == parsedRole) 
+                ?? throw new NotFoundException("Role not found");
                 participation.updateParticipationRole(role);
                 await _havocContext.SaveChangesAsync();
 
@@ -133,12 +124,8 @@ namespace Havoc_API.Services
             {
                 var participation = await _havocContext.Participations
                         .Include(a => a.User)
-                        .FirstOrDefaultAsync(a => a.UserId == userId && a.ProjectId == projectId);
-
-                if (participation == null)
-                {
-                    throw new NotFoundException($"Participation for UserId={userId}, ProjectId={projectId} doesn't exist.");
-                }
+                        .FirstOrDefaultAsync(a => a.UserId == userId && a.ProjectId == projectId) 
+                        ?? throw new NotFoundException($"Participation for UserId={userId}, ProjectId={projectId} doesn't exist.");
                 _havocContext.Participations.Remove(participation);
                 return await _havocContext.SaveChangesAsync();
             }

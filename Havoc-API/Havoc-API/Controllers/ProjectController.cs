@@ -66,15 +66,15 @@ namespace Havoc_API.Controllers
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(new { ex.Message });
             }
             catch (DbUpdateException ex)
             {
-                return StatusCode(500, ex);
+                return StatusCode(500, new { ex.Message });
             }
             catch (SqlException ex)
             {
-                return StatusCode(500, ex);
+                return StatusCode(500, new { ex.Message });
             }
         }
 
@@ -104,7 +104,7 @@ namespace Havoc_API.Controllers
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(new { ex.Message });
             }
             catch (DataAccessException ex)
             {
@@ -127,7 +127,7 @@ namespace Havoc_API.Controllers
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(new { ex.Message });
             }
             catch (DataAccessException ex)
             {
