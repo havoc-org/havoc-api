@@ -56,7 +56,7 @@ public class TagController : ControllerBase
         .GetUserRoleInProjectAsync(_userService.GetUserId(Request), projectId);
 
         if (!role.CanEditTask())
-            return Unauthorized("You have no permission to edit task");
+            return Unauthorized("You have no permission to edit taôsk");
         var result = await _tagService.DeleteTagFromTaskAsync(tagId, taskId);
         return Ok(new { result });
     }
