@@ -1,11 +1,8 @@
 -- Created by Vertabelo (http://vertabelo.com)
--- Last modification date: 2024-10-27 17:59:47.511
+-- Last modification date: 2025-02-12 02:10:40.782
 
 -- tables
 -- Table: Assignment
-CREATE DATABASE havoc;
-use havoc;
-
 CREATE TABLE Assignment (
     UserId int  NOT NULL,
     TaskId int  NOT NULL,
@@ -91,7 +88,7 @@ CREATE TABLE Task (
 
 -- Table: TaskStatus
 CREATE TABLE TaskStatus (
-    TaskStatusId int  NOT NULL IDENTITY,
+    TaskStatusId int  NOT NULL,
     Name varchar(20)  NOT NULL CHECK (LEN(LTRIM(RTRIM(Name))) > 0),
     CONSTRAINT TaskStatus_pk PRIMARY KEY  (TaskStatusId)
 );
@@ -111,6 +108,7 @@ CREATE TABLE "User" (
     Email varchar(100)  NOT NULL CHECK (Email LIKE '%_@_%._%'),
     Password varchar(128)  NOT NULL,
     Avatar varbinary(max)  NULL,
+    CONSTRAINT UQ_User_Email UNIQUE (Email),
     CONSTRAINT User_pk PRIMARY KEY  (UserId)
 );
 
@@ -118,7 +116,8 @@ CREATE TABLE "User" (
 -- Reference: Assignment_Task (table: Assignment)
 ALTER TABLE Assignment ADD CONSTRAINT Assignment_Task
     FOREIGN KEY (TaskId)
-    REFERENCES Task (TaskId);
+    REFERENCES Task (TaskId)
+    ON DELETE  CASCADE;
 
 -- Reference: Assingment_User (table: Assignment)
 ALTER TABLE Assignment ADD CONSTRAINT Assingment_User
@@ -128,7 +127,8 @@ ALTER TABLE Assignment ADD CONSTRAINT Assingment_User
 -- Reference: Attachment_Task (table: Attachment)
 ALTER TABLE Attachment ADD CONSTRAINT Attachment_Task
     FOREIGN KEY (TaskId)
-    REFERENCES Task (TaskId);
+    REFERENCES Task (TaskId)
+    ON DELETE  CASCADE;
 
 -- Reference: Attachment_User (table: Attachment)
 ALTER TABLE Attachment ADD CONSTRAINT Attachment_User
@@ -138,7 +138,8 @@ ALTER TABLE Attachment ADD CONSTRAINT Attachment_User
 -- Reference: Comment_Task (table: Comment)
 ALTER TABLE Comment ADD CONSTRAINT Comment_Task
     FOREIGN KEY (TaskId)
-    REFERENCES Task (TaskId);
+    REFERENCES Task (TaskId)
+    ON DELETE  CASCADE;
 
 -- Reference: Comment_User (table: Comment)
 ALTER TABLE Comment ADD CONSTRAINT Comment_User
@@ -148,7 +149,8 @@ ALTER TABLE Comment ADD CONSTRAINT Comment_User
 -- Reference: Participation_Project (table: Participation)
 ALTER TABLE Participation ADD CONSTRAINT Participation_Project
     FOREIGN KEY (ProjectId)
-    REFERENCES Project (ProjectId);
+    REFERENCES Project (ProjectId)
+    ON DELETE  CASCADE;
 
 -- Reference: Participation_Role (table: Participation)
 ALTER TABLE Participation ADD CONSTRAINT Participation_Role
@@ -173,7 +175,8 @@ ALTER TABLE Project ADD CONSTRAINT Project_User
 -- Reference: Task_Project (table: Task)
 ALTER TABLE Task ADD CONSTRAINT Task_Project
     FOREIGN KEY (ProjectId)
-    REFERENCES Project (ProjectId);
+    REFERENCES Project (ProjectId)
+    ON DELETE  CASCADE;
 
 -- Reference: Task_TaskStatus (table: Task)
 ALTER TABLE Task ADD CONSTRAINT Task_TaskStatus
@@ -193,7 +196,8 @@ ALTER TABLE TaskTag ADD CONSTRAINT Type_Tag
 -- Reference: Type_Task (table: TaskTag)
 ALTER TABLE TaskTag ADD CONSTRAINT Type_Task
     FOREIGN KEY (TaskId)
-    REFERENCES Task (TaskId);
+    REFERENCES Task (TaskId)
+    ON DELETE  CASCADE;
 
 -- End of file.
 
